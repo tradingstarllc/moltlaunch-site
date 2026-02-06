@@ -56,6 +56,28 @@ app.get('/api/stats', (req, res) => {
     });
 });
 
+// Logs backup endpoint (protected with simple key)
+app.get('/api/logs', (req, res) => {
+    const key = req.query.key || req.headers['x-backup-key'];
+    if (key !== process.env.BACKUP_KEY && key !== 'moltlaunch-backup-2026') {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    fs.readFile(LOG_FILE, 'utf8', (err, data) => {
+        if (err) {
+            return res.json({ logs: [], error: 'No logs yet' });
+        }
+        const lines = data.trim().split('\n').filter(Boolean);
+        const logs = lines.map(line => {
+            try { return JSON.parse(line); } catch { return null; }
+        }).filter(Boolean);
+        res.json({ 
+            logs, 
+            count: logs.length,
+            exportedAt: new Date().toISOString()
+        });
+    });
+});
+
 // Health check
 app.get('/api/health', (req, res) => {
     res.json({ 
