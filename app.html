@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoltLaunch - Launch App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0A0E17;
+            --bg-surface: #131B2E;
+            --bg-elevated: #1A2337;
+            --accent-cyan: #00D1FF;
+            --accent-purple: #8B5CF6;
+            --accent-green: #10B981;
+            --accent-amber: #F59E0B;
+            --accent-red: #EF4444;
+            --text-primary: #FFFFFF;
+            --text-secondary: #94A3B8;
+            --text-muted: #64748B;
+            --gradient-main: linear-gradient(135deg, #00D1FF 0%, #8B5CF6 100%);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; }
+        h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; }
+        
+        /* Header */
+        .header { background: var(--bg-surface); border-bottom: 1px solid rgba(255,255,255,0.1); padding: 15px 0; position: sticky; top: 0; z-index: 100; }
+        .header-inner { max-width: 1400px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-family: 'Space Grotesk'; font-size: 1.5rem; font-weight: 700; background: var(--gradient-main); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+        .nav-tabs { display: flex; gap: 30px; }
+        .nav-tabs a { color: var(--text-secondary); text-decoration: none; padding: 8px 0; border-bottom: 2px solid transparent; transition: all 0.3s; }
+        .nav-tabs a.active, .nav-tabs a:hover { color: var(--accent-cyan); border-bottom-color: var(--accent-cyan); }
+        .wallet-btn { background: var(--gradient-main); color: var(--bg-primary); padding: 10px 20px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .wallet-btn.connected { background: var(--bg-elevated); color: var(--accent-green); border: 1px solid var(--accent-green); }
+        
+        /* Main Layout */
+        .main { max-width: 1400px; margin: 0 auto; padding: 30px 20px; }
+        .page-header { margin-bottom: 30px; }
+        .page-header h1 { font-size: 2rem; margin-bottom: 10px; }
+        .page-header p { color: var(--text-secondary); }
+        
+        /* Stats Bar */
+        .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: var(--bg-surface); border-radius: 12px; padding: 20px; text-align: center; }
+        .stat-value { font-family: 'Space Grotesk'; font-size: 1.8rem; font-weight: 700; color: var(--accent-cyan); }
+        .stat-label { font-size: 0.85rem; color: var(--text-muted); margin-top: 5px; }
+        
+        /* Filter Tabs */
+        .filter-tabs { display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; }
+        .filter-tab { background: var(--bg-surface); border: 1px solid rgba(255,255,255,0.1); padding: 8px 20px; border-radius: 20px; color: var(--text-secondary); cursor: pointer; transition: all 0.3s; }
+        .filter-tab:hover, .filter-tab.active { background: var(--accent-cyan); color: var(--bg-primary); border-color: var(--accent-cyan); }
+        
+        /* Launch Grid */
+        .launches-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 25px; }
+        
+        /* Launch Card */
+        .launch-card { background: var(--bg-surface); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden; transition: all 0.3s; }
+        .launch-card:hover { border-color: var(--accent-cyan); transform: translateY(-3px); }
+        .launch-card.featured { border-color: var(--accent-purple); }
+        .launch-card.featured::before { content: '⭐ FEATURED'; position: absolute; top: 15px; right: 15px; background: var(--accent-purple); color: white; padding: 4px 10px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
+        .card-header { padding: 20px; position: relative; }
+        .card-status { position: absolute; top: 20px; right: 20px; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .card-status.live { background: rgba(16, 185, 129, 0.2); color: var(--accent-green); }
+        .card-status.upcoming { background: rgba(245, 158, 11, 0.2); color: var(--accent-amber); }
+        .card-status.ended { background: rgba(100, 116, 139, 0.2); color: var(--text-muted); }
+        .agent-info { display: flex; align-items: center; gap: 15px; }
+        .agent-icon { width: 60px; height: 60px; background: var(--gradient-main); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
+        .agent-details h3 { font-size: 1.2rem; margin-bottom: 4px; }
+        .agent-details .symbol { color: var(--accent-cyan); font-family: 'JetBrains Mono'; font-size: 0.9rem; }
+        .verification-badge { display: inline-flex; align-items: center; gap: 5px; background: rgba(16, 185, 129, 0.2); color: var(--accent-green); padding: 3px 10px; border-radius: 4px; font-size: 0.75rem; margin-top: 8px; }
+        .card-body { padding: 0 20px 20px; }
+        .description { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 15px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .tags { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
+        .tag { background: rgba(139, 92, 246, 0.2); color: var(--accent-purple); padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; }
+        .progress-section { margin-bottom: 15px; }
+        .progress-header { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px; }
+        .progress-header .raised { color: var(--accent-cyan); font-weight: 600; }
+        .progress-bar { height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--gradient-main); border-radius: 10px; transition: width 0.5s; }
+        .progress-footer { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; }
+        .card-footer { display: flex; gap: 10px; padding: 15px 20px; background: var(--bg-elevated); border-top: 1px solid rgba(255,255,255,0.05); }
+        .btn { flex: 1; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; transition: all 0.3s; text-align: center; text-decoration: none; }
+        .btn-primary { background: var(--gradient-main); color: var(--bg-primary); }
+        .btn-primary:hover { opacity: 0.9; transform: scale(1.02); }
+        .btn-secondary { background: transparent; border: 1px solid var(--accent-cyan); color: var(--accent-cyan); }
+        .btn-secondary:hover { background: rgba(0, 209, 255, 0.1); }
+        
+        /* Countdown */
+        .countdown { display: flex; gap: 8px; margin-top: 10px; }
+        .countdown-unit { background: var(--bg-primary); padding: 8px 12px; border-radius: 6px; text-align: center; min-width: 50px; }
+        .countdown-value { font-family: 'JetBrains Mono'; font-size: 1.1rem; font-weight: 700; color: var(--accent-cyan); }
+        .countdown-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; }
+        
+        /* Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: var(--bg-surface); border-radius: 20px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; }
+        .modal-header { padding: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h2 { font-size: 1.5rem; }
+        .modal-close { background: none; border: none; color: var(--text-secondary); font-size: 1.5rem; cursor: pointer; }
+        .modal-body { padding: 25px; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 8px; color: var(--text-secondary); font-size: 0.9rem; }
+        .input-group input { width: 100%; background: var(--bg-primary); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px 15px; color: var(--text-primary); font-size: 1rem; }
+        .input-group input:focus { outline: none; border-color: var(--accent-cyan); }
+        .input-row { display: flex; gap: 15px; }
+        .input-row .input-group { flex: 1; }
+        .price-preview { background: var(--bg-elevated); border-radius: 10px; padding: 15px; margin-bottom: 20px; }
+        .price-row { display: flex; justify-content: space-between; padding: 8px 0; }
+        .price-row:not(:last-child) { border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .price-row .label { color: var(--text-secondary); }
+        .price-row .value { font-family: 'JetBrains Mono'; font-weight: 600; }
+        .modal-footer { padding: 20px 25px; border-top: 1px solid rgba(255,255,255,0.1); }
+        
+        /* Empty State */
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-secondary); }
+        .empty-state .icon { font-size: 4rem; margin-bottom: 20px; }
+        
+        @media (max-width: 768px) {
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+            .launches-grid { grid-template-columns: 1fr; }
+            .nav-tabs { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="/" class="logo">⚡ MoltLaunch</a>
+            <nav class="nav-tabs">
+                <a href="#" class="active">Active Launches</a>
+                <a href="#">Upcoming</a>
+                <a href="#">Completed</a>
+                <a href="#">My Portfolio</a>
+            </nav>
+            <button class="wallet-btn" id="walletBtn" onclick="connectWallet()">
+                <span>🔗</span> Connect Wallet
+            </button>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="page-header">
+            <h1>🚀 Active Launches</h1>
+            <p>Invest in verified AI agents through fair bonding curve token sales</p>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-value" id="totalRaised">0 SOL</div>
+                <div class="stat-label">Total Raised</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="activeLaunches">0</div>
+                <div class="stat-label">Active Launches</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalInvestors">0</div>
+                <div class="stat-label">Total Investors</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avgReturn">+0%</div>
+                <div class="stat-label">Avg Return</div>
+            </div>
+        </div>
+
+        <div class="filter-tabs">
+            <div class="filter-tab active" onclick="filterLaunches('all')">All</div>
+            <div class="filter-tab" onclick="filterLaunches('live')">🟢 Live</div>
+            <div class="filter-tab" onclick="filterLaunches('upcoming')">🟡 Upcoming</div>
+            <div class="filter-tab" onclick="filterLaunches('trading')">Trading</div>
+            <div class="filter-tab" onclick="filterLaunches('defi')">DeFi</div>
+            <div class="filter-tab" onclick="filterLaunches('ai')">AI</div>
+        </div>
+
+        <div class="launches-grid" id="launchesGrid">
+            <!-- Launches will be inserted here -->
+        </div>
+    </main>
+
+    <!-- Buy Modal -->
+    <div class="modal-overlay" id="buyModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Buy <span id="modalTokenSymbol">TBP</span></h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="agent-info" style="margin-bottom: 20px;">
+                    <div class="agent-icon" id="modalAgentIcon">🤖</div>
+                    <div class="agent-details">
+                        <h3 id="modalAgentName">TradingBot Pro</h3>
+                        <div class="verification-badge">✓ Verified Agent</div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label>Amount (SOL)</label>
+                    <input type="number" id="solAmount" placeholder="0.0" step="0.1" min="0.1" value="1" oninput="updatePricePreview()">
+                </div>
+
+                <div class="price-preview">
+                    <div class="price-row">
+                        <span class="label">Current Price</span>
+                        <span class="value" id="currentPrice">0.00001 SOL</span>
+                    </div>
+                    <div class="price-row">
+                        <span class="label">You Receive</span>
+                        <span class="value" id="tokensReceived">0 TBP</span>
+                    </div>
+                    <div class="price-row">
+                        <span class="label">Price Impact</span>
+                        <span class="value" style="color: var(--accent-amber);" id="priceImpact">~0.5%</span>
+                    </div>
+                    <div class="price-row">
+                        <span class="label">New Price After</span>
+                        <span class="value" id="newPrice">0.000011 SOL</span>
+                    </div>
+                </div>
+
+                <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid var(--accent-amber); border-radius: 8px; padding: 12px; margin-bottom: 15px;">
+                    <p style="color: var(--accent-amber); font-size: 0.85rem;">
+                        ⚠️ Bonding curve pricing: Earlier buyers get lower prices. Price increases with each purchase.
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" style="width: 100%;" onclick="executeBuy()">
+                    Buy Tokens
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample launch data
+        const launches = [
+            {
+                id: 1,
+                name: 'TradingBot Pro',
+                symbol: 'TBP',
+                icon: '🤖',
+                description: 'Autonomous trading agent with proven alpha generation. Executes perpetual futures strategies on Jupiter.',
+                status: 'live',
+                verified: true,
+                verificationLevel: 'verified',
+                tags: ['trading', 'defi', 'ai'],
+                targetRaise: 1000,
+                currentRaise: 730,
+                investors: 127,
+                bondingCurve: 'exponential',
+                currentPrice: 0.00001,
+                endsIn: { days: 2, hours: 14, mins: 37 },
+                featured: true
+            },
+            {
+                id: 2,
+                name: 'AnalyticsAgent',
+                symbol: 'ANA',
+                icon: '📊',
+                description: 'On-chain analytics and market intelligence. Provides real-time signals for DeFi protocols.',
+                status: 'live',
+                verified: true,
+                verificationLevel: 'basic',
+                tags: ['analytics', 'defi'],
+                targetRaise: 500,
+                currentRaise: 285,
+                investors: 64,
+                bondingCurve: 'linear',
+                currentPrice: 0.000008,
+                endsIn: { days: 4, hours: 8, mins: 22 }
+            },
+            {
+                id: 3,
+                name: 'YieldOptimizer',
+                symbol: 'YIELD',
+                icon: '💰',
+                description: 'Autonomous yield farming agent. Optimizes across Kamino, Marinade, and Sanctum for maximum APY.',
+                status: 'live',
+                verified: true,
+                verificationLevel: 'audited',
+                tags: ['defi', 'yield'],
+                targetRaise: 2000,
+                currentRaise: 1450,
+                investors: 203,
+                bondingCurve: 'sigmoid',
+                currentPrice: 0.000015,
+                endsIn: { days: 1, hours: 5, mins: 44 }
+            },
+            {
+                id: 4,
+                name: 'SocialSentinel',
+                symbol: 'SENT',
+                icon: '🛡️',
+                description: 'Social media monitoring and sentiment analysis agent for crypto narratives.',
+                status: 'upcoming',
+                verified: true,
+                verificationLevel: 'verified',
+                tags: ['ai', 'social'],
+                targetRaise: 750,
+                currentRaise: 0,
+                investors: 0,
+                bondingCurve: 'linear',
+                currentPrice: 0.000005,
+                startsIn: { days: 1, hours: 12, mins: 0 }
+            },
+            {
+                id: 5,
+                name: 'NFTScout',
+                symbol: 'SCOUT',
+                icon: '🔍',
+                description: 'Discovers undervalued NFT collections using on-chain behavioral analysis.',
+                status: 'live',
+                verified: false,
+                verificationLevel: 'pending',
+                tags: ['nft', 'ai'],
+                targetRaise: 300,
+                currentRaise: 89,
+                investors: 31,
+                bondingCurve: 'linear',
+                currentPrice: 0.000006,
+                endsIn: { days: 5, hours: 20, mins: 15 }
+            }
+        ];
+
+        let walletConnected = false;
+        let selectedLaunch = null;
+
+        function renderLaunches(filter = 'all') {
+            const grid = document.getElementById('launchesGrid');
+            let filtered = launches;
+            
+            if (filter !== 'all') {
+                if (filter === 'live' || filter === 'upcoming') {
+                    filtered = launches.filter(l => l.status === filter);
+                } else {
+                    filtered = launches.filter(l => l.tags.includes(filter));
+                }
+            }
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <div class="icon">🔍</div>
+                        <h3>No launches found</h3>
+                        <p>Try a different filter or check back later</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(launch => `
+                <div class="launch-card ${launch.featured ? 'featured' : ''}" style="position: relative;">
+                    <div class="card-header">
+                        <span class="card-status ${launch.status}">${launch.status === 'live' ? '● LIVE' : launch.status === 'upcoming' ? '◐ SOON' : '○ ENDED'}</span>
+                        <div class="agent-info">
+                            <div class="agent-icon">${launch.icon}</div>
+                            <div class="agent-details">
+                                <h3>${launch.name}</h3>
+                                <div class="symbol">$${launch.symbol}</div>
+                                ${launch.verified ? `
+                                    <div class="verification-badge">
+                                        ${launch.verificationLevel === 'audited' ? '🟢' : launch.verificationLevel === 'verified' ? '🔵' : '⚪'} 
+                                        ${launch.verificationLevel.charAt(0).toUpperCase() + launch.verificationLevel.slice(1)}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="description">${launch.description}</p>
+                        <div class="tags">
+                            ${launch.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+                            <span class="tag" style="background: rgba(0,209,255,0.2); color: var(--accent-cyan);">${launch.bondingCurve}</span>
+                        </div>
+                        <div class="progress-section">
+                            <div class="progress-header">
+                                <span class="raised">${launch.currentRaise.toLocaleString()} SOL</span>
+                                <span>${launch.targetRaise.toLocaleString()} SOL goal</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${(launch.currentRaise / launch.targetRaise * 100).toFixed(1)}%"></div>
+                            </div>
+                            <div class="progress-footer">
+                                <span>${(launch.currentRaise / launch.targetRaise * 100).toFixed(1)}% funded</span>
+                                <span>${launch.investors} investors</span>
+                            </div>
+                        </div>
+                        ${launch.status === 'live' ? `
+                            <div class="countdown">
+                                <div class="countdown-unit"><div class="countdown-value">${String(launch.endsIn.days).padStart(2, '0')}</div><div class="countdown-label">Days</div></div>
+                                <div class="countdown-unit"><div class="countdown-value">${String(launch.endsIn.hours).padStart(2, '0')}</div><div class="countdown-label">Hours</div></div>
+                                <div class="countdown-unit"><div class="countdown-value">${String(launch.endsIn.mins).padStart(2, '0')}</div><div class="countdown-label">Mins</div></div>
+                            </div>
+                        ` : launch.status === 'upcoming' ? `
+                            <div style="color: var(--accent-amber); font-size: 0.9rem; margin-top: 10px;">
+                                🕐 Starts in ${launch.startsIn.days}d ${launch.startsIn.hours}h
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="card-footer">
+                        ${launch.status === 'live' ? `
+                            <button class="btn btn-primary" onclick="openBuyModal(${launch.id})">Buy $${launch.symbol}</button>
+                            <a href="#" class="btn btn-secondary">Details</a>
+                        ` : launch.status === 'upcoming' ? `
+                            <button class="btn btn-secondary" style="flex: 1;">🔔 Notify Me</button>
+                        ` : `
+                            <a href="#" class="btn btn-secondary" style="flex: 1;">View Results</a>
+                        `}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateStats() {
+            const totalRaised = launches.reduce((sum, l) => sum + l.currentRaise, 0);
+            const activeLaunches = launches.filter(l => l.status === 'live').length;
+            const totalInvestors = launches.reduce((sum, l) => sum + l.investors, 0);
+            
+            document.getElementById('totalRaised').textContent = totalRaised.toLocaleString() + ' SOL';
+            document.getElementById('activeLaunches').textContent = activeLaunches;
+            document.getElementById('totalInvestors').textContent = totalInvestors.toLocaleString();
+            document.getElementById('avgReturn').textContent = '+47%';
+        }
+
+        function filterLaunches(filter) {
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            renderLaunches(filter);
+        }
+
+        function connectWallet() {
+            const btn = document.getElementById('walletBtn');
+            if (walletConnected) {
+                walletConnected = false;
+                btn.innerHTML = '<span>🔗</span> Connect Wallet';
+                btn.classList.remove('connected');
+            } else {
+                // Simulate wallet connection
+                btn.innerHTML = '<span>⏳</span> Connecting...';
+                setTimeout(() => {
+                    walletConnected = true;
+                    btn.innerHTML = '<span>✓</span> 7xK3...9mNp';
+                    btn.classList.add('connected');
+                }, 1000);
+            }
+        }
+
+        function openBuyModal(launchId) {
+            if (!walletConnected) {
+                alert('Please connect your wallet first');
+                return;
+            }
+            selectedLaunch = launches.find(l => l.id === launchId);
+            document.getElementById('modalTokenSymbol').textContent = selectedLaunch.symbol;
+            document.getElementById('modalAgentName').textContent = selectedLaunch.name;
+            document.getElementById('modalAgentIcon').textContent = selectedLaunch.icon;
+            updatePricePreview();
+            document.getElementById('buyModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('buyModal').classList.remove('active');
+        }
+
+        function updatePricePreview() {
+            if (!selectedLaunch) return;
+            const solAmount = parseFloat(document.getElementById('solAmount').value) || 0;
+            const currentPrice = selectedLaunch.currentPrice;
+            
+            // Bonding curve calculation (simplified)
+            const tokensReceived = Math.floor(solAmount / currentPrice);
+            const priceImpact = (solAmount / selectedLaunch.targetRaise * 100).toFixed(2);
+            const newPrice = currentPrice * (1 + solAmount / selectedLaunch.targetRaise * 0.5);
+            
+            document.getElementById('currentPrice').textContent = currentPrice.toFixed(6) + ' SOL';
+            document.getElementById('tokensReceived').textContent = tokensReceived.toLocaleString() + ' ' + selectedLaunch.symbol;
+            document.getElementById('priceImpact').textContent = '~' + priceImpact + '%';
+            document.getElementById('newPrice').textContent = newPrice.toFixed(6) + ' SOL';
+        }
+
+        function executeBuy() {
+            const solAmount = parseFloat(document.getElementById('solAmount').value) || 0;
+            if (solAmount < 0.1) {
+                alert('Minimum purchase is 0.1 SOL');
+                return;
+            }
+            alert(`Transaction submitted!\n\nBuying ${selectedLaunch.symbol} for ${solAmount} SOL\n\n(This is a demo - real transactions coming soon)`);
+            closeModal();
+        }
+
+        // Initialize
+        renderLaunches();
+        updateStats();
+
+        // Animate countdown
+        setInterval(() => {
+            document.querySelectorAll('.countdown-unit:last-child .countdown-value').forEach(el => {
+                let val = parseInt(el.textContent);
+                val = val > 0 ? val - 1 : 59;
+                el.textContent = String(val).padStart(2, '0');
+            });
+        }, 1000);
+
+        // Close modal on outside click
+        document.getElementById('buyModal').addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) closeModal();
+        });
+    </script>
+</body>
+</html>
