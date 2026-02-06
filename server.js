@@ -141,6 +141,28 @@ app.get('/skill.md', (req, res) => {
     res.sendFile(path.join(__dirname, 'skill.md'));
 });
 
+// PWA manifest
+app.get('/manifest.json', (req, res) => {
+    res.setHeader('Content-Type', 'application/manifest+json');
+    res.sendFile(path.join(__dirname, 'manifest.json'));
+});
+
+// Service worker
+app.get('/sw.js', (req, res) => {
+    res.setHeader('Content-Type', 'application/javascript');
+    res.setHeader('Service-Worker-Allowed', '/');
+    res.sendFile(path.join(__dirname, 'sw.js'));
+});
+
+// Digital Asset Links for TWA
+app.get('/.well-known/assetlinks.json', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.sendFile(path.join(__dirname, '.well-known', 'assetlinks.json'));
+});
+
+// Icons directory
+app.use('/icons', express.static(path.join(__dirname, 'icons')));
+
 // Static files
 app.use(express.static(__dirname));
 
