@@ -1,12 +1,10 @@
-[
-  {
-    "relation": ["delegate_permission/common.handle_all_urls"],
-    "target": {
-      "namespace": "android_app",
-      "package_name": "com.moltlaunch.twa",
-      "sha256_cert_fingerprints": [
-        "PLACEHOLDER:REPLACE_WITH_ACTUAL_SHA256_FINGERPRINT_FROM_KEYSTORE"
-      ]
-    }
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "app.moltlaunch.twa",
+    "sha256_cert_fingerprints": [
+      "47:91:4E:59:42:4F:96:E8:F5:51:9F:BB:09:86:71:30:AA:25:87:69:15:96:17:6A:7E:89:8A:DC:DA:CB:8C:AF"
+    ]
   }
-]
+}]
