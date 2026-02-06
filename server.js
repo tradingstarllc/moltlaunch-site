@@ -173,3 +173,7 @@ app.listen(PORT, () => {
     console.log(`App: http://localhost:${PORT}/app`);
     console.log(`API: http://localhost:${PORT}/api/health`);
 });
+
+app.get('/launch/:id', (req, res) => {
+    res.sendFile(path.join(__dirname, 'launch.html'));
+});
