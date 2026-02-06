@@ -781,6 +781,200 @@
             color: var(--text);
         }
 
+        /* Wallet Button */
+        #wallet-container {
+            position: relative;
+        }
+
+        #wallet-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            color: var(--bg);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-family: inherit;
+        }
+
+        #wallet-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(34, 211, 238, 0.3);
+        }
+
+        #wallet-btn.connected {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        #wallet-btn.connected:hover {
+            border-color: var(--accent);
+            box-shadow: none;
+        }
+
+        .wallet-icon {
+            width: 18px;
+            height: 18px;
+        }
+
+        .wallet-chevron {
+            margin-left: 4px;
+            font-size: 0.7rem;
+            opacity: 0.7;
+        }
+
+        #wallet-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            min-width: 200px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px;
+            z-index: 1000;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        #wallet-dropdown.show {
+            display: block;
+        }
+
+        #wallet-dropdown button {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 12px 14px;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+            text-align: left;
+        }
+
+        #wallet-dropdown button:hover {
+            background: var(--bg-muted);
+            color: var(--text);
+        }
+
+        #wallet-dropdown button.disconnect {
+            color: #ef4444;
+        }
+
+        #wallet-dropdown button.disconnect:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        #wallet-dropdown .dropdown-divider {
+            height: 1px;
+            background: var(--border-subtle);
+            margin: 8px 0;
+        }
+
+        /* Wallet Install Modal */
+        .wallet-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wallet-modal.show {
+            display: flex;
+        }
+
+        .wallet-modal-content {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            max-width: 380px;
+            width: 90%;
+        }
+
+        .wallet-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .wallet-modal-header h3 {
+            font-size: 1.125rem;
+        }
+
+        .wallet-modal-close {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .wallet-modal-close:hover {
+            color: var(--text);
+        }
+
+        .wallet-modal-content > p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .wallet-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .wallet-option {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px;
+            background: var(--bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.15s;
+        }
+
+        .wallet-option:hover {
+            border-color: var(--accent);
+            background: var(--accent-muted);
+        }
+
+        .wallet-option img {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+        }
+
+        .wallet-option span {
+            font-weight: 500;
+        }
+
         /* Responsive */
         @media (max-width: 1024px) {
             .hero-grid { grid-template-columns: 1fr; gap: 48px; }
@@ -818,7 +1012,26 @@
                 <a href="#features">Features</a>
                 <a href="#tokenomics">Token</a>
                 <a href="/skill.md" class="btn-ghost mono">/skill.md</a>
-                <a href="/app" class="btn btn-primary">Launch App</a>
+                <div id="wallet-container">
+                    <button id="wallet-btn" data-connected="false" onclick="WalletManager.handleClick()">
+                        <svg class="wallet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/>
+                            <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/>
+                            <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>
+                        </svg>
+                        <span id="wallet-btn-text">Connect Wallet</span>
+                        <span class="wallet-chevron" style="display: none;">▼</span>
+                    </button>
+                    <div id="wallet-dropdown">
+                        <button class="copy-address" onclick="WalletManager.copyAddress()">
+                            📋 Copy Address
+                        </button>
+                        <div class="dropdown-divider"></div>
+                        <button class="disconnect" onclick="WalletManager.disconnect()">
+                            🚪 Disconnect
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
@@ -1245,5 +1458,8 @@
             });
         }
     </script>
+    
+    <!-- Wallet Connection -->
+    <script src="/wallet.js"></script>
 </body>
 </html>
