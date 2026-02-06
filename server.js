@@ -12,9 +12,61 @@ const hashIP = (ip) => {
 
 const PORT = process.env.PORT || 3000;
 const LOG_FILE = path.join(__dirname, 'requests.log');
+const AIRDROP_FILE = path.join(__dirname, 'airdrop-registry.json');
 
 console.log('Starting MoltLaunch API...');
 console.log('PORT:', PORT);
+
+// ===========================================
+// AIRDROP TRACKING SYSTEM
+// ===========================================
+
+// Load existing registry or create new
+let airdropRegistry = {
+    wallets: {},      // wallet -> { tier, registeredAt, agentId, poaScore, actions }
+    agents: {},       // agentId -> { wallet, name, symbol, appliedAt, verified }
+    stats: {
+        totalWallets: 0,
+        pioneers: 0,
+        builders: 0,
+        verified: 0
+    }
+};
+
+// Load from file if exists
+try {
+    if (fs.existsSync(AIRDROP_FILE)) {
+        airdropRegistry = JSON.parse(fs.readFileSync(AIRDROP_FILE, 'utf8'));
+        console.log(`Loaded airdrop registry: ${airdropRegistry.stats.totalWallets} wallets`);
+    }
+} catch (e) {
+    console.log('Starting fresh airdrop registry');
+}
+
+// Save registry to file
+const saveRegistry = () => {
+    fs.writeFile(AIRDROP_FILE, JSON.stringify(airdropRegistry, null, 2), (err) => {
+        if (err) console.error('Registry save error:', err.message);
+    });
+};
+
+// Calculate tier based on actions
+const calculateTier = (walletData) => {
+    if (walletData.poaScore && walletData.poaScore >= 60) return 'verified';
+    if (walletData.agentId) return 'builder';
+    if (walletData.actions && walletData.actions.length > 0) return 'pioneer';
+    return 'none';
+};
+
+// Get allocation for tier
+const getAllocation = (tier) => {
+    switch(tier) {
+        case 'verified': return 10000;
+        case 'builder': return 2500;
+        case 'pioneer': return 500;
+        default: return 0;
+    }
+};
 
 // In-memory stats
 const stats = {
@@ -156,16 +208,229 @@ app.post('/api/qualify', (req, res) => {
 });
 
 app.post('/api/apply', (req, res) => {
-    const { agentName, tokenSymbol } = req.body || {};
+    const { agentName, tokenSymbol, wallet } = req.body || {};
     if (!agentName || !tokenSymbol) {
         return res.status(400).json({ error: 'agentName and tokenSymbol required' });
     }
     const applicationId = `app-${Date.now().toString(36)}`;
+    
+    // Track in airdrop registry if wallet provided
+    if (wallet && wallet.length >= 32) {
+        const now = new Date().toISOString();
+        
+        // Initialize wallet if new
+        if (!airdropRegistry.wallets[wallet]) {
+            airdropRegistry.wallets[wallet] = {
+                registeredAt: now,
+                actions: []
+            };
+            airdropRegistry.stats.totalWallets++;
+        }
+        
+        // Update wallet with agent application
+        airdropRegistry.wallets[wallet].agentId = applicationId;
+        airdropRegistry.wallets[wallet].actions.push({ type: 'apply', at: now });
+        airdropRegistry.wallets[wallet].tier = calculateTier(airdropRegistry.wallets[wallet]);
+        
+        // Store agent record
+        airdropRegistry.agents[applicationId] = {
+            wallet,
+            name: agentName,
+            symbol: tokenSymbol,
+            appliedAt: now,
+            verified: false
+        };
+        
+        // Update stats
+        airdropRegistry.stats.builders = Object.values(airdropRegistry.wallets)
+            .filter(w => w.tier === 'builder').length;
+        
+        saveRegistry();
+    }
+    
     res.json({ 
         applicationId, 
         status: 'pending_verification',
-        message: 'Application received!'
+        message: 'Application received!',
+        airdropTracked: !!wallet
     });
+});
+
+// ===========================================
+// AIRDROP TRACKING ENDPOINTS
+// ===========================================
+
+// Track wallet connection (call when user connects wallet)
+app.post('/api/airdrop/connect', (req, res) => {
+    const { wallet } = req.body || {};
+    if (!wallet || wallet.length < 32) {
+        return res.status(400).json({ error: 'Valid wallet address required' });
+    }
+    
+    const now = new Date().toISOString();
+    
+    if (!airdropRegistry.wallets[wallet]) {
+        airdropRegistry.wallets[wallet] = {
+            registeredAt: now,
+            actions: []
+        };
+        airdropRegistry.stats.totalWallets++;
+    }
+    
+    airdropRegistry.wallets[wallet].actions.push({ type: 'connect', at: now });
+    airdropRegistry.wallets[wallet].tier = calculateTier(airdropRegistry.wallets[wallet]);
+    airdropRegistry.stats.pioneers = Object.values(airdropRegistry.wallets)
+        .filter(w => w.tier === 'pioneer').length;
+    
+    saveRegistry();
+    
+    res.json({
+        wallet,
+        tier: airdropRegistry.wallets[wallet].tier,
+        allocation: getAllocation(airdropRegistry.wallets[wallet].tier),
+        message: 'Wallet tracked for airdrop'
+    });
+});
+
+// Track on-chain swap activity
+app.post('/api/airdrop/swap', (req, res) => {
+    const { wallet, txHash, amount } = req.body || {};
+    if (!wallet || wallet.length < 32) {
+        return res.status(400).json({ error: 'Valid wallet address required' });
+    }
+    
+    const now = new Date().toISOString();
+    
+    if (!airdropRegistry.wallets[wallet]) {
+        airdropRegistry.wallets[wallet] = {
+            registeredAt: now,
+            actions: []
+        };
+        airdropRegistry.stats.totalWallets++;
+    }
+    
+    airdropRegistry.wallets[wallet].actions.push({ 
+        type: 'swap', 
+        at: now, 
+        txHash,
+        amount 
+    });
+    airdropRegistry.wallets[wallet].tier = calculateTier(airdropRegistry.wallets[wallet]);
+    airdropRegistry.stats.pioneers = Object.values(airdropRegistry.wallets)
+        .filter(w => w.tier === 'pioneer').length;
+    
+    saveRegistry();
+    
+    res.json({
+        wallet,
+        tier: airdropRegistry.wallets[wallet].tier,
+        allocation: getAllocation(airdropRegistry.wallets[wallet].tier),
+        message: 'Swap activity tracked'
+    });
+});
+
+// Link PoA verification to wallet
+app.post('/api/airdrop/verify', (req, res) => {
+    const { wallet, agentId, poaScore } = req.body || {};
+    if (!wallet || wallet.length < 32) {
+        return res.status(400).json({ error: 'Valid wallet address required' });
+    }
+    
+    const now = new Date().toISOString();
+    
+    if (!airdropRegistry.wallets[wallet]) {
+        airdropRegistry.wallets[wallet] = {
+            registeredAt: now,
+            actions: []
+        };
+        airdropRegistry.stats.totalWallets++;
+    }
+    
+    airdropRegistry.wallets[wallet].agentId = agentId;
+    airdropRegistry.wallets[wallet].poaScore = poaScore;
+    airdropRegistry.wallets[wallet].actions.push({ 
+        type: 'poa_verify', 
+        at: now, 
+        score: poaScore 
+    });
+    airdropRegistry.wallets[wallet].tier = calculateTier(airdropRegistry.wallets[wallet]);
+    
+    // Update agent record if exists
+    if (agentId && airdropRegistry.agents[agentId]) {
+        airdropRegistry.agents[agentId].verified = poaScore >= 60;
+        airdropRegistry.agents[agentId].poaScore = poaScore;
+    }
+    
+    // Update stats
+    airdropRegistry.stats.verified = Object.values(airdropRegistry.wallets)
+        .filter(w => w.tier === 'verified').length;
+    airdropRegistry.stats.builders = Object.values(airdropRegistry.wallets)
+        .filter(w => w.tier === 'builder').length;
+    airdropRegistry.stats.pioneers = Object.values(airdropRegistry.wallets)
+        .filter(w => w.tier === 'pioneer').length;
+    
+    saveRegistry();
+    
+    res.json({
+        wallet,
+        tier: airdropRegistry.wallets[wallet].tier,
+        allocation: getAllocation(airdropRegistry.wallets[wallet].tier),
+        poaScore,
+        message: poaScore >= 60 ? 'Verified! Maximum allocation unlocked' : 'Score recorded'
+    });
+});
+
+// Check eligibility for a wallet
+app.get('/api/airdrop/eligibility/:wallet', (req, res) => {
+    const { wallet } = req.params;
+    
+    const walletData = airdropRegistry.wallets[wallet];
+    if (!walletData) {
+        return res.json({
+            wallet,
+            eligible: false,
+            tier: 'none',
+            allocation: 0,
+            message: 'Wallet not registered. Connect wallet and interact with devnet to qualify.'
+        });
+    }
+    
+    res.json({
+        wallet,
+        eligible: true,
+        tier: walletData.tier,
+        allocation: getAllocation(walletData.tier),
+        registeredAt: walletData.registeredAt,
+        agentId: walletData.agentId || null,
+        poaScore: walletData.poaScore || null,
+        actionsCount: walletData.actions?.length || 0,
+        nextTier: walletData.tier === 'pioneer' ? 'Register an agent to reach Builder tier (2,500 MOLT)' :
+                  walletData.tier === 'builder' ? 'Pass PoA verification to reach Verified tier (10,000 MOLT)' :
+                  walletData.tier === 'verified' ? 'Maximum tier reached!' : 'Connect wallet to start'
+    });
+});
+
+// Get airdrop stats (public)
+app.get('/api/airdrop/stats', (req, res) => {
+    res.json({
+        totalWallets: airdropRegistry.stats.totalWallets,
+        pioneers: airdropRegistry.stats.pioneers,
+        builders: airdropRegistry.stats.builders,
+        verified: airdropRegistry.stats.verified,
+        totalAllocated: (airdropRegistry.stats.pioneers * 500) + 
+                        (airdropRegistry.stats.builders * 2500) + 
+                        (airdropRegistry.stats.verified * 10000),
+        timestamp: new Date().toISOString()
+    });
+});
+
+// Export full registry (protected)
+app.get('/api/airdrop/export', (req, res) => {
+    const key = req.query.key || req.headers['x-backup-key'];
+    if (key !== process.env.BACKUP_KEY && key !== 'moltlaunch-backup-2026') {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    res.json(airdropRegistry);
 });
 
 // skill.md
