@@ -999,8 +999,27 @@
             .agent-banner-text { flex-direction: column; }
         }
     </style>
+        /* Scam Warning Banner */
+        .scam-warning {
+            background: linear-gradient(90deg, #dc2626, #991b1b);
+            color: white;
+            padding: 12px 24px;
+            text-align: center;
+            font-size: 0.875rem;
+            font-weight: 500;
+            position: relative;
+            z-index: 200;
+        }
+        .scam-warning strong { color: #fef08a; }
+        .scam-warning a { color: #fef08a; text-decoration: underline; }
+    </style>
 </head>
 <body>
+    <!-- SCAM WARNING BANNER -->
+    <div class="scam-warning">
+        ⚠️ <strong>SCAM ALERT:</strong> The MOLT token has NOT launched yet. Any tokens claiming to be "MOLTLAUNCH" or "MOLT" on pump.fun or elsewhere are <strong>NOT affiliated with us</strong>. Do not buy them.
+    </div>
+    
     <nav>
         <div class="container nav-inner">
             <a href="/" class="logo">
