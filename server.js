@@ -1,7 +1,14 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 const app = express();
+
+// Hash IP for privacy
+const hashIP = (ip) => {
+    if (!ip) return 'unknown';
+    return crypto.createHash('sha256').update(ip + 'moltlaunch-salt').digest('hex').substring(0, 12);
+};
 
 const PORT = process.env.PORT || 3000;
 const LOG_FILE = path.join(__dirname, 'requests.log');
@@ -19,11 +26,12 @@ const stats = {
 
 // Request logging middleware
 app.use((req, res, next) => {
+    const rawIP = req.headers['x-forwarded-for']?.split(',')[0] || req.ip;
     const entry = {
         timestamp: new Date().toISOString(),
         method: req.method,
         path: req.path,
-        ip: req.headers['x-forwarded-for'] || req.ip,
+        ipHash: hashIP(rawIP),
         userAgent: req.headers['user-agent']?.substring(0, 100)
     };
     
