@@ -1,22 +1,68 @@
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const app = express();
 
 const PORT = process.env.PORT || 3000;
+const LOG_FILE = path.join(__dirname, 'requests.log');
 
 console.log('Starting MoltLaunch API...');
 console.log('PORT:', PORT);
-console.log('__dirname:', __dirname);
+
+// In-memory stats
+const stats = {
+    startedAt: new Date().toISOString(),
+    totalRequests: 0,
+    endpoints: {},
+    lastRequests: []
+};
+
+// Request logging middleware
+app.use((req, res, next) => {
+    const entry = {
+        timestamp: new Date().toISOString(),
+        method: req.method,
+        path: req.path,
+        ip: req.headers['x-forwarded-for'] || req.ip,
+        userAgent: req.headers['user-agent']?.substring(0, 100)
+    };
+    
+    // Update in-memory stats
+    stats.totalRequests++;
+    const key = `${req.method} ${req.path}`;
+    stats.endpoints[key] = (stats.endpoints[key] || 0) + 1;
+    
+    // Keep last 50 requests in memory
+    stats.lastRequests.unshift(entry);
+    if (stats.lastRequests.length > 50) stats.lastRequests.pop();
+    
+    // Append to log file (async, don't block)
+    fs.appendFile(LOG_FILE, JSON.stringify(entry) + '\n', (err) => {
+        if (err) console.error('Log write error:', err.message);
+    });
+    
+    next();
+});
 
 app.use(express.json());
 
-// Health check - FIRST
+// Stats endpoint
+app.get('/api/stats', (req, res) => {
+    const uptime = Math.floor((Date.now() - new Date(stats.startedAt).getTime()) / 1000);
+    res.json({
+        ...stats,
+        uptimeSeconds: uptime,
+        uptimeFormatted: `${Math.floor(uptime/3600)}h ${Math.floor((uptime%3600)/60)}m ${uptime%60}s`
+    });
+});
+
+// Health check
 app.get('/api/health', (req, res) => {
-    console.log('Health check hit');
     res.json({ 
         status: 'ok', 
         name: 'MoltLaunch API',
-        version: '2.1.0',
+        version: '2.2.0',
+        totalRequests: stats.totalRequests,
         timestamp: new Date().toISOString()
     });
 });
@@ -80,5 +126,6 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`MoltLaunch API running on 0.0.0.0:${PORT}`);
+    console.log(`MoltLaunch API v2.2.0 running on 0.0.0.0:${PORT}`);
+    console.log(`Stats: /api/stats | Logs: ${LOG_FILE}`);
 });
