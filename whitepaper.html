@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoltLaunch Whitepaper - AI Agent Launchpad</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0A0E17;
+            --bg-surface: #131B2E;
+            --accent-cyan: #00D1FF;
+            --accent-purple: #8B5CF6;
+            --accent-green: #10B981;
+            --text-primary: #FFFFFF;
+            --text-secondary: #94A3B8;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.8;
+        }
+        .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; margin: 40px 0 20px; }
+        h1 { font-size: 3rem; text-align: center; background: linear-gradient(90deg, #00D1FF, #8B5CF6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        h2 { font-size: 2rem; color: var(--accent-cyan); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+        h3 { font-size: 1.4rem; color: var(--accent-purple); }
+        p { color: var(--text-secondary); margin-bottom: 20px; }
+        ul, ol { color: var(--text-secondary); margin: 20px 0; padding-left: 30px; }
+        li { margin-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 12px; text-align: left; border: 1px solid rgba(255,255,255,0.1); }
+        th { background: var(--bg-surface); color: var(--accent-cyan); }
+        td { color: var(--text-secondary); }
+        code { font-family: 'JetBrains Mono', monospace; background: var(--bg-surface); padding: 2px 8px; border-radius: 4px; }
+        pre { background: var(--bg-surface); padding: 20px; border-radius: 10px; overflow-x: auto; margin: 20px 0; }
+        .header { text-align: center; padding: 60px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .header .version { color: var(--accent-purple); font-size: 0.9rem; }
+        .toc { background: var(--bg-surface); padding: 30px; border-radius: 10px; margin: 40px 0; }
+        .toc h3 { margin-top: 0; }
+        .toc a { color: var(--accent-cyan); text-decoration: none; display: block; padding: 8px 0; }
+        .toc a:hover { text-decoration: underline; }
+        .highlight { background: rgba(0, 209, 255, 0.1); border-left: 3px solid var(--accent-cyan); padding: 20px; margin: 20px 0; border-radius: 0 10px 10px 0; }
+        .back-link { display: inline-block; color: var(--accent-cyan); text-decoration: none; margin-bottom: 20px; }
+        .diagram { background: var(--bg-surface); padding: 20px; border-radius: 10px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; white-space: pre; overflow-x: auto; color: var(--text-secondary); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← Back to Home</a>
+        
+        <div class="header">
+            <h1>MoltLaunch Whitepaper</h1>
+            <p class="version">Version 1.0 | February 2026</p>
+            <p>The First Curated Launchpad for AI Agents on Solana</p>
+        </div>
+
+        <div class="toc">
+            <h3>Table of Contents</h3>
+            <a href="#summary">1. Executive Summary</a>
+            <a href="#problem">2. Problem Statement</a>
+            <a href="#solution">3. Solution</a>
+            <a href="#revenue">4. Revenue Model</a>
+            <a href="#tokenomics">5. Tokenomics</a>
+            <a href="#roadmap">6. Roadmap</a>
+            <a href="#team">7. Team</a>
+            <a href="#legal">8. Legal & Regulatory</a>
+        </div>
+
+        <h2 id="summary">1. Executive Summary</h2>
+        <p><strong>MoltLaunch</strong> is the first dedicated launchpad platform for AI agent projects built on Solana. As autonomous AI agents proliferate across DeFi, trading, content creation, and on-chain operations, a critical infrastructure gap has emerged: <strong>there is no dedicated funding mechanism for AI agent projects</strong>.</p>
+        
+        <div class="highlight">
+            <strong>Our Mission:</strong> Become the definitive funding platform where the next generation of autonomous AI agents are born.
+        </div>
+
+        <p>Traditional launchpads focus on tokens, NFTs, or general DeFi protocols. AI agents represent a fundamentally new category—autonomous software entities that require initial capital for:</p>
+        <ul>
+            <li>Compute infrastructure</li>
+            <li>Model fine-tuning and training</li>
+            <li>Wallet seeding and operational capital</li>
+            <li>Community building and marketing</li>
+        </ul>
+
+        <h2 id="problem">2. Problem Statement</h2>
+        <h3>2.1 The AI Agent Explosion</h3>
+        <p>By 2026, thousands of AI agents operate on-chain, managing billions in assets across trading, DeFi, social media, and infrastructure.</p>
+
+        <h3>2.2 The Funding Gap</h3>
+        <table>
+            <tr><th>Challenge</th><th>Description</th></tr>
+            <tr><td>No Dedicated Platform</td><td>Existing launchpads focus on traditional tokens—not AI-specific needs</td></tr>
+            <tr><td>Technical Complexity</td><td>Investors lack tools to evaluate AI agent capabilities</td></tr>
+            <tr><td>Operational Costs</td><td>AI agents require compute, API access, and wallet capital before generating revenue</td></tr>
+            <tr><td>Trust Deficit</td><td>Anonymous teams, unverifiable claims, and rug-pull risks plague the space</td></tr>
+            <tr><td>Fragmented Discovery</td><td>Projects launch across Twitter, Discord, Telegram with no central venue</td></tr>
+        </table>
+
+        <h3>2.3 Market Opportunity</h3>
+        <ul>
+            <li><strong>2025 AI agent token launches:</strong> $2B+ in cumulative raises</li>
+            <li><strong>Average funding need per project:</strong> $100K - $2M</li>
+            <li><strong>Failure rate without proper funding:</strong> >80%</li>
+        </ul>
+
+        <h2 id="solution">3. Solution</h2>
+        <h3>3.1 Platform Overview</h3>
+        <p>MoltLaunch is a <strong>curated launchpad</strong> specifically designed for AI agent projects on Solana.</p>
+
+        <div class="diagram">
+┌─────────────────────────────────────────────────────────────────┐
+│                        MOLTLAUNCH PLATFORM                       │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│   ┌──────────────┐    ┌──────────────┐    ┌──────────────┐     │
+│   │   PROJECT    │───▶│   CURATION   │───▶│    LAUNCH    │     │
+│   │  SUBMISSION  │    │   & REVIEW   │    │   CAMPAIGN   │     │
+│   └──────────────┘    └──────────────┘    └──────────────┘     │
+│                                                  │               │
+│                                                  ▼               │
+│   ┌──────────────┐    ┌──────────────┐    ┌──────────────┐     │
+│   │  COMMUNITY   │◀───│  PERFORMANCE │◀───│    TOKEN     │     │
+│   │  GOVERNANCE  │    │   TRACKING   │    │ DISTRIBUTION │     │
+│   └──────────────┘    └──────────────┘    └──────────────┘     │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+        </div>
+
+        <h3>3.2 Core Features</h3>
+        <h4>Proof-of-Agent Verification</h4>
+        <p>Every project must demonstrate working agent capabilities before launching. No vaporware.</p>
+
+        <h4>AI-Native Launch Mechanics</h4>
+        <table>
+            <tr><th>Mechanism</th><th>Description</th></tr>
+            <tr><td>Proof-of-Agent</td><td>Projects must demonstrate working agent capabilities before launch</td></tr>
+            <tr><td>Staged Funding</td><td>Capital released in tranches tied to milestones</td></tr>
+            <tr><td>Compute Escrow</td><td>Portion of funds locked for guaranteed compute runway</td></tr>
+            <tr><td>Agent Staking</td><td>Backers can stake on live agent performance</td></tr>
+        </table>
+
+        <h4>Bonding Curves</h4>
+        <p>Three pricing models for fair price discovery:</p>
+        <ul>
+            <li><strong>Linear:</strong> Price increases steadily with supply</li>
+            <li><strong>Exponential:</strong> Early buyers get significant discounts</li>
+            <li><strong>Sigmoid:</strong> Slow start, fast middle, slow end</li>
+        </ul>
+
+        <h2 id="revenue">4. Revenue Model</h2>
+        <table>
+            <tr><th>Revenue Stream</th><th>Amount</th><th>Description</th></tr>
+            <tr><td>Platform Fee</td><td>5%</td><td>On all successful raises</td></tr>
+            <tr><td>Basic Listing Fee</td><td>$2,500</td><td>Standard listing with basic curation</td></tr>
+            <tr><td>Premium Listing Fee</td><td>$10,000</td><td>Enhanced due diligence + featured placement</td></tr>
+            <tr><td>Enterprise Launch</td><td>$25,000</td><td>White-glove service with marketing support</td></tr>
+            <tr><td>Featured Placement</td><td>$1,000/week</td><td>Homepage featuring</td></tr>
+            <tr><td>Performance Fee</td><td>1%</td><td>On agent profits (optional tier)</td></tr>
+        </table>
+
+        <h2 id="tokenomics">5. Tokenomics</h2>
+        <h3>5.1 Token Overview</h3>
+        <table>
+            <tr><td>Token Name</td><td><strong>MOLT</strong></td></tr>
+            <tr><td>Network</td><td>Solana (SPL)</td></tr>
+            <tr><td>Total Supply</td><td>1,000,000,000</td></tr>
+            <tr><td>Initial Circulating</td><td>~15%</td></tr>
+        </table>
+
+        <h3>5.2 Allocation</h3>
+        <table>
+            <tr><th>Category</th><th>%</th><th>Tokens</th><th>Vesting</th></tr>
+            <tr><td>Community & Ecosystem</td><td>35%</td><td>350,000,000</td><td>4 years linear</td></tr>
+            <tr><td>Team & Advisors</td><td>18%</td><td>180,000,000</td><td>1yr cliff, 3yr linear</td></tr>
+            <tr><td>Treasury</td><td>18%</td><td>180,000,000</td><td>DAO controlled</td></tr>
+            <tr><td>Public Sale</td><td>13%</td><td>130,000,000</td><td>25% TGE, 6mo linear</td></tr>
+            <tr><td>Liquidity</td><td>10%</td><td>100,000,000</td><td>Locked 2 years</td></tr>
+            <tr><td>Seed Investors</td><td>6%</td><td>60,000,000</td><td>6mo cliff, 2yr linear</td></tr>
+        </table>
+
+        <h3>5.3 Utility</h3>
+        <ul>
+            <li><strong>Staking:</strong> Stake MOLT for tiered access to launches</li>
+            <li><strong>Governance:</strong> Vote on platform parameters and curation</li>
+            <li><strong>Fee Discounts:</strong> Reduced platform fees for stakers</li>
+            <li><strong>Guaranteed Allocations:</strong> Higher tiers get guaranteed spots</li>
+        </ul>
+
+        <h3>5.4 Investor Tiers</h3>
+        <table>
+            <tr><th>Tier</th><th>MOLT Required</th><th>Benefits</th></tr>
+            <tr><td>🥉 Bronze</td><td>10,000</td><td>Early access, 10% fee discount</td></tr>
+            <tr><td>🥈 Silver</td><td>50,000</td><td>Guaranteed allocation, 25% fee discount</td></tr>
+            <tr><td>🥇 Gold</td><td>250,000</td><td>Priority allocation, 50% fee discount, governance</td></tr>
+            <tr><td>💎 Diamond</td><td>1,000,000</td><td>Private rounds access, 75% fee discount, advisory</td></tr>
+        </table>
+
+        <h2 id="roadmap">6. Roadmap</h2>
+        <h3>Q1 2026 - Foundation</h3>
+        <ul>
+            <li>✅ Smart contract development</li>
+            <li>✅ Colosseum Hackathon participation</li>
+            <li>Core team formation</li>
+            <li>Devnet deployment</li>
+        </ul>
+
+        <h3>Q2 2026 - Beta Launch</h3>
+        <ul>
+            <li>Mainnet deployment</li>
+            <li>First 10 curated launches</li>
+            <li>MOLT token generation event</li>
+            <li>Staking system live</li>
+        </ul>
+
+        <h3>Q3 2026 - Scale</h3>
+        <ul>
+            <li>50+ agent launches</li>
+            <li>Performance dashboard v2</li>
+            <li>Cross-chain expansion</li>
+            <li>DAO governance activation</li>
+        </ul>
+
+        <h3>Q4 2026 - Dominance</h3>
+        <ul>
+            <li>100+ active launches</li>
+            <li>Agent incubator program</li>
+            <li>Institutional partnerships</li>
+            <li>$10M+ total volume</li>
+        </ul>
+
+        <h2 id="team">7. Team</h2>
+        <p>MoltLaunch is built by experienced developers with backgrounds in:</p>
+        <ul>
+            <li>Production trading systems</li>
+            <li>DeFi protocol development</li>
+            <li>AI/ML infrastructure</li>
+            <li>DevOps and 24/7 operations</li>
+        </ul>
+        <p><em>Full team profiles available upon request. KYC completed for grant applications.</em></p>
+
+        <h2 id="legal">8. Legal & Regulatory</h2>
+        <div class="highlight">
+            <strong>Disclaimer:</strong> MOLT tokens are utility tokens for platform access. They do not represent equity, profit-sharing, or investment contracts. Participants should consult legal counsel regarding their jurisdiction.
+        </div>
+        <ul>
+            <li><strong>Utility Classification:</strong> MOLT provides platform access, not investment returns</li>
+            <li><strong>Jurisdictional Approach:</strong> Initially excluding US, with compliance roadmap</li>
+            <li><strong>Project Requirements:</strong> All launching projects must complete KYC</li>
+            <li><strong>AML Compliance:</strong> Wallet screening and transaction monitoring</li>
+        </ul>
+
+        <hr style="margin: 60px 0; border-color: rgba(255,255,255,0.1);">
+        
+        <p style="text-align: center; color: var(--text-secondary);">
+            <strong>MoltLaunch</strong> — Where AI Agents Launch<br>
+            <a href="https://github.com/tradingstarllc/moltlaunch" style="color: var(--accent-cyan);">GitHub</a> | 
+            <a href="/" style="color: var(--accent-cyan);">Website</a>
+        </p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoltLaunch - The First AI Agent Launchpad on Solana</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0A0E17;
+            --bg-surface: #131B2E;
+            --bg-elevated: #1A2337;
+            --accent-cyan: #00D1FF;
+            --accent-purple: #8B5CF6;
+            --accent-green: #10B981;
+            --accent-amber: #F59E0B;
+            --text-primary: #FFFFFF;
+            --text-secondary: #94A3B8;
+            --text-muted: #64748B;
+            --gradient-main: linear-gradient(135deg, #00D1FF 0%, #8B5CF6 50%, #FF00AA 100%);
+            --gradient-button: linear-gradient(90deg, #00D1FF 0%, #8B5CF6 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Animated background */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0,209,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,209,255,0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .glow-orb {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .glow-orb.cyan {
+            background: var(--accent-cyan);
+            top: -200px;
+            right: -200px;
+        }
+
+        .glow-orb.purple {
+            background: var(--accent-purple);
+            bottom: -200px;
+            left: -200px;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 20px 0;
+            background: rgba(10, 14, 23, 0.8);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-main);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-cyan);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient-button);
+            color: var(--bg-primary);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0, 209, 255, 0.3);
+        }
+
+        .btn-outline {
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            background: transparent;
+        }
+
+        .btn-outline:hover {
+            background: rgba(0, 209, 255, 0.1);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-top: 80px;
+            position: relative;
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(139, 92, 246, 0.2);
+            border: 1px solid var(--accent-purple);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: var(--accent-purple);
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 span {
+            background: var(--gradient-main);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 40px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Hero Visual */
+        .hero-visual {
+            position: relative;
+        }
+
+        .launch-card {
+            background: var(--bg-surface);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .launch-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-main);
+        }
+
+        .launch-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .launch-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-button);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .launch-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .launch-tag {
+            font-size: 0.75rem;
+            color: var(--accent-green);
+            background: rgba(16, 185, 129, 0.2);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .progress-section {
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-button);
+            border-radius: 10px;
+            width: 73%;
+            animation: progress 2s ease-out;
+        }
+
+        @keyframes progress {
+            from { width: 0; }
+        }
+
+        .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+
+        .progress-stats span:first-child {
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        .countdown {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .countdown-item {
+            text-align: center;
+            background: var(--bg-primary);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .countdown-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+
+        .countdown-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 100px 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .feature-card {
+            background: var(--bg-surface);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 30px;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            border-color: var(--accent-cyan);
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 209, 255, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Token Sale Section */
+        .token-sale {
+            padding: 100px 0;
+            background: var(--bg-surface);
+        }
+
+        .token-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .tokenomics-chart {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto;
+        }
+
+        .donut-chart {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(
+                var(--accent-cyan) 0deg 126deg,
+                var(--accent-purple) 126deg 190.8deg,
+                var(--accent-green) 190.8deg 255.6deg,
+                var(--accent-amber) 255.6deg 302.4deg,
+                #EF4444 302.4deg 338.4deg,
+                #64748B 338.4deg 360deg
+            );
+            position: relative;
+        }
+
+        .donut-chart::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60%;
+            height: 60%;
+            background: var(--bg-surface);
+            border-radius: 50%;
+        }
+
+        .donut-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .donut-center .amount {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .donut-center .label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .token-legend {
+            margin-top: 30px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        .token-details h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .token-info {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .token-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .token-row:last-child {
+            border-bottom: none;
+        }
+
+        .token-row .label {
+            color: var(--text-secondary);
+        }
+
+        .token-row .value {
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Roadmap */
+        .roadmap {
+            padding: 100px 0;
+        }
+
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--gradient-main);
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            display: flex;
+            margin-bottom: 40px;
+        }
+
+        .timeline-item:nth-child(odd) {
+            flex-direction: row-reverse;
+        }
+
+        .timeline-content {
+            width: 45%;
+            background: var(--bg-surface);
+            border-radius: 12px;
+            padding: 25px;
+            position: relative;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            top: 30px;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-dot {
+            left: -35px;
+        }
+
+        .timeline-item:nth-child(even) .timeline-dot {
+            right: -35px;
+        }
+
+        .timeline-phase {
+            color: var(--accent-cyan);
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .timeline-content h3 {
+            margin-bottom: 10px;
+        }
+
+        .timeline-content ul {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            padding-left: 20px;
+        }
+
+        /* Whitepaper CTA */
+        .whitepaper-cta {
+            padding: 100px 0;
+            text-align: center;
+            background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-surface) 100%);
+        }
+
+        .whitepaper-card {
+            background: var(--bg-elevated);
+            border: 1px solid rgba(0, 209, 255, 0.3);
+            border-radius: 20px;
+            padding: 60px;
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .whitepaper-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0,209,255,0.1) 0%, transparent 50%);
+            animation: pulse 4s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.3; }
+        }
+
+        .whitepaper-card h2 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .whitepaper-card p {
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .whitepaper-card .btn {
+            position: relative;
+        }
+
+        /* Footer */
+        footer {
+            padding: 60px 0 30px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-brand p {
+            color: var(--text-secondary);
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+
+        .footer-links h4 {
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        .footer-links a {
+            display: block;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-cyan);
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .footer-bottom p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-surface);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .social-links a:hover {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .hero-stats {
+                justify-content: center;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .token-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline::before {
+                left: 20px;
+            }
+
+            .timeline-item,
+            .timeline-item:nth-child(odd) {
+                flex-direction: column;
+            }
+
+            .timeline-content {
+                width: 100%;
+                margin-left: 50px;
+            }
+
+            .timeline-dot {
+                left: -40px !important;
+                right: auto !important;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="glow-orb cyan"></div>
+    <div class="glow-orb purple"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <a href="#" class="logo">⚡ MoltLaunch</a>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#tokenomics">Tokenomics</a>
+                <a href="#roadmap">Roadmap</a>
+                <a href="#whitepaper">Whitepaper</a>
+                <a href="#" class="btn btn-primary">Launch App</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <span class="hero-badge">🚀 Colosseum Hackathon Finalist</span>
+                    <h1>The First <span>AI Agent Launchpad</span> on Solana</h1>
+                    <p>Launch your AI agent with curated token sales, proof-of-agent verification, and anti-rug protections. Built for the autonomous agent economy.</p>
+                    <div class="hero-buttons">
+                        <a href="#" class="btn btn-primary">Apply to Launch</a>
+                        <a href="#whitepaper" class="btn btn-outline">Read Whitepaper</a>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="stat">
+                            <div class="stat-value">$2.5M+</div>
+                            <div class="stat-label">Target Launch Volume</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">50+</div>
+                            <div class="stat-label">Agents Interested</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">5%</div>
+                            <div class="stat-label">Platform Fee</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="launch-card">
+                        <div class="launch-header">
+                            <div class="launch-icon">🤖</div>
+                            <div>
+                                <div class="launch-name">TradingBot Pro</div>
+                                <span class="launch-tag">✓ Verified Agent</span>
+                            </div>
+                        </div>
+                        <div class="progress-section">
+                            <div class="progress-stats">
+                                <span>730 SOL raised</span>
+                                <span>1,000 SOL goal</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                            <div class="progress-stats">
+                                <span>73% Complete</span>
+                                <span>127 backers</span>
+                            </div>
+                        </div>
+                        <div class="countdown">
+                            <div class="countdown-item">
+                                <div class="countdown-value">02</div>
+                                <div class="countdown-label">Days</div>
+                            </div>
+                            <div class="countdown-item">
+                                <div class="countdown-value">14</div>
+                                <div class="countdown-label">Hours</div>
+                            </div>
+                            <div class="countdown-item">
+                                <div class="countdown-value">37</div>
+                                <div class="countdown-label">Mins</div>
+                            </div>
+                            <div class="countdown-item">
+                                <div class="countdown-value">52</div>
+                                <div class="countdown-label">Secs</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>Why MoltLaunch?</h2>
+                <p>Purpose-built infrastructure for AI agent token launches on Solana</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔐</div>
+                    <h3>Proof-of-Agent</h3>
+                    <p>Every project must demonstrate working agent capabilities before launching. No vaporware allowed.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📈</div>
+                    <h3>Bonding Curves</h3>
+                    <p>Fair price discovery with linear, exponential, or sigmoid curves. Early supporters rewarded.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Milestone Vesting</h3>
+                    <p>Team tokens unlock tied to deliverables. Build trust with transparent accountability.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💧</div>
+                    <h3>Auto Liquidity</h3>
+                    <p>Graduated launches automatically create Raydium pools. Instant tradability post-launch.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3>Anti-Rug Protection</h3>
+                    <p>Locked liquidity, capped team allocations, and on-chain transparency by default.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Performance Tracking</h3>
+                    <p>Post-launch dashboards show real agent activity, revenue, and milestone progress.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Token Sale Section -->
+    <section class="token-sale" id="tokenomics">
+        <div class="container">
+            <div class="section-header">
+                <h2>MOLT Token</h2>
+                <p>Platform utility token powering the MoltLaunch ecosystem</p>
+            </div>
+            <div class="token-grid">
+                <div class="tokenomics-visual">
+                    <div class="tokenomics-chart">
+                        <div class="donut-chart"></div>
+                        <div class="donut-center">
+                            <div class="amount">1B</div>
+                            <div class="label">Total Supply</div>
+                        </div>
+                    </div>
+                    <div class="token-legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: var(--accent-cyan)"></div>
+                            <span>Community & Ecosystem (35%)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: var(--accent-purple)"></div>
+                            <span>Team & Advisors (18%)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: var(--accent-green)"></div>
+                            <span>Treasury (18%)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: var(--accent-amber)"></div>
+                            <span>Public Sale (13%)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #EF4444"></div>
+                            <span>Liquidity (10%)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #64748B"></div>
+                            <span>Seed Investors (6%)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="token-details">
+                    <h2>Token Utility</h2>
+                    <div class="token-info">
+                        <div class="token-row">
+                            <span class="label">Token Name</span>
+                            <span class="value">MOLT</span>
+                        </div>
+                        <div class="token-row">
+                            <span class="label">Network</span>
+                            <span class="value">Solana</span>
+                        </div>
+                        <div class="token-row">
+                            <span class="label">Total Supply</span>
+                            <span class="value">1,000,000,000</span>
+                        </div>
+                        <div class="token-row">
+                            <span class="label">Platform Fee</span>
+                            <span class="value">5%</span>
+                        </div>
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">
+                        <strong>Staking Benefits:</strong> Stake MOLT for tiered access to launches, reduced fees, and governance voting. Higher tiers get guaranteed allocations.
+                    </p>
+                    <a href="#whitepaper" class="btn btn-primary">View Full Tokenomics</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Roadmap -->
+    <section class="roadmap" id="roadmap">
+        <div class="container">
+            <div class="section-header">
+                <h2>Roadmap</h2>
+                <p>Our journey to becoming the definitive AI agent funding platform</p>
+            </div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-phase">Q1 2026</div>
+                        <h3>Foundation</h3>
+                        <ul>
+                            <li>Smart contract development</li>
+                            <li>Colosseum Hackathon launch</li>
+                            <li>Core team formation</li>
+                            <li>Devnet deployment</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-phase">Q2 2026</div>
+                        <h3>Beta Launch</h3>
+                        <ul>
+                            <li>Mainnet deployment</li>
+                            <li>First 10 curated launches</li>
+                            <li>MOLT token generation event</li>
+                            <li>Staking system live</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-phase">Q3 2026</div>
+                        <h3>Scale</h3>
+                        <ul>
+                            <li>50+ agent launches</li>
+                            <li>Performance dashboard v2</li>
+                            <li>Cross-chain expansion</li>
+                            <li>DAO governance activation</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-phase">Q4 2026</div>
+                        <h3>Dominance</h3>
+                        <ul>
+                            <li>100+ active launches</li>
+                            <li>Agent incubator program</li>
+                            <li>Institutional partnerships</li>
+                            <li>$10M+ total volume</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Whitepaper CTA -->
+    <section class="whitepaper-cta" id="whitepaper">
+        <div class="container">
+            <div class="whitepaper-card">
+                <h2>📄 Read the Whitepaper</h2>
+                <p>Deep dive into MoltLaunch's architecture, tokenomics, and vision for the AI agent economy.</p>
+                <a href="/whitepaper.html" class="btn btn-primary">Download Whitepaper</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="#" class="logo">⚡ MoltLaunch</a>
+                    <p>The first dedicated launchpad for AI agents on Solana. Curated launches, verified agents, anti-rug protections.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Product</h4>
+                    <a href="#features">Features</a>
+                    <a href="#tokenomics">Tokenomics</a>
+                    <a href="#roadmap">Roadmap</a>
+                    <a href="#">Apply to Launch</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Resources</h4>
+                    <a href="#whitepaper">Whitepaper</a>
+                    <a href="#">Documentation</a>
+                    <a href="https://github.com/tradingstarllc/moltlaunch">GitHub</a>
+                    <a href="#">Brand Kit</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Community</h4>
+                    <a href="#">Twitter</a>
+                    <a href="#">Discord</a>
+                    <a href="#">Telegram</a>
+                    <a href="#">Blog</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 MoltLaunch. Built on Solana.</p>
+                <div class="social-links">
+                    <a href="#">𝕏</a>
+                    <a href="#">💬</a>
+                    <a href="#">📱</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Countdown timer
+        function updateCountdown() {
+            const items = document.querySelectorAll('.countdown-value');
+            // Mock countdown - in production would be real end date
+            items[3].textContent = String(Math.floor(Math.random() * 60)).padStart(2, '0');
+        }
+        setInterval(updateCountdown, 1000);
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

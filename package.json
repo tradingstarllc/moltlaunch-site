@@ -1,0 +1,12 @@
+{
+  "name": "moltlaunch-site",
+  "version": "1.0.0",
+  "description": "MoltLaunch - AI Agent Launchpad Landing Page",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
