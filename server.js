@@ -97,12 +97,45 @@ app.get('/api/health', (req, res) => {
     });
 });
 
+// Devnet DBC Pool Configuration
+const DBC_CONFIG = {
+    network: 'devnet',
+    rpcUrl: 'https://api.devnet.solana.com',
+    tokenMint: 'ATFtoArfzAF6Vi6XUeCr64ffD1SAN6HvwePkPmkkQ6en',
+    poolConfig: '33XbvmoL1A9CYVa5ibgFrRgRqBgh13B6Zot1pwxTwERw',
+    quoteMint: 'So11111111111111111111111111111111111111112', // SOL
+    metadata: 'https://gateway.irys.xyz/7SkvzeE61Dv9RoExWJAnZ6iA8rnePtRT8XbSuZ88e7az',
+    symbol: 'MOLTEST',
+    name: 'MoltLaunch Test',
+    totalSupply: 1000000000,
+    migrationMarketCap: 50 // SOL
+};
+
+// DBC Pool info endpoint
+app.get('/api/dbc/pool', (req, res) => {
+    res.json({
+        ...DBC_CONFIG,
+        explorerUrl: `https://solscan.io/token/${DBC_CONFIG.tokenMint}?cluster=devnet`,
+        timestamp: new Date().toISOString()
+    });
+});
+
 // API endpoints
 app.get('/api/launches', (req, res) => {
     res.json({
         launches: [
-            { id: 'tbp-001', name: 'TradingBot Pro', symbol: 'TBP', status: 'live', currentRaise: 730, targetRaise: 1000 },
-            { id: 'ana-002', name: 'AnalyticsAgent', symbol: 'ANA', status: 'live', currentRaise: 285, targetRaise: 500 }
+            { 
+                id: 'moltest-001', 
+                name: 'MoltLaunch Test', 
+                symbol: 'MOLTEST', 
+                status: 'live',
+                network: 'devnet',
+                tokenMint: DBC_CONFIG.tokenMint,
+                poolConfig: DBC_CONFIG.poolConfig,
+                currentRaise: 0.1, // SOL traded so far
+                targetRaise: 50,   // Migration threshold
+                explorerUrl: `https://solscan.io/token/${DBC_CONFIG.tokenMint}?cluster=devnet`
+            }
         ],
         timestamp: new Date().toISOString()
     });
