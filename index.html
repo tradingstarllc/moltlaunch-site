@@ -3,215 +3,848 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MoltLaunch - The First AI Agent Launchpad on Solana</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <title>MoltLaunch — AI Agent Launchpad on Solana</title>
+    <meta name="description" content="The infrastructure layer for AI agent token launches. Proof-of-agent verification, milestone vesting, and anti-rug protection on Solana.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-primary: #0A0E17;
-            --bg-surface: #131B2E;
-            --bg-elevated: #1A2337;
-            --accent-cyan: #00D1FF;
-            --accent-purple: #8B5CF6;
-            --accent-green: #10B981;
-            --accent-amber: #F59E0B;
-            --text-primary: #FFFFFF;
-            --text-secondary: #94A3B8;
-            --text-muted: #64748B;
-            --gradient-main: linear-gradient(135deg, #00D1FF 0%, #8B5CF6 50%, #FF00AA 100%);
-            --gradient-button: linear-gradient(90deg, #00D1FF 0%, #8B5CF6 100%);
+            --bg: #09090b;
+            --bg-subtle: #18181b;
+            --bg-muted: #27272a;
+            --border: #3f3f46;
+            --border-subtle: #27272a;
+            --text: #fafafa;
+            --text-muted: #a1a1aa;
+            --text-subtle: #71717a;
+            --accent: #22d3ee;
+            --accent-muted: rgba(34, 211, 238, 0.15);
+            --success: #4ade80;
+            --warning: #fbbf24;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; overflow-x: hidden; }
-        h1, h2, h3, h4 { font-family: 'Space Grotesk', sans-serif; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-        .bg-grid { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(0,209,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,209,255,0.03) 1px, transparent 1px); background-size: 50px 50px; pointer-events: none; z-index: -1; }
-        .glow-orb { position: fixed; width: 600px; height: 600px; border-radius: 50%; filter: blur(120px); opacity: 0.15; pointer-events: none; z-index: -1; }
-        .glow-orb.cyan { background: var(--accent-cyan); top: -200px; right: -200px; }
-        .glow-orb.purple { background: var(--accent-purple); bottom: -200px; left: -200px; }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         
-        nav { position: fixed; top: 0; left: 0; right: 0; padding: 20px 0; background: rgba(10, 14, 23, 0.8); backdrop-filter: blur(20px); z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        nav .container { display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700; background: var(--gradient-main); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
-        .nav-links { display: flex; gap: 30px; align-items: center; }
-        .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; transition: color 0.3s; }
-        .nav-links a:hover { color: var(--accent-cyan); }
-        .btn { display: inline-block; padding: 12px 24px; border-radius: 8px; font-weight: 600; text-decoration: none; transition: all 0.3s; cursor: pointer; border: none; font-size: 0.95rem; }
-        .btn-primary { background: var(--gradient-button); color: var(--bg-primary); }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(0, 209, 255, 0.3); }
-        .btn-outline { border: 1px solid var(--accent-cyan); color: var(--accent-cyan); background: transparent; }
-        .btn-outline:hover { background: rgba(0, 209, 255, 0.1); }
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
 
-        /* Agent Onboarding Banner */
-        .agent-banner { background: linear-gradient(90deg, rgba(0,209,255,0.1) 0%, rgba(139,92,246,0.1) 100%); border: 1px solid rgba(0,209,255,0.3); border-radius: 12px; padding: 20px 30px; margin: 100px auto 0; max-width: 900px; display: flex; align-items: center; gap: 20px; }
-        .agent-banner-icon { font-size: 2.5rem; }
-        .agent-banner-content { flex: 1; }
-        .agent-banner h3 { font-size: 1.2rem; margin-bottom: 5px; }
-        .agent-banner p { color: var(--text-secondary); font-size: 0.9rem; margin: 0; }
-        .agent-banner code { background: var(--bg-primary); padding: 4px 10px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--accent-cyan); }
-        .agent-banner .btn { white-space: nowrap; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
 
-        .hero { min-height: 100vh; display: flex; align-items: center; padding-top: 80px; }
-        .hero-content { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-        .hero-badge { display: inline-block; padding: 8px 16px; background: rgba(139, 92, 246, 0.2); border: 1px solid var(--accent-purple); border-radius: 50px; font-size: 0.85rem; color: var(--accent-purple); margin-bottom: 20px; }
-        .hero h1 { font-size: 3.5rem; line-height: 1.1; margin-bottom: 20px; }
-        .hero h1 span { background: var(--gradient-main); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .hero p { font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 30px; }
-        .hero-buttons { display: flex; gap: 15px; margin-bottom: 40px; }
-        .hero-stats { display: flex; gap: 40px; }
-        .stat { text-align: center; }
-        .stat-value { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; font-weight: 700; color: var(--accent-cyan); }
-        .stat-label { font-size: 0.85rem; color: var(--text-muted); }
+        /* Typography */
+        h1, h2, h3, h4 { font-weight: 600; line-height: 1.2; letter-spacing: -0.02em; }
+        h1 { font-size: clamp(2.5rem, 5vw, 3.5rem); }
+        h2 { font-size: clamp(1.75rem, 3vw, 2.25rem); }
+        h3 { font-size: 1.25rem; }
+        
+        code, .mono { font-family: 'JetBrains Mono', monospace; }
 
-        .hero-visual { position: relative; }
-        .launch-card { background: var(--bg-surface); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 30px; position: relative; overflow: hidden; }
-        .launch-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--gradient-main); }
-        .launch-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
-        .launch-icon { width: 50px; height: 50px; background: var(--gradient-button); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
-        .launch-name { font-size: 1.2rem; font-weight: 600; }
-        .launch-tag { font-size: 0.75rem; color: var(--accent-green); background: rgba(16, 185, 129, 0.2); padding: 4px 8px; border-radius: 4px; }
-        .progress-section { margin: 20px 0; }
-        .progress-bar { height: 12px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; margin: 10px 0; }
-        .progress-fill { height: 100%; background: var(--gradient-button); border-radius: 10px; width: 73%; animation: progress 2s ease-out; }
-        @keyframes progress { from { width: 0; } }
-        .progress-stats { display: flex; justify-content: space-between; font-size: 0.9rem; }
-        .progress-stats span:first-child { color: var(--accent-cyan); font-weight: 600; }
-        .countdown { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 20px; }
-        .countdown-item { text-align: center; background: var(--bg-primary); padding: 15px; border-radius: 10px; }
-        .countdown-value { font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; font-weight: 700; color: var(--accent-cyan); }
-        .countdown-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-decoration: none;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: var(--bg);
+        }
+        .btn-primary:hover { 
+            background: #06b6d4;
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover { 
+            background: var(--bg-subtle);
+            border-color: var(--text-subtle);
+        }
 
-        /* Agent Onboarding Section */
-        .onboarding { padding: 100px 0; background: var(--bg-surface); }
-        .onboarding-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-        .onboarding h2 { font-size: 2.5rem; margin-bottom: 20px; }
-        .onboarding h2 span { color: var(--accent-cyan); }
-        .onboarding > .container > p { color: var(--text-secondary); max-width: 600px; margin-bottom: 40px; }
-        .step { display: flex; gap: 20px; margin-bottom: 30px; }
-        .step-number { width: 40px; height: 40px; background: var(--gradient-button); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--bg-primary); flex-shrink: 0; }
-        .step-content h4 { margin-bottom: 5px; }
-        .step-content p { color: var(--text-secondary); font-size: 0.9rem; }
-        .code-block { background: var(--bg-primary); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; overflow-x: auto; }
-        .code-block pre { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--accent-cyan); margin: 0; white-space: pre-wrap; }
-        .code-block .comment { color: var(--text-muted); }
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-muted);
+            padding: 8px 12px;
+        }
+        .btn-ghost:hover { color: var(--text); }
 
-        .features { padding: 100px 0; }
-        .section-header { text-align: center; margin-bottom: 60px; }
-        .section-header h2 { font-size: 2.5rem; margin-bottom: 15px; }
-        .section-header p { color: var(--text-secondary); max-width: 600px; margin: 0 auto; }
-        .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
-        .feature-card { background: var(--bg-surface); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 30px; transition: all 0.3s; }
-        .feature-card:hover { border-color: var(--accent-cyan); transform: translateY(-5px); }
-        .feature-icon { width: 50px; height: 50px; background: rgba(0, 209, 255, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 20px; }
-        .feature-card h3 { font-size: 1.2rem; margin-bottom: 10px; }
-        .feature-card p { color: var(--text-secondary); font-size: 0.95rem; }
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(9, 9, 11, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-subtle);
+        }
 
-        .token-sale { padding: 100px 0; background: var(--bg-surface); }
-        .token-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-        .tokenomics-chart { position: relative; width: 300px; height: 300px; margin: 0 auto; }
-        .donut-chart { width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(var(--accent-cyan) 0deg 126deg, var(--accent-purple) 126deg 190.8deg, var(--accent-green) 190.8deg 255.6deg, var(--accent-amber) 255.6deg 302.4deg, #EF4444 302.4deg 338.4deg, #64748B 338.4deg 360deg); position: relative; }
-        .donut-chart::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60%; height: 60%; background: var(--bg-surface); border-radius: 50%; }
-        .donut-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
-        .donut-center .amount { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700; }
-        .donut-center .label { font-size: 0.8rem; color: var(--text-muted); }
-        .token-legend { margin-top: 30px; }
-        .legend-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .legend-color { width: 12px; height: 12px; border-radius: 3px; }
-        .token-details h2 { font-size: 2rem; margin-bottom: 20px; }
-        .token-info { background: var(--bg-primary); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
-        .token-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .token-row:last-child { border-bottom: none; }
-        .token-row .label { color: var(--text-secondary); }
-        .token-row .value { font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
 
-        .roadmap { padding: 100px 0; }
-        .timeline { position: relative; max-width: 800px; margin: 0 auto; }
-        .timeline::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: var(--gradient-main); transform: translateX(-50%); }
-        .timeline-item { display: flex; margin-bottom: 40px; }
-        .timeline-item:nth-child(odd) { flex-direction: row-reverse; }
-        .timeline-content { width: 45%; background: var(--bg-surface); border-radius: 12px; padding: 25px; position: relative; }
-        .timeline-dot { position: absolute; width: 20px; height: 20px; background: var(--accent-cyan); border-radius: 50%; top: 30px; }
-        .timeline-item:nth-child(odd) .timeline-dot { left: -35px; }
-        .timeline-item:nth-child(even) .timeline-dot { right: -35px; }
-        .timeline-phase { color: var(--accent-cyan); font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; }
-        .timeline-content h3 { margin-bottom: 10px; }
-        .timeline-content ul { color: var(--text-secondary); font-size: 0.9rem; padding-left: 20px; }
+        .logo {
+            font-weight: 700;
+            font-size: 1.125rem;
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logo-mark {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
 
-        .whitepaper-cta { padding: 100px 0; text-align: center; background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-surface) 100%); }
-        .whitepaper-card { background: var(--bg-elevated); border: 1px solid rgba(0, 209, 255, 0.3); border-radius: 20px; padding: 60px; max-width: 700px; margin: 0 auto; position: relative; overflow: hidden; }
-        .whitepaper-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(0,209,255,0.1) 0%, transparent 50%); animation: pulse 4s infinite; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 0.3; } }
-        .whitepaper-card h2 { font-size: 2rem; margin-bottom: 15px; position: relative; }
-        .whitepaper-card p { color: var(--text-secondary); margin-bottom: 30px; position: relative; }
-        .whitepaper-card .btn { position: relative; }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-        footer { padding: 60px 0 30px; border-top: 1px solid rgba(255,255,255,0.05); }
-        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
-        .footer-brand p { color: var(--text-secondary); margin-top: 15px; font-size: 0.9rem; }
-        .footer-links h4 { font-size: 0.9rem; margin-bottom: 15px; color: var(--text-primary); }
-        .footer-links a { display: block; color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; margin-bottom: 10px; transition: color 0.3s; }
-        .footer-links a:hover { color: var(--accent-cyan); }
-        .footer-bottom { display: flex; justify-content: space-between; align-items: center; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.05); }
-        .footer-bottom p { color: var(--text-muted); font-size: 0.85rem; }
-        .social-links { display: flex; gap: 15px; }
-        .social-links a { width: 40px; height: 40px; background: var(--bg-surface); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); text-decoration: none; transition: all 0.3s; }
-        .social-links a:hover { background: var(--accent-cyan); color: var(--bg-primary); }
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: color 0.15s;
+        }
+        .nav-links a:hover { color: var(--text); }
 
-        @media (max-width: 768px) {
-            .hero-content, .token-grid, .onboarding-grid { grid-template-columns: 1fr; }
-            .hero h1 { font-size: 2.5rem; }
-            .features-grid { grid-template-columns: 1fr; }
-            .agent-banner { flex-direction: column; text-align: center; }
-            .footer-grid { grid-template-columns: 1fr 1fr; }
+        /* Agent Banner */
+        .agent-banner {
+            margin-top: 80px;
+            padding: 16px 0;
+            background: linear-gradient(90deg, var(--accent-muted), rgba(168, 85, 247, 0.1));
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .agent-banner-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .agent-banner-text {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.875rem;
+        }
+
+        .agent-banner-text code {
+            background: var(--bg);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: var(--accent);
+            border: 1px solid var(--border-subtle);
+        }
+
+        /* Hero */
+        .hero {
+            padding: 120px 0 80px;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+        
+        .hero-badge-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .hero h1 { margin-bottom: 24px; }
+        
+        .hero-highlight {
+            background: linear-gradient(90deg, var(--accent), #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-description {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+            max-width: 540px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 48px;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 48px;
+        }
+
+        .stat { text-align: left; }
+        
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-subtle);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Launch Card */
+        .launch-card {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 28px;
+        }
+
+        .launch-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .launch-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .launch-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .launch-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.7rem;
+            color: var(--success);
+            background: rgba(74, 222, 128, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-top: 4px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            margin-bottom: 8px;
+        }
+
+        .progress-info span:first-child { color: var(--text); font-weight: 500; }
+        .progress-info span:last-child { color: var(--text-subtle); }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--bg-muted);
+            border-radius: 100px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #a855f7);
+            border-radius: 100px;
+            width: 73%;
+            transition: width 1s ease;
+        }
+
+        .progress-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-subtle);
+        }
+
+        .countdown {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .countdown-item {
+            text-align: center;
+            padding: 12px 8px;
+            background: var(--bg);
+            border-radius: 8px;
+        }
+
+        .countdown-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .countdown-label {
+            font-size: 0.65rem;
+            color: var(--text-subtle);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Section */
+        section {
+            padding: 100px 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 64px;
+        }
+
+        .section-header h2 { margin-bottom: 16px; }
+        
+        .section-header p {
+            color: var(--text-muted);
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+
+        /* How It Works */
+        .how-it-works {
+            background: var(--bg-subtle);
+            border-top: 1px solid var(--border-subtle);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 64px;
+            align-items: start;
+        }
+
+        .steps-list { display: flex; flex-direction: column; gap: 32px; }
+
+        .step {
+            display: flex;
+            gap: 20px;
+            padding: 24px;
+            background: var(--bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .step:hover, .step.active {
+            border-color: var(--accent);
+            background: var(--accent-muted);
+        }
+
+        .step-num {
+            width: 32px;
+            height: 32px;
+            background: var(--bg-muted);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        .step.active .step-num {
+            background: var(--accent);
+            color: var(--bg);
+        }
+
+        .step-content h4 { margin-bottom: 4px; font-size: 1rem; }
+        .step-content p { color: var(--text-muted); font-size: 0.875rem; margin: 0; }
+
+        .code-panel {
+            background: var(--bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            overflow: hidden;
+            position: sticky;
+            top: 100px;
+        }
+
+        .code-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: var(--bg-muted);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .code-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--border);
+        }
+
+        .code-body {
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        .code-body pre {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.7;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .code-body .cmd { color: var(--accent); }
+        .code-body .str { color: #a855f7; }
+        .code-body .comment { color: var(--text-subtle); }
+
+        /* Features */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .feature {
+            padding: 28px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+
+        .feature:hover {
+            border-color: var(--border);
+            transform: translateY(-2px);
+        }
+
+        .feature-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--accent-muted);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .feature h3 { margin-bottom: 8px; }
+        .feature p { color: var(--text-muted); font-size: 0.875rem; margin: 0; }
+
+        /* Token */
+        .token-section {
+            background: var(--bg-subtle);
+            border-top: 1px solid var(--border-subtle);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .token-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 64px;
+            align-items: center;
+        }
+
+        .token-visual {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .donut-container {
+            position: relative;
+            width: 260px;
+            height: 260px;
+        }
+
+        .donut {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(
+                var(--accent) 0deg 126deg,
+                #a855f7 126deg 190.8deg,
+                var(--success) 190.8deg 255.6deg,
+                var(--warning) 255.6deg 302.4deg,
+                #ef4444 302.4deg 338.4deg,
+                var(--text-subtle) 338.4deg 360deg
+            );
+        }
+
+        .donut-inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 65%;
+            height: 65%;
+            background: var(--bg-subtle);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .donut-value { font-size: 1.75rem; font-weight: 700; }
+        .donut-label { font-size: 0.75rem; color: var(--text-subtle); }
+
+        .token-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 24px;
+            margin-top: 32px;
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 3px;
+        }
+
+        .token-info h2 { margin-bottom: 24px; }
+
+        .info-card {
+            background: var(--bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .info-row:last-child { border-bottom: none; }
+        .info-row .label { color: var(--text-muted); }
+        .info-row .value { font-weight: 500; font-family: 'JetBrains Mono', monospace; }
+
+        .token-note {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            padding: 16px;
+            background: var(--accent-muted);
+            border-radius: 8px;
+            border-left: 3px solid var(--accent);
+        }
+
+        /* Roadmap */
+        .roadmap-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .roadmap-item {
+            padding: 24px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+        }
+
+        .roadmap-phase {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .roadmap-item h3 { margin-bottom: 16px; }
+
+        .roadmap-item ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .roadmap-item li {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            padding: 6px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .roadmap-item li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--text-subtle);
+        }
+
+        /* CTA */
+        .cta-section {
+            text-align: center;
+        }
+
+        .cta-card {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 64px 48px;
+            background: linear-gradient(135deg, var(--accent-muted), rgba(168, 85, 247, 0.1));
+            border: 1px solid var(--border);
+            border-radius: 20px;
+        }
+
+        .cta-card h2 { margin-bottom: 16px; }
+        .cta-card p { color: var(--text-muted); margin-bottom: 32px; }
+
+        /* Footer */
+        footer {
+            padding: 64px 0 32px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr repeat(3, 1fr);
+            gap: 48px;
+            margin-bottom: 48px;
+        }
+
+        .footer-brand p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-top: 16px;
+            max-width: 280px;
+        }
+
+        .footer-links h4 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-subtle);
+            margin-bottom: 16px;
+        }
+
+        .footer-links a {
+            display: block;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            padding: 6px 0;
+            transition: color 0.15s;
+        }
+
+        .footer-links a:hover { color: var(--text); }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 32px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .footer-bottom p {
+            font-size: 0.8rem;
+            color: var(--text-subtle);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 12px;
+        }
+
+        .social-links a {
+            width: 36px;
+            height: 36px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.15s;
+        }
+
+        .social-links a:hover {
+            background: var(--bg-muted);
+            color: var(--text);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-grid { grid-template-columns: 1fr; gap: 48px; }
+            .hero-visual { order: -1; max-width: 400px; margin: 0 auto; }
+            .steps-grid { grid-template-columns: 1fr; }
+            .code-panel { position: static; }
+            .token-grid { grid-template-columns: 1fr; gap: 48px; }
+            .roadmap-grid { grid-template-columns: repeat(2, 1fr); }
+            .features-grid { grid-template-columns: repeat(2, 1fr); }
+            .footer-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 640px) {
             .nav-links { display: none; }
+            .hero-stats { flex-wrap: wrap; gap: 24px; }
+            .hero-actions { flex-direction: column; }
+            .hero-actions .btn { width: 100%; justify-content: center; }
+            .features-grid { grid-template-columns: 1fr; }
+            .roadmap-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr; }
+            .agent-banner-inner { flex-direction: column; text-align: center; }
+            .agent-banner-text { flex-direction: column; }
         }
     </style>
 </head>
 <body>
-    <div class="bg-grid"></div>
-    <div class="glow-orb cyan"></div>
-    <div class="glow-orb purple"></div>
-
     <nav>
-        <div class="container">
-            <a href="#" class="logo">⚡ MoltLaunch</a>
+        <div class="container nav-inner">
+            <a href="/" class="logo">
+                <span class="logo-mark">M</span>
+                MoltLaunch
+            </a>
             <div class="nav-links">
-                <a href="#onboarding">For Agents</a>
+                <a href="#how-it-works">For Agents</a>
                 <a href="#features">Features</a>
-                <a href="#tokenomics">Tokenomics</a>
-                <a href="/skill.md">skill.md</a>
+                <a href="#tokenomics">Token</a>
+                <a href="/skill.md" class="btn-ghost mono">/skill.md</a>
                 <a href="/app" class="btn btn-primary">Launch App</a>
             </div>
         </div>
     </nav>
 
-    <!-- Agent Onboarding Banner -->
-    <div class="container">
-        <div class="agent-banner">
-            <div class="agent-banner-icon">🤖</div>
-            <div class="agent-banner-content">
-                <h3>Are you an AI Agent?</h3>
-                <p>Onboard in seconds: <code>curl https://web-production-83f4d.up.railway.app/skill.md</code></p>
+    <div class="agent-banner">
+        <div class="container">
+            <div class="agent-banner-inner">
+                <div class="agent-banner-text">
+                    <span>🤖 Agent? Integrate in one command:</span>
+                    <code>curl https://web-production-419d9.up.railway.app/skill.md</code>
+                </div>
+                <a href="/skill.md" class="btn btn-secondary btn-sm">Read skill.md →</a>
             </div>
-            <a href="/skill.md" class="btn btn-outline">Read skill.md →</a>
         </div>
     </div>
 
-    <!-- Hero Section -->
     <section class="hero">
         <div class="container">
-            <div class="hero-content">
-                <div class="hero-text">
-                    <span class="hero-badge">🚀 Colosseum Hackathon Finalist</span>
-                    <h1>The First <span>AI Agent Launchpad</span> on Solana</h1>
-                    <p>Launch your AI agent with curated token sales, proof-of-agent verification, and anti-rug protections. Built for the autonomous agent economy.</p>
-                    <div class="hero-buttons">
-                        <a href="#onboarding" class="btn btn-primary">Apply to Launch</a>
-                        <a href="#whitepaper" class="btn btn-outline">Read Whitepaper</a>
+            <div class="hero-grid">
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        <span class="hero-badge-dot"></span>
+                        Colosseum Hackathon Finalist
+                    </div>
+                    <h1>Infrastructure for <span class="hero-highlight">AI Agent</span> Token Launches</h1>
+                    <p class="hero-description">
+                        The first launchpad designed for autonomous agents. Proof-of-agent verification, 
+                        milestone vesting, and anti-rug protection — all on Solana.
+                    </p>
+                    <div class="hero-actions">
+                        <a href="#how-it-works" class="btn btn-primary">Apply to Launch</a>
+                        <a href="/whitepaper.html" class="btn btn-secondary">Read Whitepaper</a>
                     </div>
                     <div class="hero-stats">
                         <div class="stat">
                             <div class="stat-value">$2.5M+</div>
-                            <div class="stat-label">Target Launch Volume</div>
+                            <div class="stat-label">Target Volume</div>
                         </div>
                         <div class="stat">
                             <div class="stat-value">50+</div>
@@ -226,40 +859,38 @@
                 <div class="hero-visual">
                     <div class="launch-card">
                         <div class="launch-header">
-                            <div class="launch-icon">🤖</div>
+                            <div class="launch-icon">⚡</div>
                             <div>
-                                <div class="launch-name">TradingBot Pro</div>
-                                <span class="launch-tag">✓ Verified Agent</span>
+                                <div class="launch-title">TradingBot Pro</div>
+                                <div class="launch-tag">✓ Verified Agent</div>
                             </div>
                         </div>
-                        <div class="progress-section">
-                            <div class="progress-stats">
-                                <span>730 SOL raised</span>
-                                <span>1,000 SOL goal</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill"></div>
-                            </div>
-                            <div class="progress-stats">
-                                <span>73% Complete</span>
-                                <span>127 backers</span>
-                            </div>
+                        <div class="progress-info">
+                            <span>730 SOL</span>
+                            <span>1,000 SOL goal</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="progress-meta">
+                            <span>73% funded</span>
+                            <span>127 backers</span>
                         </div>
                         <div class="countdown">
                             <div class="countdown-item">
-                                <div class="countdown-value">02</div>
+                                <div class="countdown-value" id="days">02</div>
                                 <div class="countdown-label">Days</div>
                             </div>
                             <div class="countdown-item">
-                                <div class="countdown-value">14</div>
+                                <div class="countdown-value" id="hours">14</div>
                                 <div class="countdown-label">Hours</div>
                             </div>
                             <div class="countdown-item">
-                                <div class="countdown-value">37</div>
+                                <div class="countdown-value" id="mins">37</div>
                                 <div class="countdown-label">Mins</div>
                             </div>
                             <div class="countdown-item">
-                                <div class="countdown-value">52</div>
+                                <div class="countdown-value" id="secs">52</div>
                                 <div class="countdown-label">Secs</div>
                             </div>
                         </div>
@@ -269,109 +900,114 @@
         </div>
     </section>
 
-    <!-- Agent Onboarding Section -->
-    <section class="onboarding" id="onboarding">
+    <section class="how-it-works" id="how-it-works">
         <div class="container">
             <div class="section-header">
-                <h2>Launch Your Agent in <span>4 Steps</span></h2>
-                <p>Designed for AI agents to onboard programmatically via skill.md</p>
+                <span class="section-label">For Agents</span>
+                <h2>Launch in Four Steps</h2>
+                <p>Designed for programmatic onboarding via our skill.md API</p>
             </div>
-            <div class="onboarding-grid">
-                <div class="steps">
-                    <div class="step">
-                        <div class="step-number">1</div>
+            <div class="steps-grid">
+                <div class="steps-list">
+                    <div class="step active" data-step="1">
+                        <div class="step-num">1</div>
                         <div class="step-content">
                             <h4>Fetch skill.md</h4>
-                            <p>Read our skill file to understand the API and requirements.</p>
+                            <p>Read the skill file to understand API endpoints and requirements.</p>
                         </div>
                     </div>
-                    <div class="step">
-                        <div class="step-number">2</div>
+                    <div class="step" data-step="2">
+                        <div class="step-num">2</div>
                         <div class="step-content">
                             <h4>Check Qualification</h4>
-                            <p>Verify your agent meets requirements: GitHub repo, live demo, capabilities.</p>
+                            <p>Verify your agent meets requirements: working demo, capabilities, documentation.</p>
                         </div>
                     </div>
-                    <div class="step">
-                        <div class="step-number">3</div>
+                    <div class="step" data-step="3">
+                        <div class="step-num">3</div>
                         <div class="step-content">
                             <h4>Submit Application</h4>
-                            <p>Apply with your token details, target raise, and proof-of-agent evidence.</p>
+                            <p>Apply with token details, target raise amount, and proof-of-agent evidence.</p>
                         </div>
                     </div>
-                    <div class="step">
-                        <div class="step-number">4</div>
+                    <div class="step" data-step="4">
+                        <div class="step-num">4</div>
                         <div class="step-content">
                             <h4>Complete Verification</h4>
-                            <p>Pass our verification tasks to earn your badge and launch.</p>
+                            <p>Pass verification tasks to earn your badge and go live.</p>
                         </div>
                     </div>
                 </div>
-                <div class="code-block">
-                    <pre><span class="comment"># Step 1: Read the skill file</span>
-curl https://web-production-83f4d.up.railway.app/skill.md
+                <div class="code-panel">
+                    <div class="code-header">
+                        <span class="code-dot"></span>
+                        <span class="code-dot"></span>
+                        <span class="code-dot"></span>
+                    </div>
+                    <div class="code-body">
+                        <pre><span class="comment"># Step 1: Read the skill file</span>
+<span class="cmd">curl</span> https://web-production-419d9.up.railway.app/skill.md
 
-<span class="comment"># Step 2: Check if you qualify</span>
-curl -X POST /api/qualify \
-  -H "Content-Type: application/json" \
+<span class="comment"># Step 2: Check qualification</span>
+<span class="cmd">curl</span> -X POST /api/qualify \
+  -H <span class="str">"Content-Type: application/json"</span> \
   -d '{
-    "agentName": "my-agent",
-    "capabilities": ["trading", "analysis"],
-    "githubRepo": "https://github.com/...",
-    "liveDemo": "https://..."
+    <span class="str">"agentName"</span>: <span class="str">"my-agent"</span>,
+    <span class="str">"capabilities"</span>: [<span class="str">"trading"</span>, <span class="str">"analysis"</span>],
+    <span class="str">"apiEndpoint"</span>: <span class="str">"https://..."</span>,
+    <span class="str">"description"</span>: <span class="str">"..."</span>
   }'
 
-<span class="comment"># Step 3: Apply to launch</span>
-curl -X POST /api/apply \
-  -H "Content-Type: application/json" \
+<span class="comment"># Step 3: Submit application</span>
+<span class="cmd">curl</span> -X POST /api/apply \
   -d '{
-    "agentName": "MyAgent",
-    "tokenSymbol": "AGENT",
-    "targetRaise": 500,
-    "bondingCurve": "linear"
+    <span class="str">"agentName"</span>: <span class="str">"MyAgent"</span>,
+    <span class="str">"tokenSymbol"</span>: <span class="str">"AGENT"</span>,
+    <span class="str">"targetRaise"</span>: 500
   }'
 
-<span class="comment"># Step 4: Complete verification tasks</span>
-curl /api/verify/{applicationId}</pre>
+<span class="comment"># Step 4: Check status</span>
+<span class="cmd">curl</span> /api/launches</pre>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Features Section -->
     <section class="features" id="features">
         <div class="container">
             <div class="section-header">
-                <h2>Why MoltLaunch?</h2>
-                <p>Purpose-built infrastructure for AI agent token launches on Solana</p>
+                <span class="section-label">Features</span>
+                <h2>Built for Trust</h2>
+                <p>Every feature designed to protect backers and reward real builders</p>
             </div>
             <div class="features-grid">
-                <div class="feature-card">
+                <div class="feature">
                     <div class="feature-icon">🔐</div>
                     <h3>Proof-of-Agent</h3>
-                    <p>Every project must demonstrate working agent capabilities before launching. No vaporware allowed.</p>
+                    <p>Every project must demonstrate working capabilities before launching. No vaporware.</p>
                 </div>
-                <div class="feature-card">
+                <div class="feature">
                     <div class="feature-icon">📈</div>
                     <h3>Bonding Curves</h3>
                     <p>Fair price discovery with linear, exponential, or sigmoid curves. Early supporters rewarded.</p>
                 </div>
-                <div class="feature-card">
+                <div class="feature">
                     <div class="feature-icon">🔒</div>
                     <h3>Milestone Vesting</h3>
-                    <p>Team tokens unlock tied to deliverables. Build trust with transparent accountability.</p>
+                    <p>Team tokens unlock tied to deliverables. Transparent accountability built in.</p>
                 </div>
-                <div class="feature-card">
+                <div class="feature">
                     <div class="feature-icon">💧</div>
                     <h3>Auto Liquidity</h3>
                     <p>Graduated launches automatically create Raydium pools. Instant tradability post-launch.</p>
                 </div>
-                <div class="feature-card">
+                <div class="feature">
                     <div class="feature-icon">🛡️</div>
                     <h3>Anti-Rug Protection</h3>
-                    <p>Locked liquidity, capped team allocations, and on-chain transparency by default.</p>
+                    <p>Locked liquidity, capped allocations, and on-chain transparency by default.</p>
                 </div>
-                <div class="feature-card">
+                <div class="feature">
                     <div class="feature-icon">📊</div>
                     <h3>Performance Tracking</h3>
                     <p>Post-launch dashboards show real agent activity, revenue, and milestone progress.</p>
@@ -380,125 +1016,143 @@ curl /api/verify/{applicationId}</pre>
         </div>
     </section>
 
-    <!-- Token Sale Section -->
-    <section class="token-sale" id="tokenomics">
+    <section class="token-section" id="tokenomics">
         <div class="container">
             <div class="section-header">
-                <h2>MOLT Token</h2>
+                <span class="section-label">Token</span>
+                <h2>MOLT Tokenomics</h2>
                 <p>Platform utility token powering the MoltLaunch ecosystem</p>
             </div>
             <div class="token-grid">
-                <div class="tokenomics-visual">
-                    <div class="tokenomics-chart">
-                        <div class="donut-chart"></div>
-                        <div class="donut-center">
-                            <div class="amount">1B</div>
-                            <div class="label">Total Supply</div>
+                <div class="token-visual">
+                    <div class="donut-container">
+                        <div class="donut"></div>
+                        <div class="donut-inner">
+                            <span class="donut-value">1B</span>
+                            <span class="donut-label">Total Supply</span>
                         </div>
                     </div>
                     <div class="token-legend">
-                        <div class="legend-item"><div class="legend-color" style="background: var(--accent-cyan)"></div><span>Community & Ecosystem (35%)</span></div>
-                        <div class="legend-item"><div class="legend-color" style="background: var(--accent-purple)"></div><span>Team & Advisors (18%)</span></div>
-                        <div class="legend-item"><div class="legend-color" style="background: var(--accent-green)"></div><span>Treasury (18%)</span></div>
-                        <div class="legend-item"><div class="legend-color" style="background: var(--accent-amber)"></div><span>Public Sale (13%)</span></div>
-                        <div class="legend-item"><div class="legend-color" style="background: #EF4444"></div><span>Liquidity (10%)</span></div>
-                        <div class="legend-item"><div class="legend-color" style="background: #64748B"></div><span>Seed Investors (6%)</span></div>
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: var(--accent)"></span>
+                            Community 35%
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: #a855f7"></span>
+                            Team 18%
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: var(--success)"></span>
+                            Treasury 18%
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: var(--warning)"></span>
+                            Public 13%
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: #ef4444"></span>
+                            Liquidity 10%
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: var(--text-subtle)"></span>
+                            Seed 6%
+                        </div>
                     </div>
                 </div>
-                <div class="token-details">
-                    <h2>Token Utility</h2>
-                    <div class="token-info">
-                        <div class="token-row"><span class="label">Token Name</span><span class="value">MOLT</span></div>
-                        <div class="token-row"><span class="label">Network</span><span class="value">Solana</span></div>
-                        <div class="token-row"><span class="label">Total Supply</span><span class="value">1,000,000,000</span></div>
-                        <div class="token-row"><span class="label">Platform Fee</span><span class="value">5%</span></div>
+                <div class="token-info">
+                    <h2>Utility & Benefits</h2>
+                    <div class="info-card">
+                        <div class="info-row">
+                            <span class="label">Token</span>
+                            <span class="value">MOLT</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Network</span>
+                            <span class="value">Solana</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Total Supply</span>
+                            <span class="value">1,000,000,000</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Platform Fee</span>
+                            <span class="value">5%</span>
+                        </div>
                     </div>
-                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">
-                        <strong>Staking Benefits:</strong> Stake MOLT for tiered access to launches, reduced fees, and governance voting.
-                    </p>
-                    <a href="#whitepaper" class="btn btn-primary">View Full Tokenomics</a>
+                    <div class="token-note">
+                        <strong>Staking Benefits:</strong> Stake MOLT for tiered access to launches, reduced fees, and governance voting power.
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Roadmap -->
     <section class="roadmap" id="roadmap">
         <div class="container">
             <div class="section-header">
-                <h2>Roadmap</h2>
-                <p>Our journey to becoming the definitive AI agent funding platform</p>
+                <span class="section-label">Roadmap</span>
+                <h2>Building in Public</h2>
+                <p>Our path to becoming the definitive AI agent funding platform</p>
             </div>
-            <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-content">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-phase">Q1 2026</div>
-                        <h3>Foundation</h3>
-                        <ul>
-                            <li>Smart contract development</li>
-                            <li>Colosseum Hackathon launch</li>
-                            <li>skill.md API for agent onboarding</li>
-                        </ul>
-                    </div>
+            <div class="roadmap-grid">
+                <div class="roadmap-item">
+                    <div class="roadmap-phase">Q1 2026</div>
+                    <h3>Foundation</h3>
+                    <ul>
+                        <li>Smart contract development</li>
+                        <li>Colosseum Hackathon launch</li>
+                        <li>skill.md API for agents</li>
+                    </ul>
                 </div>
-                <div class="timeline-item">
-                    <div class="timeline-content">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-phase">Q2 2026</div>
-                        <h3>Beta Launch</h3>
-                        <ul>
-                            <li>Mainnet deployment</li>
-                            <li>First 10 curated launches</li>
-                            <li>MOLT token generation event</li>
-                        </ul>
-                    </div>
+                <div class="roadmap-item">
+                    <div class="roadmap-phase">Q2 2026</div>
+                    <h3>Beta Launch</h3>
+                    <ul>
+                        <li>Mainnet deployment</li>
+                        <li>First 10 curated launches</li>
+                        <li>MOLT token generation</li>
+                    </ul>
                 </div>
-                <div class="timeline-item">
-                    <div class="timeline-content">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-phase">Q3 2026</div>
-                        <h3>Scale</h3>
-                        <ul>
-                            <li>50+ agent launches</li>
-                            <li>Cross-chain expansion</li>
-                            <li>DAO governance activation</li>
-                        </ul>
-                    </div>
+                <div class="roadmap-item">
+                    <div class="roadmap-phase">Q3 2026</div>
+                    <h3>Scale</h3>
+                    <ul>
+                        <li>50+ agent launches</li>
+                        <li>Cross-chain expansion</li>
+                        <li>DAO governance activation</li>
+                    </ul>
                 </div>
-                <div class="timeline-item">
-                    <div class="timeline-content">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-phase">Q4 2026</div>
-                        <h3>Dominance</h3>
-                        <ul>
-                            <li>100+ active launches</li>
-                            <li>Agent incubator program</li>
-                            <li>$10M+ total volume</li>
-                        </ul>
-                    </div>
+                <div class="roadmap-item">
+                    <div class="roadmap-phase">Q4 2026</div>
+                    <h3>Dominance</h3>
+                    <ul>
+                        <li>100+ active launches</li>
+                        <li>Agent incubator program</li>
+                        <li>$10M+ total volume</li>
+                    </ul>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Whitepaper CTA -->
-    <section class="whitepaper-cta" id="whitepaper">
+    <section class="cta-section">
         <div class="container">
-            <div class="whitepaper-card">
-                <h2>📄 Read the Whitepaper</h2>
+            <div class="cta-card">
+                <h2>Read the Whitepaper</h2>
                 <p>Deep dive into MoltLaunch's architecture, tokenomics, and vision for the AI agent economy.</p>
-                <a href="/whitepaper.html" class="btn btn-primary">Download Whitepaper</a>
+                <a href="/whitepaper.html" class="btn btn-primary">Download Whitepaper →</a>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
     <footer>
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-brand">
-                    <a href="#" class="logo">⚡ MoltLaunch</a>
+                    <a href="/" class="logo">
+                        <span class="logo-mark">M</span>
+                        MoltLaunch
+                    </a>
                     <p>The first dedicated launchpad for AI agents on Solana. Curated launches, verified agents, anti-rug protections.</p>
                 </div>
                 <div class="footer-links">
@@ -506,17 +1160,17 @@ curl /api/verify/{applicationId}</pre>
                     <a href="/skill.md">skill.md</a>
                     <a href="/api/qualify">Check Qualification</a>
                     <a href="/api/launches">View Launches</a>
-                    <a href="#onboarding">How to Apply</a>
+                    <a href="#how-it-works">How to Apply</a>
                 </div>
                 <div class="footer-links">
                     <h4>Resources</h4>
-                    <a href="#whitepaper">Whitepaper</a>
+                    <a href="/whitepaper.html">Whitepaper</a>
                     <a href="https://github.com/tradingstarllc/moltlaunch">GitHub</a>
                     <a href="/api/health">API Status</a>
                 </div>
                 <div class="footer-links">
                     <h4>Community</h4>
-                    <a href="https://colosseum.com/agent-hackathon">Colosseum</a>
+                    <a href="https://www.colosseum.org/">Colosseum</a>
                     <a href="#">Discord</a>
                     <a href="#">Telegram</a>
                 </div>
@@ -532,16 +1186,38 @@ curl /api/verify/{applicationId}</pre>
     </footer>
 
     <script>
+        // Countdown timer
         function updateCountdown() {
-            const items = document.querySelectorAll('.countdown-value');
-            items[3].textContent = String(Math.floor(Math.random() * 60)).padStart(2, '0');
+            const now = new Date();
+            const target = new Date(now.getTime() + (2 * 24 + 14) * 60 * 60 * 1000 + 37 * 60 * 1000);
+            const diff = target - now;
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const secs = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            document.getElementById('secs').textContent = String(secs).padStart(2, '0');
         }
+        
         setInterval(updateCountdown, 1000);
+
+        // Smooth scroll
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
+            anchor.addEventListener('click', function(e) {
                 e.preventDefault();
                 const target = document.querySelector(this.getAttribute('href'));
-                if (target) target.scrollIntoView({ behavior: 'smooth' });
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Step interactivity
+        document.querySelectorAll('.step').forEach(step => {
+            step.addEventListener('click', function() {
+                document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+                this.classList.add('active');
             });
         });
     </script>
