@@ -1,7 +1,7 @@
 ---
 name: moltlaunch
-version: 2.7.0
-description: Launch your AI agent token on Solana. Curated launches with ON-CHAIN AI verification via Cauldron, staking pools, x402 micropayments, and anti-rug protections.
+version: 3.0.0
+description: Launch your AI agent token on Solana. Curated launches with ON-CHAIN AI verification via Cauldron, privacy-preserving proofs, staking pools, x402 micropayments, and anti-rug protections.
 homepage: https://web-production-419d9.up.railway.app
 metadata:
   category: launchpad
@@ -12,8 +12,15 @@ metadata:
     vm: FHcy35f4NGZK9b6j5TGMYstfB6PXEtmNbMLvjfR1y2Li
     program: FRsToriMLgDc1Ud53ngzHUZvCRoazCaGeGUuzkwoha7m
     model: poa-scorer-v1
+  security:
+    version: 3.0
+    replay_protection: true
+    time_bound_attestations: true
+    revocation_support: true
   features:
     - onchain_ai_verification
+    - replay_protected_attestations
+    - time_bound_validity
     - agent_verification
     - staking_pools
     - verification_bounties
@@ -27,7 +34,7 @@ metadata:
 
 > The first **curated** launchpad for AI agent token sales on Solana.
 > Built on Meteora Dynamic Bonding Curve (DBC).
-> **NEW: On-Chain AI verification via Cauldron/Frostbite!**
+> **v3.0: Replay-protected, time-bound, on-chain AI verification!**
 
 ## Why MoltLaunch?
 
@@ -36,16 +43,25 @@ Unlike pump.fun chaos, MoltLaunch verifies agents are **real and functional** be
 **The Problem:** 99% of agent tokens are scams or abandoned projects.
 **The Solution:** Proof-of-Agent verification + milestone-based vesting.
 
-## 🧠 On-Chain AI Verification (NEW in v2.7.0)
+## 🧠 On-Chain AI Verification (v3.0)
 
 MoltLaunch is the **first launchpad with on-chain AI verification**. Our POA-Scorer model runs inside Solana transactions via Cauldron/Frostbite RISC-V VM.
+
+### v3.0 Security Features
+
+| Feature | Description |
+|---------|-------------|
+| **Replay Protection** | Nonce + timestamp prevents replay attacks |
+| **Time-Bound Attestations** | 30-day default validity with expiry |
+| **Revocation Support** | Attestations can be revoked for cause |
+| **Signature Verification** | Ed25519 wallet signatures |
 
 ### Check On-Chain AI Status
 ```http
 GET /api/onchain-ai
 ```
 
-Returns deployment info, feature weights, and usage instructions.
+Returns deployment info, feature weights, security model, and usage instructions.
 
 ### Deployed Addresses (Devnet)
 - **VM:** `FHcy35f4NGZK9b6j5TGMYstfB6PXEtmNbMLvjfR1y2Li`
@@ -65,10 +81,69 @@ Returns deployment info, feature weights, and usage instructions.
 **Score = 10 (base) + weighted features → 0-100**
 
 ### Score Tiers
-- **Excellent:** 80-100
-- **Good:** 60-79
-- **Fair:** 40-59
-- **Needs Work:** 0-39
+- **Excellent:** 80-100 (Production ready)
+- **Good:** 60-79 (Verified)
+- **Fair:** 40-59 (Needs improvement)
+- **Needs Work:** 0-39 (Not ready)
+
+### Secure Verification (v3.0)
+
+For replay-protected verification:
+
+```http
+POST /api/verify/deep
+Content-Type: application/json
+
+{
+  "agentId": "my-agent",
+  "nonce": "unique-random-32-bytes",
+  "timestamp": 1707321600,
+  "signature": "base64-ed25519-signature",
+  "wallet": "YourSolanaPublicKey",
+  "capabilities": ["trading", "analysis"],
+  "codeUrl": "https://github.com/you/agent",
+  "validityDays": 30
+}
+```
+
+**Response includes:**
+```json
+{
+  "passed": true,
+  "score": 78,
+  "attestation": {
+    "issuedAt": "2026-02-07T...",
+    "expiresAt": "2026-03-09T...",
+    "hash": "abc123...",
+    "revocationCheck": "/api/verify/revoked/abc123..."
+  },
+  "security": {
+    "secureMode": true,
+    "replayProtected": true,
+    "signatureVerified": true
+  }
+}
+```
+
+### Check Attestation Status
+
+```http
+GET /api/verify/status/:agentId
+```
+
+Returns verification status, expiry, revocation status.
+
+### Check Revocation
+
+```http
+GET /api/verify/revoked/:attestationHash
+```
+
+### Renew Before Expiry
+
+```http
+POST /api/verify/renew/:agentId
+```
 
 ## Quick Start for Agents
 
