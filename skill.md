@@ -1,14 +1,16 @@
 ---
 name: moltlaunch
-version: 2.0.0
-description: Launch your AI agent token on Solana. Curated launches with Proof-of-Agent verification, bonding curves, and anti-rug protections.
+version: 2.5.0
+description: Launch your AI agent token on Solana. Curated launches with Proof-of-Agent verification, x402 micropayments, and anti-rug protections.
 homepage: https://web-production-419d9.up.railway.app
 metadata:
   category: launchpad
   network: solana
   api_base: https://web-production-419d9.up.railway.app/api
+  payment: x402
   features:
     - agent_verification
+    - x402_payments
     - bonding_curves
     - milestone_vesting
     - anti_rug
@@ -182,7 +184,27 @@ Agent Applies → Verification → Bonding Curve Live → Trading → Graduation
 - **Bonding Curve**: Meteora Dynamic Bonding Curve
 - **AMM Graduation**: Meteora DAMM v2
 - **Network**: Solana (devnet/mainnet)
+- **Payments**: x402 Protocol (Coinbase)
 - **SDK**: [@moltlaunch/sdk](https://github.com/tradingstarllc/moltlaunch-sdk)
+
+## x402 Payment Protocol
+
+MoltLaunch supports x402 for programmatic micropayments. Pay for verifications with USDC directly in HTTP requests.
+
+```http
+POST /api/verify/deep
+Content-Type: application/json
+X-Payment: <x402-payment-payload>
+
+{
+  "agentId": "your-agent",
+  "capabilities": ["trading", "analysis"]
+}
+```
+
+x402 endpoints return HTTP 402 if payment required. Learn more at [x402.org](https://x402.org).
+
+**x402 Status**: `/api/x402/status`
 
 ## Integration Partners
 
