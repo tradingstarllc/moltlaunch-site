@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Dashboard — MoltLaunch</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #09090b;
+            --bg-subtle: #18181b;
+            --bg-muted: #27272a;
+            --border: #3f3f46;
+            --border-subtle: #27272a;
+            --text: #fafafa;
+            --text-muted: #a1a1aa;
+            --text-subtle: #71717a;
+            --accent: #22d3ee;
+            --accent-muted: rgba(34, 211, 238, 0.15);
+            --success: #4ade80;
+            --warning: #fbbf24;
+            --error: #ef4444;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
+        h1, h2, h3 { font-weight: 600; line-height: 1.2; letter-spacing: -0.02em; }
+        h1 { font-size: 2rem; }
+        h2 { font-size: 1.5rem; }
+        h3 { font-size: 1.125rem; }
+        code { font-family: 'JetBrains Mono', monospace; background: var(--bg-muted); padding: 2px 6px; border-radius: 4px; font-size: 0.85rem; }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-decoration: none;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .btn-primary { background: var(--accent); color: var(--bg); }
+        .btn-primary:hover { background: #06b6d4; }
+        .btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: var(--bg-subtle); }
+        .btn-success { background: var(--success); color: var(--bg); }
+        .btn-warning { background: var(--warning); color: var(--bg); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        nav {
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: 32px;
+        }
+        nav .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo {
+            font-weight: 700;
+            font-size: 1.125rem;
+            color: var(--text);
+            text-decoration: none;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+        }
+        .wallet-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+        .wallet-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--error);
+        }
+        .wallet-dot.connected { background: var(--success); }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        .card {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .card-header h3 { margin: 0; }
+        .score-display {
+            text-align: center;
+            padding: 32px;
+        }
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(var(--accent) calc(var(--score) * 1%), var(--bg-muted) 0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            position: relative;
+        }
+        .score-circle::before {
+            content: '';
+            width: 90px;
+            height: 90px;
+            background: var(--bg-subtle);
+            border-radius: 50%;
+            position: absolute;
+        }
+        .score-value {
+            position: relative;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .score-label { color: var(--text-muted); font-size: 0.9rem; }
+        .tier-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-top: 12px;
+        }
+        .tier-bronze { background: rgba(205, 127, 50, 0.2); color: #cd7f32; }
+        .tier-silver { background: rgba(192, 192, 192, 0.2); color: #c0c0c0; }
+        .tier-gold { background: rgba(255, 215, 0, 0.2); color: #ffd700; }
+        .tier-premium { background: rgba(168, 85, 247, 0.2); color: #a855f7; }
+        .tier-unverified { background: var(--bg-muted); color: var(--text-muted); }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.9rem;
+            font-family: inherit;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .trace-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .trace-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            background: var(--bg);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        .trace-date { color: var(--text-muted); }
+        .trace-score { color: var(--success); font-weight: 500; }
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: var(--text-muted);
+        }
+        .empty-state span { font-size: 3rem; display: block; margin-bottom: 16px; }
+        .alert {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+        }
+        .alert-success { background: rgba(74, 222, 128, 0.1); border: 1px solid var(--success); color: var(--success); }
+        .alert-error { background: rgba(239, 68, 68, 0.1); border: 1px solid var(--error); color: var(--error); }
+        .alert-info { background: rgba(34, 211, 238, 0.1); border: 1px solid var(--accent); color: var(--accent); }
+        .full-width { grid-column: 1 / -1; }
+        .steps {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .step {
+            flex: 1;
+            text-align: center;
+            padding: 16px;
+            background: var(--bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-subtle);
+        }
+        .step.active { border-color: var(--accent); background: var(--accent-muted); }
+        .step.completed { border-color: var(--success); }
+        .step-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--bg-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .step.active .step-num { background: var(--accent); color: var(--bg); }
+        .step.completed .step-num { background: var(--success); color: var(--bg); }
+        .step-label { font-size: 0.85rem; color: var(--text-muted); }
+        footer {
+            text-align: center;
+            padding: 32px 0;
+            margin-top: 48px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-subtle);
+        }
+        @media (max-width: 768px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .steps { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <a href="/" class="logo">🚀 MoltLaunch</a>
+            <div style="display: flex; gap: 16px; align-items: center;">
+                <a href="/airdrop.html" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">Airdrop</a>
+                <a href="/docs.html" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">Docs</a>
+                <div class="wallet-status" id="wallet-status">
+                    <div class="wallet-dot" id="wallet-dot"></div>
+                    <span id="wallet-text">Not Connected</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Agent Dashboard</h1>
+                <p style="color: var(--text-muted);">Register, verify, and track your agent's performance</p>
+            </div>
+            <button class="btn btn-primary" id="connect-btn" onclick="connectWallet()">Connect Wallet</button>
+        </div>
+
+        <!-- Progress Steps -->
+        <div class="steps" id="progress-steps">
+            <div class="step" id="step-1">
+                <div class="step-num">1</div>
+                <div class="step-label">Connect Wallet</div>
+            </div>
+            <div class="step" id="step-2">
+                <div class="step-num">2</div>
+                <div class="step-label">Register Agent</div>
+            </div>
+            <div class="step" id="step-3">
+                <div class="step-num">3</div>
+                <div class="step-label">Get Verified</div>
+            </div>
+            <div class="step" id="step-4">
+                <div class="step-num">4</div>
+                <div class="step-label">Track Score</div>
+            </div>
+        </div>
+
+        <!-- Alerts -->
+        <div id="alert-container"></div>
+
+        <div class="dashboard-grid">
+            <!-- Agent Registration -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>📝 Register Agent</h3>
+                </div>
+                <form id="register-form" onsubmit="registerAgent(event)">
+                    <div class="form-group">
+                        <label>Agent ID *</label>
+                        <input type="text" id="agent-id" placeholder="my-trading-agent" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="agent-name" placeholder="My Trading Agent">
+                    </div>
+                    <div class="form-group">
+                        <label>GitHub URL</label>
+                        <input type="url" id="github-url" placeholder="https://github.com/user/repo">
+                    </div>
+                    <div class="form-group">
+                        <label>Capabilities</label>
+                        <select id="capabilities">
+                            <option value="trading">Trading</option>
+                            <option value="research">Research</option>
+                            <option value="automation">Automation</option>
+                            <option value="social">Social</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Register Agent</button>
+                </form>
+            </div>
+
+            <!-- Verification Score -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>🔐 Verification Score</h3>
+                    <button class="btn btn-secondary" onclick="refreshScore()" style="padding: 8px 16px; font-size: 0.8rem;">Refresh</button>
+                </div>
+                <div class="score-display" id="score-display">
+                    <div class="empty-state">
+                        <span>🔒</span>
+                        <p>Register an agent to see your score</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Verify -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>⚡ Quick Verify</h3>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">
+                    Run verification on your registered agent
+                </p>
+                <div class="form-group">
+                    <label>Agent ID</label>
+                    <input type="text" id="verify-agent-id" placeholder="Enter your agent ID">
+                </div>
+                <div style="display: flex; gap: 12px;">
+                    <button class="btn btn-secondary" onclick="quickVerify()" style="flex: 1;">Quick (Free)</button>
+                    <button class="btn btn-primary" onclick="deepVerify()" style="flex: 1;">Deep ($0.25)</button>
+                </div>
+            </div>
+
+            <!-- Behavioral History -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>📊 Behavioral History</h3>
+                </div>
+                <div class="trace-list" id="trace-list">
+                    <div class="empty-state" style="padding: 24px;">
+                        <span>📈</span>
+                        <p style="font-size: 0.9rem;">No execution traces yet</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Trace -->
+            <div class="card full-width">
+                <div class="card-header">
+                    <h3>📋 Submit Execution Trace</h3>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">
+                    Submit execution traces to build your behavioral score (up to +25 points)
+                </p>
+                <form id="trace-form" onsubmit="submitTrace(event)">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+                        <div class="form-group">
+                            <label>Agent ID *</label>
+                            <input type="text" id="trace-agent-id" placeholder="my-agent" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Total Actions</label>
+                            <input type="number" id="trace-actions" placeholder="100" value="100">
+                        </div>
+                        <div class="form-group">
+                            <label>Success Rate (0-1)</label>
+                            <input type="number" id="trace-success" placeholder="0.95" value="0.95" step="0.01" min="0" max="1">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success" style="margin-top: 8px;">Submit Trace</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>MoltLaunch — Trust Infrastructure for AI Agents</p>
+            <p style="margin-top: 8px;">
+                <a href="/" style="color: var(--accent);">Home</a> · 
+                <a href="/airdrop.html" style="color: var(--accent);">Airdrop</a> · 
+                <a href="/docs.html" style="color: var(--accent);">Docs</a> · 
+                <a href="/skill.md" style="color: var(--accent);">API</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        let walletAddress = null;
+        let registeredAgentId = null;
+
+        function showAlert(message, type = 'info') {
+            const container = document.getElementById('alert-container');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            container.appendChild(alert);
+            setTimeout(() => alert.remove(), 5000);
+        }
+
+        function updateStep(step, status) {
+            const el = document.getElementById(`step-${step}`);
+            el.classList.remove('active', 'completed');
+            if (status === 'active') el.classList.add('active');
+            if (status === 'completed') el.classList.add('completed');
+        }
+
+        async function connectWallet() {
+            if (window.solana && window.solana.isPhantom) {
+                try {
+                    const resp = await window.solana.connect();
+                    walletAddress = resp.publicKey.toString();
+                    document.getElementById('wallet-dot').classList.add('connected');
+                    document.getElementById('wallet-text').textContent = walletAddress.slice(0, 4) + '...' + walletAddress.slice(-4);
+                    document.getElementById('connect-btn').textContent = 'Connected';
+                    document.getElementById('connect-btn').disabled = true;
+                    updateStep(1, 'completed');
+                    updateStep(2, 'active');
+                    
+                    // Register with airdrop
+                    await fetch('/api/airdrop/connect', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ wallet: walletAddress })
+                    });
+                    showAlert('Wallet connected! You\'re now a Pioneer (500 MOLT)', 'success');
+                } catch (err) {
+                    showAlert('Failed to connect wallet: ' + err.message, 'error');
+                }
+            } else {
+                showAlert('Please install Phantom wallet', 'error');
+            }
+        }
+
+        async function registerAgent(e) {
+            e.preventDefault();
+            const agentId = document.getElementById('agent-id').value;
+            const name = document.getElementById('agent-name').value;
+            const github = document.getElementById('github-url').value;
+            const capabilities = [document.getElementById('capabilities').value];
+
+            try {
+                const res = await fetch('/api/apply', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        agentId,
+                        name: name || agentId,
+                        description: `Agent registered via dashboard`,
+                        capabilities,
+                        website: github || undefined,
+                        contact: walletAddress || undefined
+                    })
+                });
+                const data = await res.json();
+                if (data.success || data.applicationId) {
+                    registeredAgentId = agentId;
+                    document.getElementById('verify-agent-id').value = agentId;
+                    document.getElementById('trace-agent-id').value = agentId;
+                    updateStep(2, 'completed');
+                    updateStep(3, 'active');
+                    showAlert('Agent registered! You\'re now a Builder (2,500 MOLT)', 'success');
+                } else {
+                    showAlert('Registration failed: ' + (data.error || 'Unknown error'), 'error');
+                }
+            } catch (err) {
+                showAlert('Error: ' + err.message, 'error');
+            }
+        }
+
+        async function quickVerify() {
+            const agentId = document.getElementById('verify-agent-id').value;
+            if (!agentId) return showAlert('Enter an agent ID', 'error');
+
+            try {
+                const res = await fetch('/api/verify/quick', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ agentId })
+                });
+                const data = await res.json();
+                updateScoreDisplay(data);
+                showAlert(`Quick verification complete! Score: ${data.score || 'N/A'}`, 'info');
+            } catch (err) {
+                showAlert('Verification failed: ' + err.message, 'error');
+            }
+        }
+
+        async function deepVerify() {
+            const agentId = document.getElementById('verify-agent-id').value;
+            if (!agentId) return showAlert('Enter an agent ID', 'error');
+
+            try {
+                showAlert('Running deep verification... (this may take a moment)', 'info');
+                const res = await fetch('/api/verify/deep', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ agentId, capabilities: ['trading'] })
+                });
+                const data = await res.json();
+                updateScoreDisplay(data);
+                if (data.score >= 60) {
+                    updateStep(3, 'completed');
+                    updateStep(4, 'active');
+                    showAlert(`Verified! Score: ${data.score}. You're now eligible for 10,000 MOLT!`, 'success');
+                } else {
+                    showAlert(`Score: ${data.score}. Need 60+ for max tier.`, 'info');
+                }
+            } catch (err) {
+                showAlert('Verification failed: ' + err.message, 'error');
+            }
+        }
+
+        function updateScoreDisplay(data) {
+            const container = document.getElementById('score-display');
+            const score = data.score || 0;
+            const tier = data.tier || 'unverified';
+            
+            container.innerHTML = `
+                <div class="score-circle" style="--score: ${score}">
+                    <div class="score-value">${score}</div>
+                </div>
+                <div class="score-label">Verification Score</div>
+                <div class="tier-badge tier-${tier.toLowerCase()}">${tier}</div>
+                ${data.behavioral ? `<div style="margin-top: 12px; font-size: 0.85rem; color: var(--text-muted);">Behavioral bonus: +${data.behavioral.bonus || 0}</div>` : ''}
+            `;
+        }
+
+        async function refreshScore() {
+            const agentId = document.getElementById('verify-agent-id').value || registeredAgentId;
+            if (!agentId) return showAlert('Enter an agent ID first', 'error');
+
+            try {
+                const res = await fetch(`/api/verify/status/${agentId}`);
+                const data = await res.json();
+                if (data.verified) {
+                    updateScoreDisplay(data);
+                } else {
+                    showAlert('Agent not verified yet', 'info');
+                }
+            } catch (err) {
+                showAlert('Error: ' + err.message, 'error');
+            }
+        }
+
+        async function submitTrace(e) {
+            e.preventDefault();
+            const agentId = document.getElementById('trace-agent-id').value;
+            const actions = parseInt(document.getElementById('trace-actions').value) || 100;
+            const successRate = parseFloat(document.getElementById('trace-success').value) || 0.95;
+
+            try {
+                const res = await fetch('/api/traces', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        agentId,
+                        trace: {
+                            period: {
+                                start: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+                                end: new Date().toISOString()
+                            },
+                            summary: {
+                                totalActions: actions,
+                                successRate: successRate,
+                                errorRate: 1 - successRate
+                            }
+                        }
+                    })
+                });
+                const data = await res.json();
+                if (data.traceId) {
+                    showAlert(`Trace submitted! Behavioral score: +${data.behavioralScore || 0}`, 'success');
+                    loadTraces(agentId);
+                } else {
+                    showAlert('Failed to submit trace', 'error');
+                }
+            } catch (err) {
+                showAlert('Error: ' + err.message, 'error');
+            }
+        }
+
+        async function loadTraces(agentId) {
+            if (!agentId) return;
+            try {
+                const res = await fetch(`/api/traces/${agentId}`);
+                const data = await res.json();
+                const container = document.getElementById('trace-list');
+                
+                if (data.traces && data.traces.length > 0) {
+                    container.innerHTML = data.traces.map(t => `
+                        <div class="trace-item">
+                            <span class="trace-date">${new Date(t.submittedAt).toLocaleDateString()}</span>
+                            <span>Actions: ${t.trace?.summary?.totalActions || 'N/A'}</span>
+                            <span class="trace-score">+${t.behavioralScore || 0}</span>
+                        </div>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error('Failed to load traces:', err);
+            }
+        }
+
+        // Check for Phantom on load
+        window.addEventListener('load', () => {
+            if (window.solana && window.solana.isPhantom) {
+                updateStep(1, 'active');
+            }
+        });
+    </script>
+</body>
+</html>

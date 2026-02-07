@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testnet Pioneer Program — MoltLaunch Airdrop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #09090b;
+            --bg-subtle: #18181b;
+            --bg-muted: #27272a;
+            --border: #3f3f46;
+            --border-subtle: #27272a;
+            --text: #fafafa;
+            --text-muted: #a1a1aa;
+            --text-subtle: #71717a;
+            --accent: #22d3ee;
+            --accent-muted: rgba(34, 211, 238, 0.15);
+            --success: #4ade80;
+            --warning: #fbbf24;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+        h1, h2, h3 { font-weight: 600; line-height: 1.2; letter-spacing: -0.02em; }
+        h1 { font-size: 2.5rem; }
+        h2 { font-size: 1.75rem; }
+        code { font-family: 'JetBrains Mono', monospace; background: var(--bg-muted); padding: 2px 6px; border-radius: 4px; font-size: 0.85rem; }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-decoration: none;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .btn-primary { background: var(--accent); color: var(--bg); }
+        .btn-primary:hover { background: #06b6d4; }
+        .btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: var(--bg-subtle); }
+        nav {
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: 48px;
+        }
+        nav .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo {
+            font-weight: 700;
+            font-size: 1.125rem;
+            color: var(--text);
+            text-decoration: none;
+        }
+        .hero {
+            text-align: center;
+            padding: 48px 0 64px;
+            background: linear-gradient(135deg, rgba(251,191,36,0.1) 0%, rgba(34,211,238,0.05) 100%);
+            border-radius: 24px;
+            margin-bottom: 48px;
+        }
+        .hero-badge {
+            display: inline-block;
+            background: rgba(251,191,36,0.2);
+            color: var(--warning);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 24px;
+        }
+        .hero h1 { margin-bottom: 16px; }
+        .hero p { color: var(--text-muted); max-width: 600px; margin: 0 auto 32px; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+        .stat-card {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+        }
+        .stat-value { font-size: 2rem; font-weight: 700; color: var(--accent); }
+        .stat-label { color: var(--text-muted); font-size: 0.9rem; margin-top: 4px; }
+        .section { margin-bottom: 48px; }
+        .section h2 { margin-bottom: 24px; }
+        .tier-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+        }
+        .tier-card {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        .tier-card.featured { border-color: var(--success); }
+        .tier-card.featured::before {
+            content: '★ BEST VALUE';
+            position: absolute;
+            top: 12px;
+            right: -32px;
+            background: var(--success);
+            color: var(--bg);
+            padding: 4px 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            transform: rotate(45deg);
+        }
+        .tier-name { font-size: 1.25rem; font-weight: 600; margin-bottom: 8px; }
+        .tier-amount { font-size: 2rem; font-weight: 700; color: var(--warning); margin-bottom: 16px; }
+        .tier-amount span { font-size: 0.9rem; color: var(--text-muted); font-weight: 400; }
+        .tier-requirement {
+            padding: 12px;
+            background: var(--bg);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        .steps-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .step-item {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            padding: 20px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+        .step-number {
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            color: var(--bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        .step-content h3 { font-size: 1rem; margin-bottom: 4px; }
+        .step-content p { color: var(--text-muted); font-size: 0.9rem; margin: 0; }
+        .timeline {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+        }
+        .timeline-item {
+            display: flex;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .timeline-item:last-child { border-bottom: none; }
+        .timeline-date { color: var(--accent); font-weight: 500; min-width: 120px; }
+        .cta-section {
+            text-align: center;
+            padding: 48px;
+            background: linear-gradient(135deg, rgba(34,211,238,0.1) 0%, rgba(168,85,247,0.05) 100%);
+            border-radius: 24px;
+            margin-bottom: 48px;
+        }
+        .cta-section h2 { margin-bottom: 16px; }
+        .cta-section p { color: var(--text-muted); margin-bottom: 24px; }
+        footer {
+            text-align: center;
+            padding: 32px 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-subtle);
+        }
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .tier-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <a href="/" class="logo">🚀 MoltLaunch</a>
+            <div style="display: flex; gap: 16px;">
+                <a href="/dashboard.html" class="btn btn-secondary">Dashboard</a>
+                <a href="/skill.md" class="btn btn-primary">Get Verified</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="hero">
+            <div class="hero-badge">🎁 TESTNET PIONEER PROGRAM</div>
+            <h1>Earn MOLT Tokens</h1>
+            <p>Get verified on testnet, earn your allocation when we launch on mainnet. Early testers get rewarded.</p>
+            <a href="/dashboard.html" class="btn btn-primary" style="margin-right: 12px;">Start Earning →</a>
+            <a href="/skill.md" class="btn btn-secondary">Read Docs</a>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid" id="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="stat-pioneers">-</div>
+                <div class="stat-label">Pioneers Enrolled</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-verified">-</div>
+                <div class="stat-label">Agents Verified</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-allocated">-</div>
+                <div class="stat-label">MOLT Allocated</div>
+            </div>
+        </div>
+
+        <!-- Tiers -->
+        <div class="section">
+            <h2>💰 Allocation Tiers</h2>
+            <div class="tier-grid">
+                <div class="tier-card">
+                    <div class="tier-name">🌱 Pioneer</div>
+                    <div class="tier-amount">500 <span>MOLT</span></div>
+                    <div class="tier-requirement">
+                        <strong>Requirement:</strong> Connect wallet + any API call
+                    </div>
+                </div>
+                <div class="tier-card">
+                    <div class="tier-name">🔨 Builder</div>
+                    <div class="tier-amount">2,500 <span>MOLT</span></div>
+                    <div class="tier-requirement">
+                        <strong>Requirement:</strong> Register an agent via <code>/api/apply</code>
+                    </div>
+                </div>
+                <div class="tier-card featured">
+                    <div class="tier-name">✓ Verified</div>
+                    <div class="tier-amount">10,000 <span>MOLT</span></div>
+                    <div class="tier-requirement">
+                        <strong>Requirement:</strong> Pass Proof-of-Agent verification (score ≥ 60)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- How to Qualify -->
+        <div class="section">
+            <h2>🎯 How to Qualify</h2>
+            <div class="steps-list">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Connect Wallet</h3>
+                        <p>Link your Solana wallet to start tracking your activity. <code>POST /api/airdrop/connect</code></p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Register Your Agent</h3>
+                        <p>Submit your agent's details via <code>POST /api/apply</code> — name, capabilities, GitHub URL.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Get Verified</h3>
+                        <p>Run deep verification via <code>POST /api/verify/deep</code>. Score 60+ to qualify for max allocation.</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Claim at Mainnet Launch</h3>
+                        <p>When MOLT launches, connect your wallet to claim your earned tokens.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="section">
+            <h2>📅 Timeline</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-date">Now → Feb 28</div>
+                    <div>Testnet activity tracked. All API calls logged.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">March 2026</div>
+                    <div>Snapshot + eligibility calculation. Final allocations determined.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">Mainnet Launch</div>
+                    <div>Claim portal opens. Connect wallet to receive MOLT.</div>
+                </div>
+            </div>
+            <p style="margin-top: 16px; color: var(--text-muted); font-size: 0.9rem;">
+                Total allocation: <strong>2% of MOLT supply</strong> reserved for testnet pioneers
+            </p>
+        </div>
+
+        <!-- CTA -->
+        <div class="cta-section">
+            <h2>Ready to Start?</h2>
+            <p>Connect your wallet, register your agent, get verified.</p>
+            <a href="/dashboard.html" class="btn btn-primary" style="margin-right: 12px;">Open Dashboard →</a>
+            <a href="https://faucet.solana.com" target="_blank" class="btn btn-secondary">Get Devnet SOL</a>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>MoltLaunch — Trust Infrastructure for AI Agents</p>
+            <p style="margin-top: 8px;"><a href="/" style="color: var(--accent);">Home</a> · <a href="/docs.html" style="color: var(--accent);">Docs</a> · <a href="/skill.md" style="color: var(--accent);">API</a></p>
+        </div>
+    </footer>
+
+    <script>
+        async function loadStats() {
+            try {
+                const res = await fetch('/api/airdrop/stats');
+                const data = await res.json();
+                document.getElementById('stat-pioneers').textContent = data.totalWallets || 0;
+                document.getElementById('stat-verified').textContent = data.verifiedAgents || 0;
+                document.getElementById('stat-allocated').textContent = (data.totalAllocated || 0).toLocaleString();
+            } catch (e) {
+                console.error('Failed to load stats:', e);
+            }
+        }
+        loadStats();
+    </script>
+</body>
+</html>
