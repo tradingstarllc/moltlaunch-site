@@ -17,12 +17,15 @@ try {
 // STARK Prover for privacy-preserving proofs (Week 2)
 let starkProver = null;
 try {
-    const { MoltLaunchStarkProver } = require('./stark-prover');
+    const starkProverPath = path.join(__dirname, 'stark-prover');
+    const { MoltLaunchStarkProver } = require(starkProverPath);
     starkProver = new MoltLaunchStarkProver();
     console.log('STARK prover loaded');
     console.log('  Backend:', starkProver.getInfo().backend);
+    console.log('  Path:', starkProverPath);
 } catch (e) {
     console.log('STARK prover not available:', e.message);
+    console.log('  Stack:', e.stack?.split('\n')[1]);
     console.log('Proofs will not be generated');
 }
 
