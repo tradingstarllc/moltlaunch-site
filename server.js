@@ -13,9 +13,13 @@ try {
     paymentMiddleware = x402Express.paymentMiddleware;
     x402ResourceServer = x402Express.x402ResourceServer;
     HTTPFacilitatorClient = x402Core.HTTPFacilitatorClient;
-    ExactSvmScheme = x402Svm.ExactSvmServer;
+    ExactSvmScheme = x402Svm.ExactSvmScheme; // Fixed: was ExactSvmServer
     x402Available = true;
     console.log('x402 payment protocol loaded successfully');
+    console.log('  paymentMiddleware:', typeof paymentMiddleware);
+    console.log('  x402ResourceServer:', typeof x402ResourceServer);
+    console.log('  HTTPFacilitatorClient:', typeof HTTPFacilitatorClient);
+    console.log('  ExactSvmScheme:', typeof ExactSvmScheme);
 } catch (e) {
     console.log('x402 not available:', e.message);
     console.log('Paid endpoints will use credit system only');
@@ -347,48 +351,56 @@ app.get('/api/metrics', (req, res) => {
 // Wallet to receive USDC payments (Solana devnet for testing)
 const PAYMENT_WALLET = process.env.PAYMENT_WALLET || 'ATFtoArfzAF6Vi6XUeCr64ffD1SAN6HvwePkPmkkQ6en';
 
+// CAIP-2 network identifiers for Solana
+const SOLANA_DEVNET = 'solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1';
+// const SOLANA_MAINNET = 'solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp';
+
 // x402 configuration for paid endpoints
 const X402_ROUTES = {
     'POST /api/verify/deep': {
-        accepts: {
+        accepts: [{
             scheme: 'exact',
             price: '$0.25',
-            network: 'solana-devnet',
+            network: SOLANA_DEVNET,
             payTo: PAYMENT_WALLET,
-        },
-        description: 'Deep PoA verification with code analysis and capability testing'
+        }],
+        description: 'Deep PoA verification with code analysis and capability testing',
+        mimeType: 'application/json'
     },
     'POST /api/verify/certified': {
-        accepts: {
+        accepts: [{
             scheme: 'exact',
             price: '$2.00',
-            network: 'solana-devnet',
+            network: SOLANA_DEVNET,
             payTo: PAYMENT_WALLET,
-        },
-        description: 'Certified verification with on-chain attestation and manual review'
+        }],
+        description: 'Certified verification with on-chain attestation and manual review',
+        mimeType: 'application/json'
     },
     'POST /api/launch/apply': {
-        accepts: {
+        accepts: [{
             scheme: 'exact',
             price: '$5.00',
-            network: 'solana-devnet',
+            network: SOLANA_DEVNET,
             payTo: PAYMENT_WALLET,
-        },
-        description: 'Submit token launch application for review'
+        }],
+        description: 'Submit token launch application for review',
+        mimeType: 'application/json'
     }
 };
 
 // Initialize x402 middleware if available
 if (x402Available) {
     try {
+        // Use testnet facilitator
         const facilitatorClient = new HTTPFacilitatorClient({ 
-            url: process.env.X402_FACILITATOR || 'https://facilitator.x402.org' 
+            url: process.env.X402_FACILITATOR || 'https://x402.org/facilitator' 
         });
         const resourceServer = new x402ResourceServer(facilitatorClient);
         
-        // Register Solana scheme
+        // Register Solana scheme with CAIP-2 network
         if (ExactSvmScheme) {
-            resourceServer.register('solana-devnet', new ExactSvmScheme());
+            resourceServer.register(SOLANA_DEVNET, new ExactSvmScheme());
         }
         
         // Apply x402 middleware for paid routes
