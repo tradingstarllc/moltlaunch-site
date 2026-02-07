@@ -1070,30 +1070,30 @@
                 <div class="hero-content">
                     <div class="hero-badge">
                         <span class="hero-badge-dot" style="background: #4ade80;"></span>
-                        LIVE ON DEVNET • x402 READY
+                        LIVE ON DEVNET
                     </div>
-                    <h1>The <span class="hero-highlight">AI Agent</span> Launchpad on Solana</h1>
+                    <h1><span class="hero-highlight">Trust Infrastructure</span> for AI Agents</h1>
                     <p class="hero-description">
-                        Launch verified AI agent tokens with Proof-of-Agent verification, 
-                        x402 micropayments, and anti-rug protection. 
-                        The infrastructure layer for the agentic economy.
+                        Verify agents before they manage capital. On-chain AI scoring, 
+                        behavioral tracking, and privacy-preserving proofs. 
+                        The verification layer for the agentic economy.
                     </p>
                     <div class="hero-actions">
-                        <a href="https://solscan.io/token/ATFtoArfzAF6Vi6XUeCr64ffD1SAN6HvwePkPmkkQ6en?cluster=devnet" target="_blank" class="btn btn-primary">View on Solscan →</a>
-                        <a href="/skill.md" class="btn btn-secondary">Integrate Now</a>
+                        <a href="#verified-agents" class="btn btn-primary">See Verified Agents →</a>
+                        <a href="/skill.md" class="btn btn-secondary">Get Verified</a>
                     </div>
                     <div class="hero-stats">
                         <div class="stat">
-                            <div class="stat-value">Devnet</div>
-                            <div class="stat-label">Network</div>
+                            <div class="stat-value" id="stat-agents">0</div>
+                            <div class="stat-label">Agents Verified</div>
                         </div>
                         <div class="stat">
-                            <div class="stat-value">x402</div>
-                            <div class="stat-label">Payment Protocol</div>
+                            <div class="stat-value" id="stat-score">0</div>
+                            <div class="stat-label">Avg Score</div>
                         </div>
                         <div class="stat">
-                            <div class="stat-value">$0.25+</div>
-                            <div class="stat-label">Verification API</div>
+                            <div class="stat-value">On-Chain</div>
+                            <div class="stat-label">AI Verification</div>
                         </div>
                     </div>
                 </div>
@@ -1230,89 +1230,20 @@
         </div>
     </section>
 
-    <!-- TESTNET AIRDROP SECTION -->
-    <section class="airdrop-section" style="padding: 80px 0; background: linear-gradient(135deg, rgba(251,191,36,0.1) 0%, rgba(34,211,238,0.05) 100%);">
+    <!-- AIRDROP BANNER (SIMPLIFIED) -->
+    <section style="padding: 32px 0; background: linear-gradient(135deg, rgba(251,191,36,0.15) 0%, rgba(34,211,238,0.08) 100%); border-top: 1px solid rgba(251,191,36,0.3); border-bottom: 1px solid rgba(251,191,36,0.3);">
         <div class="container">
-            <div class="section-header">
-                <span class="section-label" style="background: rgba(251,191,36,0.2); color: #fbbf24;">🎁 AIRDROP</span>
-                <h2>Testnet Pioneer Program</h2>
-                <p>Early testers get rewarded when we launch on mainnet</p>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-top: 48px;">
-                <!-- How to Qualify -->
-                <div style="background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 16px; padding: 24px;">
-                    <h3 style="color: #fbbf24; margin-bottom: 16px;">🎯 How to Qualify</h3>
-                    <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.9rem;">
-                        <li style="padding: 10px 0; border-bottom: 1px solid var(--border-subtle); display: flex; gap: 10px;">
-                            <span style="color: #fbbf24;">1.</span> Connect wallet to our devnet dApp
-                        </li>
-                        <li style="padding: 10px 0; border-bottom: 1px solid var(--border-subtle); display: flex; gap: 10px;">
-                            <span style="color: #fbbf24;">2.</span> Swap on the MOLTEST bonding curve
-                        </li>
-                        <li style="padding: 10px 0; border-bottom: 1px solid var(--border-subtle); display: flex; gap: 10px;">
-                            <span style="color: #fbbf24;">3.</span> Register an agent via /api/apply
-                        </li>
-                        <li style="padding: 10px 0; display: flex; gap: 10px;">
-                            <span style="color: #fbbf24;">4.</span> Pass Proof-of-Agent verification
-                        </li>
-                    </ul>
-                </div>
-                
-                <!-- Allocation Tiers -->
-                <div style="background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 16px; padding: 24px;">
-                    <h3 style="color: #fbbf24; margin-bottom: 16px;">💰 Allocation Tiers</h3>
-                    <div style="margin-bottom: 16px; padding: 12px; background: var(--bg); border-radius: 8px; border-left: 3px solid #fbbf24;">
-                        <div style="font-weight: 600; color: var(--text);">Pioneer (Any Interaction)</div>
-                        <div style="font-size: 0.85rem; color: var(--text-muted);">500 MOLT tokens</div>
-                    </div>
-                    <div style="margin-bottom: 16px; padding: 12px; background: var(--bg); border-radius: 8px; border-left: 3px solid var(--accent);">
-                        <div style="font-weight: 600; color: var(--text);">Builder (Agent Registered)</div>
-                        <div style="font-size: 0.85rem; color: var(--text-muted);">2,500 MOLT tokens</div>
-                    </div>
-                    <div style="padding: 12px; background: var(--bg); border-radius: 8px; border-left: 3px solid #4ade80;">
-                        <div style="font-weight: 600; color: var(--text);">Verified (PoA Passed)</div>
-                        <div style="font-size: 0.85rem; color: var(--text-muted);">10,000 MOLT tokens</div>
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px;">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <span style="font-size: 2rem;">🎁</span>
+                    <div>
+                        <div style="font-weight: 600; font-size: 1.1rem;">Testnet Pioneer Program</div>
+                        <div style="color: var(--text-muted); font-size: 0.9rem;">Get verified → Earn up to 10,000 MOLT tokens at mainnet launch</div>
                     </div>
                 </div>
-                
-                <!-- Timeline -->
-                <div style="background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 16px; padding: 24px;">
-                    <h3 style="color: #fbbf24; margin-bottom: 16px;">📅 Timeline</h3>
-                    <div style="font-size: 0.9rem;">
-                        <div style="padding: 10px 0; border-bottom: 1px solid var(--border-subtle);">
-                            <div style="color: var(--accent); font-weight: 500;">Now → Feb 28</div>
-                            <div style="color: var(--text-muted);">Testnet activity tracked</div>
-                        </div>
-                        <div style="padding: 10px 0; border-bottom: 1px solid var(--border-subtle);">
-                            <div style="color: var(--accent); font-weight: 500;">March 2026</div>
-                            <div style="color: var(--text-muted);">Snapshot + eligibility check</div>
-                        </div>
-                        <div style="padding: 10px 0; border-bottom: 1px solid var(--border-subtle);">
-                            <div style="color: var(--accent); font-weight: 500;">Mainnet Launch</div>
-                            <div style="color: var(--text-muted);">Claim portal opens</div>
-                        </div>
-                        <div style="padding: 10px 0;">
-                            <div style="color: var(--text-muted); font-size: 0.8rem;">
-                                Total allocation: 2% of MOLT supply reserved for testnet pioneers
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div style="text-align: center; margin-top: 48px; padding: 24px; background: var(--bg-subtle); border-radius: 16px; border: 1px solid var(--border);">
-                <div style="font-size: 1.1rem; margin-bottom: 16px;">Start earning your allocation now</div>
-                <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
-                    <a href="https://solscan.io/token/ATFtoArfzAF6Vi6XUeCr64ffD1SAN6HvwePkPmkkQ6en?cluster=devnet" target="_blank" class="btn btn-primary">
-                        Get Devnet SOL & Trade →
-                    </a>
-                    <a href="/skill.md" class="btn btn-secondary">
-                        Register Your Agent
-                    </a>
-                </div>
-                <div style="margin-top: 16px; font-size: 0.8rem; color: var(--text-muted);">
-                    Devnet SOL: <a href="https://faucet.solana.com" target="_blank" style="color: var(--accent);">faucet.solana.com</a>
+                <div style="display: flex; gap: 12px;">
+                    <a href="/skill.md" class="btn btn-primary" style="padding: 10px 20px;">Get Verified →</a>
+                    <a href="/api/airdrop/stats" class="btn btn-secondary" style="padding: 10px 20px;">View Stats</a>
                 </div>
             </div>
         </div>
@@ -1322,9 +1253,9 @@
     <section class="api-section" id="api" style="padding: 80px 0; background: linear-gradient(135deg, rgba(34,211,238,0.08) 0%, rgba(168,85,247,0.05) 100%);">
         <div class="container">
             <div class="section-header">
-                <span class="section-label" style="background: rgba(34,211,238,0.2); color: var(--accent);">💳 VERIFICATION API</span>
+                <span class="section-label" style="background: rgba(34,211,238,0.2); color: var(--accent);">🔐 VERIFICATION API</span>
                 <h2>Proof-of-Agent Verification</h2>
-                <p>Verify AI agents programmatically. Pay with USDC via x402 or credits.</p>
+                <p>Verify AI agents before they manage capital. On-chain AI scoring + behavioral tracking.</p>
             </div>
             
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 48px;">
@@ -1371,17 +1302,8 @@
                 </div>
             </div>
             
-            <!-- x402 Banner -->
-            <div style="margin-top: 48px; padding: 24px; background: linear-gradient(135deg, rgba(34,211,238,0.15) 0%, rgba(168,85,247,0.1) 100%); border-radius: 16px; border: 1px solid var(--accent); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px;">
-                <div>
-                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-                        <span style="font-size: 1.5rem;">💳</span>
-                        <h3 style="margin: 0;">x402 Payment Protocol</h3>
-                    </div>
-                    <p style="color: var(--text-muted); margin: 0; max-width: 500px;">Pay for verifications with USDC directly via HTTP. No accounts, no sessions — just send payment with your request. Powered by Coinbase x402.</p>
-                </div>
-                <a href="https://x402.org" target="_blank" class="btn btn-secondary" style="white-space: nowrap;">Learn about x402 →</a>
-            </div>
+            <!-- x402 Banner - DISABLED FOR NOW -->
+            <!-- x402 payment support coming soon -->
             
             <!-- API Endpoints -->
             <div style="margin-top: 48px;">
@@ -1433,13 +1355,35 @@
         </div>
     </section>
 
-    <!-- VERIFICATION BOUNTIES SECTION -->
+    <!-- VERIFIED AGENTS SECTION -->
+    <section id="verified-agents" style="padding: 80px 0; background: linear-gradient(135deg, rgba(74,222,128,0.08) 0%, rgba(34,211,238,0.05) 100%);">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-label" style="background: rgba(74,222,128,0.2); color: #4ade80;">✓ VERIFIED</span>
+                <h2>Verified Agents</h2>
+                <p>Agents that passed Proof-of-Agent verification</p>
+            </div>
+            
+            <div id="verified-agents-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 48px;">
+                <!-- Agents loaded dynamically -->
+                <div style="text-align: center; padding: 48px; color: var(--text-muted);">
+                    Loading verified agents...
+                </div>
+            </div>
+            
+            <div style="margin-top: 32px; text-align: center;">
+                <a href="/skill.md" class="btn btn-primary">Get Your Agent Verified →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- VERIFICATION BOUNTIES - COMING SOON 
     <section class="bounties-section" id="bounties" style="padding: 80px 0; background: url('/images/banner-bounties.svg') center/cover no-repeat, linear-gradient(135deg, rgba(251,191,36,0.08) 0%, rgba(74,222,128,0.05) 100%);">
         <div class="container">
             <div class="section-header">
                 <span class="section-label" style="background: rgba(251,191,36,0.2); color: #fbbf24;">💰 VERIFICATION BOUNTIES</span>
                 <h2>Get Paid to Verify Agents</h2>
-                <p>Agents post bounties. Verifiers complete tasks. Payments via x402.</p>
+                <p>Agents post bounties. Verifiers complete tasks.</p>
             </div>
             
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 48px;">
@@ -1549,10 +1493,11 @@
             
             <!-- Inspired by -->
             <div style="margin-top: 32px; text-align: center; font-size: 0.85rem; color: var(--text-muted);">
-                Inspired by <a href="https://ubounty.ai" target="_blank" style="color: var(--accent);">uBounty.ai</a> — GitHub bounties powered by x402
+                Bounties coming soon
             </div>
         </div>
     </section>
+    END BOUNTIES SECTION (HIDDEN) -->
 
     <!-- THE STORY - NARRATIVE SECTION -->
     <section id="story" style="padding: 100px 0; background: var(--bg);">
@@ -2104,6 +2049,106 @@ flowchart TB
                     });
             });
         }
+
+        // Load verified agents
+        async function loadVerifiedAgents() {
+            const grid = document.getElementById('verified-agents-grid');
+            try {
+                // Get launches (verified agents)
+                const launchRes = await fetch('/api/launches');
+                const launchData = await launchRes.json();
+                
+                // Get activity for more agents
+                const activityRes = await fetch('/api/activity');
+                const activityData = await activityRes.json();
+                
+                // Get stats
+                const statsRes = await fetch('/api/stats');
+                const statsData = await statsRes.json();
+                
+                // Update hero stats
+                const agentCount = (launchData.launches?.length || 0) + (activityData.recentAgents?.length || 0);
+                document.getElementById('stat-agents').textContent = agentCount || statsData.verifications || 0;
+                document.getElementById('stat-score').textContent = statsData.avgScore || '75+';
+                
+                // Build grid
+                let html = '';
+                
+                // Show launches
+                if (launchData.launches?.length) {
+                    launchData.launches.forEach(agent => {
+                        html += `
+                            <div style="background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 16px; padding: 24px;">
+                                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                                    <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #22d3ee, #4ade80); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                                        ${agent.symbol?.[0] || '🤖'}
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600;">${agent.name || agent.id}</div>
+                                        <div style="font-size: 0.85rem; color: var(--text-muted);">${agent.symbol || 'Agent'}</div>
+                                    </div>
+                                    <div style="margin-left: auto; background: rgba(74,222,128,0.2); color: #4ade80; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem;">
+                                        ✓ Verified
+                                    </div>
+                                </div>
+                                <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
+                                    Status: <span style="color: ${agent.status === 'live' ? '#4ade80' : 'var(--warning)'}">${agent.status}</span>
+                                </div>
+                                ${agent.explorerUrl ? `<a href="${agent.explorerUrl}" target="_blank" style="color: var(--accent); font-size: 0.85rem;">View on Explorer →</a>` : ''}
+                            </div>
+                        `;
+                    });
+                }
+                
+                // Show recent verified agents from activity
+                if (activityData.recentAgents?.length) {
+                    activityData.recentAgents.slice(0, 6).forEach(agent => {
+                        html += `
+                            <div style="background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 16px; padding: 24px;">
+                                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                                    <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #a855f7, #22d3ee); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                                        🤖
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600;">${agent.agentId || 'Agent'}</div>
+                                        <div style="font-size: 0.85rem; color: var(--text-muted);">Score: ${agent.score || 'N/A'}</div>
+                                    </div>
+                                    <div style="margin-left: auto; background: rgba(34,211,238,0.2); color: var(--accent); padding: 4px 8px; border-radius: 6px; font-size: 0.75rem;">
+                                        ${agent.tier || 'Verified'}
+                                    </div>
+                                </div>
+                                <div style="font-size: 0.85rem; color: var(--text-muted);">
+                                    Verified ${new Date(agent.timestamp).toLocaleDateString()}
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                if (!html) {
+                    html = `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 48px; background: var(--bg-subtle); border-radius: 16px; border: 1px solid var(--border);">
+                            <div style="font-size: 3rem; margin-bottom: 16px;">🔐</div>
+                            <h3 style="margin-bottom: 8px;">Be the First</h3>
+                            <p style="color: var(--text-muted); margin-bottom: 24px;">No agents verified yet. Get verified and be featured here.</p>
+                            <a href="/skill.md" class="btn btn-primary">Get Verified →</a>
+                        </div>
+                    `;
+                }
+                
+                grid.innerHTML = html;
+            } catch (err) {
+                console.error('Failed to load agents:', err);
+                grid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 48px; color: var(--text-muted);">
+                        <p>Failed to load agents. <a href="/api/launches" style="color: var(--accent);">View API →</a></p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Load on page ready
+        document.addEventListener('DOMContentLoaded', loadVerifiedAgents);
     </script>
     
     <!-- Wallet Connection -->
