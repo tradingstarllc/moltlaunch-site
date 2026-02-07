@@ -71,10 +71,54 @@ const hashIP = (ip) => {
 
 const PORT = process.env.PORT || 3000;
 const LOG_FILE = path.join(__dirname, 'requests.log');
+const DATA_DIR = path.join(__dirname, 'data');
 const AIRDROP_FILE = path.join(__dirname, 'airdrop-registry.json');
+
+// Ensure data directory exists
+if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+}
+
+// Data file paths
+const DATA_FILES = {
+    verifications: path.join(DATA_DIR, 'verifications.json'),
+    bounties: path.join(DATA_DIR, 'bounties.json'),
+    pools: path.join(DATA_DIR, 'pools.json'),
+    traces: path.join(DATA_DIR, 'traces.json'),
+    credits: path.join(DATA_DIR, 'credits.json'),
+    attestations: path.join(DATA_DIR, 'attestations.json')
+};
+
+// Generic load/save helpers
+function loadData(filePath, defaultValue = {}) {
+    try {
+        if (fs.existsSync(filePath)) {
+            const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+            console.log(`Loaded ${filePath}: ${Object.keys(data).length} entries`);
+            return data;
+        }
+    } catch (e) {
+        console.log(`Starting fresh: ${filePath}`);
+    }
+    return defaultValue;
+}
+
+function saveData(filePath, data) {
+    fs.writeFile(filePath, JSON.stringify(data, null, 2), (err) => {
+        if (err) console.error(`Save error ${filePath}:`, err.message);
+    });
+}
+
+// Debounced save (wait 1s after last change before writing)
+const saveTimers = {};
+function debouncedSave(key, filePath, data) {
+    if (saveTimers[key]) clearTimeout(saveTimers[key]);
+    saveTimers[key] = setTimeout(() => saveData(filePath, data), 1000);
+}
 
 console.log('Starting MoltLaunch API...');
 console.log('PORT:', PORT);
+console.log('Data directory:', DATA_DIR);
 
 // ===========================================
 // AIRDROP TRACKING SYSTEM
@@ -127,8 +171,9 @@ const getAllocation = (tier) => {
     }
 };
 
-// Verification cache (for status lookups)
-const verificationCache = {};
+// Verification cache (for status lookups) - PERSISTED
+const verificationCache = loadData(DATA_FILES.verifications, {});
+const saveVerifications = () => debouncedSave('verifications', DATA_FILES.verifications, verificationCache);
 
 // ===========================================
 // SECURITY: Replay Protection & Attestations
@@ -350,8 +395,9 @@ const PRICING = {
     }
 };
 
-// Credit balances (in-memory for now)
-let creditBalances = {};
+// Credit balances - PERSISTED
+let creditBalances = loadData(DATA_FILES.credits, {});
+const saveCredits = () => debouncedSave('credits', DATA_FILES.credits, creditBalances);
 
 app.get('/api/pricing', (req, res) => {
     res.json(PRICING);
@@ -401,6 +447,9 @@ app.post('/api/deposit', (req, res) => {
         txHash: txHash || 'simulated_' + crypto.randomBytes(8).toString('hex'),
         at: new Date().toISOString()
     });
+    
+    // Persist credits
+    saveCredits();
     
     res.json({
         success: true,
@@ -665,6 +714,9 @@ app.post('/api/verify/deep', async (req, res) => {
                 secureMode,
                 hasStarkProof: !!starkProofData
             };
+            
+            // Persist verification cache
+            saveVerifications();
             
             // Build response
             const response = {
@@ -1252,17 +1304,15 @@ app.get('/api/x402/status', (req, res) => {
 // ===========================================
 // VERIFICATION BOUNTIES (uBounty-style)
 // ===========================================
-// Bounty registry - agents can post bounties for verification tasks
-let bountyRegistry = {
-    bounties: {},    // bountyId -> { agentId, reward, status, taskType, claimer, completedAt }
-    claims: {},      // claimId -> { bountyId, verifier, submittedAt, evidence }
-    stats: {
-        totalBounties: 0,
-        activeBounties: 0,
-        completedBounties: 0,
-        totalPaidOut: 0
-    }
+// Bounty registry - PERSISTED
+const defaultBountyRegistry = {
+    bounties: {},
+    claims: {},
+    stats: { totalBounties: 0, activeBounties: 0, completedBounties: 0, totalPaidOut: 0 }
 };
+let bountyRegistry = loadData(DATA_FILES.bounties, defaultBountyRegistry);
+if (!bountyRegistry.bounties) bountyRegistry = defaultBountyRegistry;
+const saveBounties = () => debouncedSave('bounties', DATA_FILES.bounties, bountyRegistry);
 
 // Create a verification bounty
 app.post('/api/bounty/create', (req, res) => {
@@ -1308,6 +1358,9 @@ app.post('/api/bounty/create', (req, res) => {
     
     bountyRegistry.stats.totalBounties++;
     bountyRegistry.stats.activeBounties++;
+    
+    // Persist bounties
+    saveBounties();
     
     res.json({
         success: true,
@@ -1511,6 +1564,9 @@ app.post('/api/bounty/:bountyId/release', (req, res) => {
     bountyRegistry.stats.completedBounties++;
     bountyRegistry.stats.totalPaidOut += bounty.reward;
     
+    // Persist bounties
+    saveBounties();
+    
     res.json({
         success: true,
         message: `Payment of $${bounty.reward} USDC released to verifier!`,
@@ -1538,24 +1594,31 @@ const POOL_TOPICS = {
     research: { name: 'Research', description: 'Data analysis, reports', riskLevel: 'low', targetAPY: '8-20%' }
 };
 
-let stakingPools = {};
-let stakingPositions = {};  // wallet -> [{ poolId, amount, stakedAt }]
-let poolAgents = {};        // poolId -> [{ agentId, totalDrawn, totalReturned, efficiency, status }]
+// Staking pools - PERSISTED
+const poolsData = loadData(DATA_FILES.pools, { pools: {}, positions: {}, agents: {} });
+let stakingPools = poolsData.pools || {};
+let stakingPositions = poolsData.positions || {};  // wallet -> [{ poolId, amount, stakedAt }]
+let poolAgents = poolsData.agents || {};           // poolId -> [{ agentId, totalDrawn, totalReturned, efficiency, status }]
+const savePools = () => debouncedSave('pools', DATA_FILES.pools, { pools: stakingPools, positions: stakingPositions, agents: poolAgents });
 
-// Initialize pools
+// Initialize pools (only if empty)
 Object.keys(POOL_TOPICS).forEach(topic => {
-    stakingPools[topic] = {
-        id: topic,
-        ...POOL_TOPICS[topic],
-        totalStaked: 0,
-        totalAgents: 0,
-        totalReturns: 0,
-        totalDrawn: 0,
-        currentAPY: 0,
-        stakeholders: [],
-        createdAt: new Date().toISOString()
-    };
-    poolAgents[topic] = [];
+    if (!stakingPools[topic]) {
+        stakingPools[topic] = {
+            id: topic,
+            ...POOL_TOPICS[topic],
+            totalStaked: 0,
+            totalAgents: 0,
+            totalReturns: 0,
+            totalDrawn: 0,
+            currentAPY: 0,
+            stakeholders: [],
+            createdAt: new Date().toISOString()
+        };
+    }
+    if (!poolAgents[topic]) {
+        poolAgents[topic] = [];
+    }
 });
 
 // List all staking pools
@@ -1684,6 +1747,9 @@ app.post('/api/stake', (req, res) => {
     let tier = 'Pioneer';
     if (totalStaked >= 10000) tier = 'Whale';
     else if (totalStaked >= 1000) tier = 'Builder';
+    
+    // Persist pools
+    savePools();
     
     res.json({
         success: true,

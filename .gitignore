@@ -3,3 +3,8 @@ node_modules/
 *.log
 .DS_Store
 .env.local
+
+# Persistent data files
+data/
+airdrop-registry.json
+*.log

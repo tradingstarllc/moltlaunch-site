@@ -5,11 +5,39 @@
  */
 
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 
 /**
- * Trace storage (in-memory for now)
+ * Trace storage - PERSISTED
  */
-const traceStore = new Map();
+const TRACES_FILE = path.join(__dirname, '..', 'data', 'traces.json');
+let traceData = {};
+
+// Load existing traces
+try {
+    if (fs.existsSync(TRACES_FILE)) {
+        traceData = JSON.parse(fs.readFileSync(TRACES_FILE, 'utf8'));
+        console.log(`Loaded ${Object.keys(traceData).length} traces`);
+    }
+} catch (e) {
+    console.log('Starting fresh trace store');
+}
+
+// Convert to Map for compatibility
+const traceStore = new Map(Object.entries(traceData));
+
+// Save traces (debounced)
+let saveTimer = null;
+function saveTraces() {
+    if (saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => {
+        const data = Object.fromEntries(traceStore);
+        fs.writeFile(TRACES_FILE, JSON.stringify(data, null, 2), (err) => {
+            if (err) console.error('Trace save error:', err.message);
+        });
+    }, 1000);
+}
 
 /**
  * Generate trace ID
@@ -150,6 +178,9 @@ function submitTrace(agentId, traceData) {
         traceStore.set(agentId, []);
     }
     traceStore.get(agentId).push(trace);
+    
+    // Persist to disk
+    saveTraces();
     
     return {
         success: true,
