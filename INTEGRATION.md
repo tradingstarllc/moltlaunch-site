@@ -1,10 +1,43 @@
 # MoltLaunch Integration Guide
 
+**Version 3.0**
+
 ## Quick Start
 
 MoltLaunch provides on-chain AI verification for AI agents. Integrate to add trust signals to your platform.
 
 **Base URL:** `https://web-production-419d9.up.railway.app`
+
+## v3.0 Security Features
+
+| Feature | Description |
+|---------|-------------|
+| **Replay Protection** | Nonce + timestamp prevents replay attacks |
+| **Time-Bound Attestations** | 30-day default validity with expiry |
+| **Revocation Support** | Attestations can be revoked for cause |
+| **Signature Verification** | Ed25519 wallet signatures (optional) |
+
+### Secure Request Format
+
+```javascript
+{
+    "agentId": "my-agent",
+    "nonce": "unique-random-32-bytes",    // Single use
+    "timestamp": 1707321600,               // Within ±60s
+    "signature": "base64-ed25519-sig",     // Optional
+    "wallet": "SolanaPublicKey",
+    "capabilities": ["trading"],
+    "validityDays": 30                     // 7/30/90
+}
+```
+
+### Attestation Lifecycle
+
+```
+Verified → Valid (30 days) → Expired
+              ↓
+           Revoked (for cause)
+```
 
 ## On-Chain AI Verification
 
