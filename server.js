@@ -143,8 +143,180 @@ app.get('/api/health', (req, res) => {
     res.json({ 
         status: 'ok', 
         name: 'MoltLaunch API',
-        version: '2.2.0',
+        version: '2.3.0',
         totalRequests: stats.totalRequests,
+        timestamp: new Date().toISOString()
+    });
+});
+
+// ===========================================
+// PRICING API (like Clodds)
+// ===========================================
+const PRICING = {
+    verify_quick: {
+        service: 'verify_quick',
+        description: 'Quick PoA verification (basic checks)',
+        basePrice: 0,
+        unit: 'request',
+        pricePerUnit: 0,
+        minCharge: 0,
+        maxCharge: 0,
+        tier: 'free'
+    },
+    verify_deep: {
+        service: 'verify_deep',
+        description: 'Deep PoA verification (code analysis, capability testing)',
+        basePrice: 0.25,
+        unit: 'request',
+        pricePerUnit: 0.25,
+        minCharge: 0.25,
+        maxCharge: 2.00,
+        tier: 'paid'
+    },
+    verify_certified: {
+        service: 'verify_certified',
+        description: 'Certified verification (on-chain attestation, manual review)',
+        basePrice: 2.00,
+        unit: 'request',
+        pricePerUnit: 2.00,
+        minCharge: 2.00,
+        maxCharge: 10.00,
+        tier: 'premium'
+    },
+    launch_application: {
+        service: 'launch_application',
+        description: 'Submit token launch application',
+        basePrice: 5.00,
+        unit: 'application',
+        pricePerUnit: 5.00,
+        minCharge: 5.00,
+        maxCharge: 5.00,
+        tier: 'paid'
+    },
+    launch_featured: {
+        service: 'launch_featured',
+        description: 'Featured listing on homepage',
+        basePrice: 50.00,
+        unit: 'week',
+        pricePerUnit: 50.00,
+        minCharge: 50.00,
+        maxCharge: 200.00,
+        tier: 'premium'
+    },
+    monitor: {
+        service: 'monitor',
+        description: 'Real-time agent monitoring and alerts',
+        basePrice: 0,
+        unit: 'day',
+        pricePerUnit: 0.10,
+        minCharge: 0.10,
+        maxCharge: 10.00,
+        tier: 'paid'
+    },
+    score_history: {
+        service: 'score_history',
+        description: 'Historical verification scores',
+        basePrice: 0,
+        unit: 'query',
+        pricePerUnit: 0.01,
+        minCharge: 0.01,
+        maxCharge: 1.00,
+        tier: 'paid'
+    }
+};
+
+// Credit balances (in-memory for now)
+let creditBalances = {};
+
+app.get('/api/pricing', (req, res) => {
+    res.json(PRICING);
+});
+
+app.get('/api/balance/:wallet', (req, res) => {
+    const { wallet } = req.params;
+    if (!wallet || wallet.length < 32) {
+        return res.status(400).json({ error: 'Invalid wallet address' });
+    }
+    
+    const balance = creditBalances[wallet] || { 
+        wallet,
+        credits: 0,
+        currency: 'USDC',
+        deposits: [],
+        usage: []
+    };
+    
+    res.json(balance);
+});
+
+// Simulated deposit (would integrate with Solana in production)
+app.post('/api/deposit', (req, res) => {
+    const { wallet, amount, txHash } = req.body || {};
+    
+    if (!wallet || wallet.length < 32) {
+        return res.status(400).json({ error: 'Invalid wallet address' });
+    }
+    if (!amount || amount <= 0) {
+        return res.status(400).json({ error: 'Invalid amount' });
+    }
+    
+    if (!creditBalances[wallet]) {
+        creditBalances[wallet] = {
+            wallet,
+            credits: 0,
+            currency: 'USDC',
+            deposits: [],
+            usage: []
+        };
+    }
+    
+    creditBalances[wallet].credits += amount;
+    creditBalances[wallet].deposits.push({
+        amount,
+        txHash: txHash || 'simulated_' + crypto.randomBytes(8).toString('hex'),
+        at: new Date().toISOString()
+    });
+    
+    res.json({
+        success: true,
+        wallet,
+        deposited: amount,
+        newBalance: creditBalances[wallet].credits,
+        message: 'Credits added to your account'
+    });
+});
+
+app.get('/api/usage/:wallet', (req, res) => {
+    const { wallet } = req.params;
+    const balance = creditBalances[wallet];
+    
+    if (!balance) {
+        return res.json({ wallet, usage: [], totalSpent: 0 });
+    }
+    
+    const totalSpent = balance.usage.reduce((sum, u) => sum + u.cost, 0);
+    res.json({
+        wallet,
+        usage: balance.usage,
+        totalSpent,
+        currentBalance: balance.credits
+    });
+});
+
+app.get('/api/metrics', (req, res) => {
+    const totalDeposits = Object.values(creditBalances)
+        .reduce((sum, b) => sum + b.deposits.reduce((s, d) => s + d.amount, 0), 0);
+    const totalUsage = Object.values(creditBalances)
+        .reduce((sum, b) => sum + b.usage.reduce((s, u) => s + u.cost, 0), 0);
+    
+    res.json({
+        uptime: process.uptime(),
+        totalRequests: stats.totalRequests,
+        totalDeposits,
+        totalUsage,
+        totalRevenue: totalUsage,
+        activeWallets: Object.keys(creditBalances).length,
+        airdropStats: airdropRegistry.stats,
         timestamp: new Date().toISOString()
     });
 });
