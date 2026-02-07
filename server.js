@@ -1666,6 +1666,7 @@ app.get('/.well-known/assetlinks.json', (req, res) => {
 
 // Icons directory
 app.use('/icons', express.static(path.join(__dirname, 'icons')));
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 // Static files
 app.use(express.static(__dirname));
