@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 600" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="featGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#09090b"/>
+      <stop offset="100%" stop-color="#0c0a09"/>
+    </linearGradient>
+    <radialGradient id="featGlow1" cx="30%" cy="50%" r="40%">
+      <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#22d3ee" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="featGlow2" cx="70%" cy="50%" r="40%">
+      <stop offset="0%" stop-color="#a855f7" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#a855f7" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  
+  <rect width="1920" height="600" fill="url(#featGrad)"/>
+  <rect width="1920" height="600" fill="url(#featGlow1)"/>
+  <rect width="1920" height="600" fill="url(#featGlow2)"/>
+  
+  <!-- Shield icons (trust) -->
+  <g fill="none" stroke="#22d3ee" stroke-width="1.5" opacity="0.15">
+    <path d="M200,250 L240,235 L240,285 L200,310 L160,285 L160,235 Z"/>
+    <polyline points="180,270 195,285 220,255" stroke-width="2"/>
+    
+    <path d="M1720,280 L1760,265 L1760,315 L1720,340 L1680,315 L1680,265 Z"/>
+    <polyline points="1700,300 1715,315 1740,285" stroke-width="2"/>
+  </g>
+  
+  <!-- Lock icons (security) -->
+  <g fill="none" stroke="#a855f7" stroke-width="1.5" opacity="0.12">
+    <rect x="480" y="180" width="40" height="35" rx="4"/>
+    <path d="M490,180 L490,165 Q500,145 510,165 L510,180"/>
+    
+    <rect x="1400" y="380" width="40" height="35" rx="4"/>
+    <path d="M1410,380 L1410,365 Q1420,345 1430,365 L1430,380"/>
+  </g>
+  
+  <!-- Chart/growth icons -->
+  <g stroke="#4ade80" stroke-width="1.5" fill="none" opacity="0.12">
+    <polyline points="700,400 750,350 800,380 850,300 900,320"/>
+    <polyline points="1100,200 1150,150 1200,180 1250,100 1300,120"/>
+  </g>
+  
+  <!-- Hexagon pattern (blockchain) -->
+  <g fill="none" stroke="#22d3ee" stroke-width="0.5" opacity="0.08">
+    <polygon points="960,150 990,165 990,195 960,210 930,195 930,165"/>
+    <polygon points="1000,180 1030,195 1030,225 1000,240 970,225 970,195"/>
+    <polygon points="920,180 950,195 950,225 920,240 890,225 890,195"/>
+    <polygon points="960,210 990,225 990,255 960,270 930,255 930,225"/>
+  </g>
+  
+  <g fill="none" stroke="#a855f7" stroke-width="0.5" opacity="0.08">
+    <polygon points="960,380 990,395 990,425 960,440 930,425 930,395"/>
+    <polygon points="1000,410 1030,425 1030,455 1000,470 970,455 970,425"/>
+    <polygon points="920,410 950,425 950,455 920,470 890,455 890,425"/>
+    <polygon points="960,440 990,455 990,485 960,500 930,485 930,455"/>
+  </g>
+  
+  <!-- Floating particles -->
+  <g fill="#22d3ee" opacity="0.2">
+    <circle cx="100" cy="200" r="3"/>
+    <circle cx="300" cy="450" r="4"/>
+    <circle cx="600" cy="100" r="3"/>
+    <circle cx="1300" cy="500" r="4"/>
+    <circle cx="1600" cy="150" r="3"/>
+    <circle cx="1850" cy="400" r="4"/>
+  </g>
+  
+  <g fill="#a855f7" opacity="0.15">
+    <circle cx="150" cy="350" r="4"/>
+    <circle cx="450" cy="500" r="3"/>
+    <circle cx="750" cy="50" r="4"/>
+    <circle cx="1150" cy="550" r="3"/>
+    <circle cx="1500" cy="80" r="4"/>
+    <circle cx="1800" cy="250" r="3"/>
+  </g>
+</svg>

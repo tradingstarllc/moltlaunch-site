@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 800" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="flowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#09090b"/>
+      <stop offset="100%" stop-color="#18181b"/>
+    </linearGradient>
+    <radialGradient id="flowGlow1" cx="20%" cy="30%" r="30%">
+      <stop offset="0%" stop-color="#a855f7" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#a855f7" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="flowGlow2" cx="80%" cy="70%" r="30%">
+      <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#22d3ee" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  
+  <rect width="1920" height="800" fill="url(#flowGrad)"/>
+  <rect width="1920" height="800" fill="url(#flowGlow1)"/>
+  <rect width="1920" height="800" fill="url(#flowGlow2)"/>
+  
+  <!-- Flow arrows pattern -->
+  <g stroke="#a855f7" stroke-width="2" fill="none" opacity="0.15">
+    <!-- Arrow 1 -->
+    <path d="M100,400 Q300,200 500,400 T900,400"/>
+    <polygon points="900,400 880,390 880,410" fill="#a855f7"/>
+    
+    <!-- Arrow 2 -->
+    <path d="M1000,400 Q1200,600 1400,400 T1800,400"/>
+    <polygon points="1800,400 1780,390 1780,410" fill="#a855f7"/>
+  </g>
+  
+  <!-- Flowchart boxes -->
+  <g fill="none" stroke="#22d3ee" stroke-width="1" opacity="0.1">
+    <rect x="200" y="200" width="150" height="80" rx="8"/>
+    <rect x="500" y="350" width="150" height="80" rx="8"/>
+    <rect x="800" y="200" width="150" height="80" rx="8"/>
+    <rect x="1100" y="350" width="150" height="80" rx="8"/>
+    <rect x="1400" y="200" width="150" height="80" rx="8"/>
+    <rect x="1700" y="350" width="150" height="80" rx="8"/>
+  </g>
+  
+  <!-- Connecting lines -->
+  <g stroke="#22d3ee" stroke-width="1" opacity="0.08">
+    <line x1="350" y1="240" x2="500" y2="390"/>
+    <line x1="650" y1="390" x2="800" y2="240"/>
+    <line x1="950" y1="240" x2="1100" y2="390"/>
+    <line x1="1250" y1="390" x2="1400" y2="240"/>
+    <line x1="1550" y1="240" x2="1700" y2="390"/>
+  </g>
+  
+  <!-- Step circles -->
+  <g fill="#a855f7" opacity="0.2">
+    <circle cx="275" cy="240" r="20"/>
+    <circle cx="575" cy="390" r="20"/>
+    <circle cx="875" cy="240" r="20"/>
+    <circle cx="1175" cy="390" r="20"/>
+    <circle cx="1475" cy="240" r="20"/>
+    <circle cx="1775" cy="390" r="20"/>
+  </g>
+  
+  <!-- Numbers -->
+  <g fill="#a855f7" font-size="16" font-weight="bold" text-anchor="middle" opacity="0.3">
+    <text x="275" y="246">1</text>
+    <text x="575" y="396">2</text>
+    <text x="875" y="246">3</text>
+    <text x="1175" y="396">4</text>
+    <text x="1475" y="246">5</text>
+    <text x="1775" y="396">6</text>
+  </g>
+  
+  <!-- Decorative dots -->
+  <g fill="#22d3ee" opacity="0.15">
+    <circle cx="50" cy="100" r="3"/>
+    <circle cx="150" cy="600" r="4"/>
+    <circle cx="1800" cy="100" r="3"/>
+    <circle cx="1850" cy="700" r="4"/>
+  </g>
+</svg>

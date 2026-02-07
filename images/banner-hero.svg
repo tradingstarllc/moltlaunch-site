@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 600" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#09090b"/>
+      <stop offset="50%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#09090b"/>
+    </linearGradient>
+    <radialGradient id="glowCyan" cx="30%" cy="40%" r="40%">
+      <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#22d3ee" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowPurple" cx="70%" cy="60%" r="40%">
+      <stop offset="0%" stop-color="#a855f7" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#a855f7" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  
+  <rect width="1920" height="600" fill="url(#heroGrad)"/>
+  <rect width="1920" height="600" fill="url(#glowCyan)"/>
+  <rect width="1920" height="600" fill="url(#glowPurple)"/>
+  
+  <!-- Grid lines -->
+  <g stroke="#22d3ee" stroke-width="0.5" opacity="0.1">
+    <line x1="0" y1="100" x2="1920" y2="100"/>
+    <line x1="0" y1="200" x2="1920" y2="200"/>
+    <line x1="0" y1="300" x2="1920" y2="300"/>
+    <line x1="0" y1="400" x2="1920" y2="400"/>
+    <line x1="0" y1="500" x2="1920" y2="500"/>
+    <line x1="200" y1="0" x2="200" y2="600"/>
+    <line x1="400" y1="0" x2="400" y2="600"/>
+    <line x1="600" y1="0" x2="600" y2="600"/>
+    <line x1="800" y1="0" x2="800" y2="600"/>
+    <line x1="1000" y1="0" x2="1000" y2="600"/>
+    <line x1="1200" y1="0" x2="1200" y2="600"/>
+    <line x1="1400" y1="0" x2="1400" y2="600"/>
+    <line x1="1600" y1="0" x2="1600" y2="600"/>
+  </g>
+  
+  <!-- Floating nodes -->
+  <g fill="#22d3ee" opacity="0.3">
+    <circle cx="150" cy="120" r="4"/>
+    <circle cx="350" cy="280" r="3"/>
+    <circle cx="550" cy="180" r="5"/>
+    <circle cx="780" cy="420" r="3"/>
+    <circle cx="1100" cy="150" r="4"/>
+    <circle cx="1350" cy="350" r="3"/>
+    <circle cx="1550" cy="200" r="5"/>
+    <circle cx="1750" cy="450" r="4"/>
+  </g>
+  
+  <g fill="#a855f7" opacity="0.25">
+    <circle cx="250" cy="380" r="3"/>
+    <circle cx="450" cy="80" r="4"/>
+    <circle cx="680" cy="520" r="3"/>
+    <circle cx="950" cy="280" r="5"/>
+    <circle cx="1200" cy="480" r="3"/>
+    <circle cx="1450" cy="120" r="4"/>
+    <circle cx="1650" cy="380" r="3"/>
+    <circle cx="1850" cy="200" r="4"/>
+  </g>
+  
+  <!-- Connection lines -->
+  <g stroke="#22d3ee" stroke-width="1" opacity="0.08">
+    <line x1="150" y1="120" x2="350" y2="280"/>
+    <line x1="350" y1="280" x2="550" y2="180"/>
+    <line x1="550" y1="180" x2="780" y2="420"/>
+    <line x1="1100" y1="150" x2="1350" y2="350"/>
+    <line x1="1350" y1="350" x2="1550" y2="200"/>
+  </g>
+</svg>

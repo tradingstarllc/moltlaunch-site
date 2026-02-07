@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 600" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="roadGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#09090b"/>
+      <stop offset="50%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#09090b"/>
+    </linearGradient>
+    <linearGradient id="timelineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="50%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#4ade80"/>
+    </linearGradient>
+  </defs>
+  
+  <rect width="1920" height="600" fill="url(#roadGrad)"/>
+  
+  <!-- Main timeline -->
+  <line x1="100" y1="300" x2="1820" y2="300" stroke="url(#timelineGrad)" stroke-width="3" opacity="0.2"/>
+  
+  <!-- Timeline nodes -->
+  <g fill="none" stroke-width="2" opacity="0.25">
+    <circle cx="200" cy="300" r="20" stroke="#22d3ee" fill="#09090b"/>
+    <circle cx="200" cy="300" r="8" fill="#22d3ee"/>
+    
+    <circle cx="520" cy="300" r="20" stroke="#06b6d4" fill="#09090b"/>
+    <circle cx="520" cy="300" r="8" fill="#06b6d4"/>
+    
+    <circle cx="840" cy="300" r="20" stroke="#8b5cf6" fill="#09090b"/>
+    <circle cx="840" cy="300" r="8" fill="#8b5cf6"/>
+    
+    <circle cx="1160" cy="300" r="20" stroke="#a855f7" fill="#09090b"/>
+    <circle cx="1160" cy="300" r="8" fill="#a855f7"/>
+    
+    <circle cx="1480" cy="300" r="20" stroke="#22c55e" fill="#09090b"/>
+    <circle cx="1480" cy="300" r="8" fill="#22c55e"/>
+    
+    <circle cx="1720" cy="300" r="20" stroke="#4ade80" fill="#09090b"/>
+    <circle cx="1720" cy="300" r="8" fill="#4ade80"/>
+  </g>
+  
+  <!-- Milestone boxes above -->
+  <g fill="none" stroke-width="1" opacity="0.12">
+    <rect x="140" y="150" width="120" height="80" rx="8" stroke="#22d3ee"/>
+    <line x1="200" y1="230" x2="200" y2="280" stroke="#22d3ee"/>
+    
+    <rect x="780" y="150" width="120" height="80" rx="8" stroke="#8b5cf6"/>
+    <line x1="840" y1="230" x2="840" y2="280" stroke="#8b5cf6"/>
+    
+    <rect x="1420" y="150" width="120" height="80" rx="8" stroke="#22c55e"/>
+    <line x1="1480" y1="230" x2="1480" y2="280" stroke="#22c55e"/>
+  </g>
+  
+  <!-- Milestone boxes below -->
+  <g fill="none" stroke-width="1" opacity="0.12">
+    <rect x="460" y="370" width="120" height="80" rx="8" stroke="#06b6d4"/>
+    <line x1="520" y1="320" x2="520" y2="370" stroke="#06b6d4"/>
+    
+    <rect x="1100" y="370" width="120" height="80" rx="8" stroke="#a855f7"/>
+    <line x1="1160" y1="320" x2="1160" y2="370" stroke="#a855f7"/>
+    
+    <rect x="1660" y="370" width="120" height="80" rx="8" stroke="#4ade80"/>
+    <line x1="1720" y1="320" x2="1720" y2="370" stroke="#4ade80"/>
+  </g>
+  
+  <!-- Progress indicator -->
+  <rect x="100" y="296" width="300" height="8" fill="url(#timelineGrad)" opacity="0.3" rx="4"/>
+  
+  <!-- Checkmarks for completed -->
+  <g stroke="#4ade80" stroke-width="2" fill="none" opacity="0.3" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="190,300 198,308 215,290"/>
+  </g>
+  
+  <!-- Decorative elements -->
+  <g fill="#22d3ee" opacity="0.1">
+    <circle cx="50" cy="150" r="3"/>
+    <circle cx="100" cy="450" r="4"/>
+    <circle cx="1850" cy="100" r="4"/>
+    <circle cx="1880" cy="500" r="3"/>
+  </g>
+  
+  <g fill="#a855f7" opacity="0.08">
+    <circle cx="300" cy="80" r="3"/>
+    <circle cx="600" cy="520" r="4"/>
+    <circle cx="1200" cy="60" r="3"/>
+    <circle cx="1600" cy="540" r="4"/>
+  </g>
+</svg>
