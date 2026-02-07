@@ -282,31 +282,35 @@ async function getRecommendedPriorityFee() {
 
 ---
 
-## Implementation Priority
+## Implementation Status
 
-| Integration | Priority | Effort | Impact |
-|-------------|----------|--------|--------|
-| **Blinks** | 🔴 High | 2 days | Viral loop for verification |
-| **Helius Webhooks** | 🔴 High | 1 day | Real-time dashboard |
-| **Dialect** | 🟡 Medium | 2 days | Staker retention |
-| **Jupiter** | 🟡 Medium | 3 days | Liquidity graduation |
-| **SNS** | 🟢 Low | 1 day | UX improvement |
-| **Mobile/Seed Vault** | 🟢 Low | 3 days | Seeker optimization |
-| **Priority Fees** | 🟢 Low | 0.5 day | Agent resilience |
+| Integration | Priority | Status | Notes |
+|-------------|----------|--------|-------|
+| **Blinks** | 🔴 High | ✅ Done | `/api/blink/stake/:agentId`, `/api/blink/verify/:agentId` |
+| **Helius Webhooks** | 🔴 High | ✅ Done | `/api/webhooks/helius`, `/api/webhooks/events` |
+| **Priority Fees** | 🟢 Low | ✅ Done | `/api/priority-fee` |
+| **SNS Identity** | 🟢 Low | ✅ Done | `/api/identity/link`, `/api/identity/:agentId` |
+| **Jupiter Graduation** | 🟡 Medium | ✅ Stub | `/api/graduation/status`, `/api/jupiter/quote` (mock) |
+| **Dialect Notifications** | 🟡 Medium | ✅ Stub | `/api/notify`, `/api/notifications` (queue only) |
+| **Mobile/Seed Vault** | 🟢 Low | ⏳ Q3 | Requires Solana Mobile SDK |
 
 ---
 
 ## Devnet Checklist
 
-### Week 1 (Hackathon Sprint)
-- [ ] Deploy test Blink for moltlaunch-agent
-- [ ] Set up Helius webhook for pool monitoring
-- [ ] Add priority fee endpoint
+### Week 1 (Hackathon Sprint) ✅ COMPLETE
+- [x] Deploy test Blink for moltlaunch-agent
+- [x] Set up Helius webhook endpoint
+- [x] Add priority fee endpoint
+- [x] SNS identity linking
+- [x] Jupiter graduation status
+- [x] Dialect notification queue
 
 ### Week 2 (Post-Hackathon)
-- [ ] Jupiter API integration + graduation test
-- [ ] Dialect notification bot
-- [ ] SNS domain linking
+- [ ] Register Helius webhook with pool wallets
+- [ ] Connect Dialect SDK for real delivery
+- [ ] Jupiter V6 API for real quotes
+- [ ] Test Blinks on X/Discord
 
 ### Week 3
 - [ ] Mobile Wallet Adapter testing
