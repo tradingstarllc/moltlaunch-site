@@ -1,0 +1,24 @@
+{
+  "name": "@moltlaunch/platform",
+  "version": "1.0.0",
+  "description": "MoltLaunch verification integration for agent platforms",
+  "main": "moltlaunch-platform.js",
+  "types": "moltlaunch-platform.d.ts",
+  "keywords": [
+    "moltlaunch",
+    "agent",
+    "verification",
+    "ai",
+    "solana",
+    "trust"
+  ],
+  "author": "MoltLaunch",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tradingstarllc/moltlaunch-site"
+  },
+  "peerDependencies": {
+    "node-fetch": ">=2.0.0"
+  }
+}
