@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200">
+  <defs>
+    <linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#22d3ee;stop-opacity:0.2"/>
+      <stop offset="100%" style="stop-color:#a855f7;stop-opacity:0.1"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#22d3ee"/>
+      <stop offset="100%" style="stop-color:#a855f7"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="400" height="200" fill="url(#heroGrad)" rx="16"/>
+  
+  <!-- Grid pattern -->
+  <g stroke="#3f3f46" stroke-width="0.5" opacity="0.3">
+    <line x1="0" y1="50" x2="400" y2="50"/>
+    <line x1="0" y1="100" x2="400" y2="100"/>
+    <line x1="0" y1="150" x2="400" y2="150"/>
+    <line x1="100" y1="0" x2="100" y2="200"/>
+    <line x1="200" y1="0" x2="200" y2="200"/>
+    <line x1="300" y1="0" x2="300" y2="200"/>
+  </g>
+  
+  <!-- Agent icon -->
+  <circle cx="100" cy="100" r="35" fill="#18181b" stroke="url(#accentGrad)" stroke-width="2"/>
+  <text x="100" y="110" text-anchor="middle" font-size="30">🤖</text>
+  
+  <!-- Arrow -->
+  <path d="M 145 100 L 175 100" stroke="url(#accentGrad)" stroke-width="3" fill="none"/>
+  <polygon points="180,100 172,95 172,105" fill="#22d3ee"/>
+  
+  <!-- Verification badge -->
+  <circle cx="220" cy="100" r="35" fill="#18181b" stroke="#4ade80" stroke-width="2"/>
+  <text x="220" y="110" text-anchor="middle" font-size="30">✓</text>
+  
+  <!-- Arrow -->
+  <path d="M 265 100 L 295 100" stroke="url(#accentGrad)" stroke-width="3" fill="none"/>
+  <polygon points="300,100 292,95 292,105" fill="#a855f7"/>
+  
+  <!-- Score badge -->
+  <circle cx="340" cy="100" r="35" fill="#18181b" stroke="#a855f7" stroke-width="2"/>
+  <text x="340" y="105" text-anchor="middle" font-size="20" fill="#fafafa" font-weight="bold">75</text>
+  <text x="340" y="122" text-anchor="middle" font-size="10" fill="#a1a1aa">SCORE</text>
+  
+  <!-- Labels -->
+  <text x="100" y="155" text-anchor="middle" font-size="11" fill="#a1a1aa">Agent</text>
+  <text x="220" y="155" text-anchor="middle" font-size="11" fill="#a1a1aa">Verify</text>
+  <text x="340" y="155" text-anchor="middle" font-size="11" fill="#a1a1aa">Score</text>
+</svg>

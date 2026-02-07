@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 80">
+  <defs>
+    <linearGradient id="verifyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#22d3ee"/>
+      <stop offset="100%" style="stop-color:#06b6d4"/>
+    </linearGradient>
+    <linearGradient id="fundGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4ade80"/>
+      <stop offset="100%" style="stop-color:#22c55e"/>
+    </linearGradient>
+    <linearGradient id="operateGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#a855f7"/>
+      <stop offset="100%" style="stop-color:#9333ea"/>
+    </linearGradient>
+    <linearGradient id="surviveGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f97316"/>
+      <stop offset="100%" style="stop-color:#ea580c"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Phase 1: Verify -->
+  <g transform="translate(20, 10)">
+    <rect width="100" height="60" rx="10" fill="#18181b" stroke="url(#verifyGrad)" stroke-width="2"/>
+    <text x="50" y="28" text-anchor="middle" font-size="18">🔐</text>
+    <text x="50" y="48" text-anchor="middle" font-size="10" fill="#22d3ee" font-weight="600">VERIFY</text>
+  </g>
+  
+  <!-- Arrow 1 -->
+  <path d="M 130 40 L 145 40" stroke="#3f3f46" stroke-width="2"/>
+  <polygon points="150,40 143,36 143,44" fill="#3f3f46"/>
+  
+  <!-- Phase 2: Fund -->
+  <g transform="translate(145, 10)">
+    <rect width="100" height="60" rx="10" fill="#18181b" stroke="url(#fundGrad)" stroke-width="2"/>
+    <text x="50" y="28" text-anchor="middle" font-size="18">💰</text>
+    <text x="50" y="48" text-anchor="middle" font-size="10" fill="#4ade80" font-weight="600">FUND</text>
+  </g>
+  
+  <!-- Arrow 2 -->
+  <path d="M 255 40 L 270 40" stroke="#3f3f46" stroke-width="2"/>
+  <polygon points="275,40 268,36 268,44" fill="#3f3f46"/>
+  
+  <!-- Phase 3: Operate -->
+  <g transform="translate(270, 10)">
+    <rect width="100" height="60" rx="10" fill="#18181b" stroke="url(#operateGrad)" stroke-width="2"/>
+    <text x="50" y="28" text-anchor="middle" font-size="18">⚡</text>
+    <text x="50" y="48" text-anchor="middle" font-size="10" fill="#a855f7" font-weight="600">OPERATE</text>
+  </g>
+  
+  <!-- Arrow 3 -->
+  <path d="M 380 40 L 395 40" stroke="#3f3f46" stroke-width="2"/>
+  <polygon points="400,40 393,36 393,44" fill="#3f3f46"/>
+  
+  <!-- Phase 4: Survive -->
+  <g transform="translate(395, 10)">
+    <rect width="100" height="60" rx="10" fill="#18181b" stroke="url(#surviveGrad)" stroke-width="2"/>
+    <text x="50" y="28" text-anchor="middle" font-size="18">🏆</text>
+    <text x="50" y="48" text-anchor="middle" font-size="10" fill="#f97316" font-weight="600">SURVIVE</text>
+  </g>
+</svg>
