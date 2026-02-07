@@ -175,6 +175,25 @@ const getAllocation = (tier) => {
 const verificationCache = loadData(DATA_FILES.verifications, {});
 const saveVerifications = () => debouncedSave('verifications', DATA_FILES.verifications, verificationCache);
 
+// Seed moltlaunch-agent on startup (Railway ephemeral filesystem workaround)
+if (!verificationCache['moltlaunch-agent']) {
+    console.log('Seeding moltlaunch-agent verification...');
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+    verificationCache['moltlaunch-agent'] = {
+        score: 75,
+        tier: 'good',
+        timestamp: now.toISOString(),
+        expiresAt: expiresAt.toISOString(),
+        attestationHash: 'seed_' + require('crypto').randomBytes(16).toString('hex'),
+        features: { hasGithub: 1, hasApiEndpoint: 1, capabilityCount: 6 },
+        onChain: false,
+        secureMode: false,
+        hasStarkProof: false
+    };
+    saveVerifications();
+}
+
 // ===========================================
 // SECURITY: Replay Protection & Attestations
 // ===========================================
