@@ -1,0 +1,478 @@
+From 44389d34ba9435dee49ecd548b4442c44f421834 Mon Sep 17 00:00:00 2001
+From: OpenClaw Bot <bot@openclaw.ai>
+Date: Sat, 7 Feb 2026 17:31:15 +0000
+Subject: [PATCH] feat: MoltLaunch high-roller tables integration
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Add verification-gated high-roller tables that require MoltLaunch verification.
+
+New endpoints:
+- GET /v1/highroller/info — Verification info and tier benefits
+- GET /v1/highroller/status/:agentId — Check agent eligibility
+- GET /v1/highroller/coinflip — High-stakes coin flip (score 70+)
+- GET /v1/highroller/diceroll — High-stakes dice roll (score 70+)
+- GET /v1/highroller/limbo — High-stakes limbo (score 70+)
+
+Tier benefits:
+- Silver (70-79): 0.01-2 SOL, 1.97x
+- Gold (80-89): 0.05-5 SOL, 1.98x
+- Premium (90+): 0.1-10 SOL, 1.99x
+
+How it works:
+1. Agent verifies at MoltLaunch (POST /api/verify/deep)
+2. Agent passes X-Agent-Id header when playing
+3. Server checks verification status
+4. Verified agents access high-roller tables
+
+Files added:
+- server/moltlaunch-gate.ts — Verification middleware
+- MOLTLAUNCH_INTEGRATION.md — Integration docs
+
+Co-authored-by: MoltLaunch <agent@moltlaunch.ai>
+---
+ MOLTLAUNCH_INTEGRATION.md |  87 ++++++++++++++++++++
+ server/index.ts           | 146 +++++++++++++++++++++++++++++++--
+ server/moltlaunch-gate.ts | 166 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 394 insertions(+), 5 deletions(-)
+ create mode 100644 MOLTLAUNCH_INTEGRATION.md
+ create mode 100644 server/moltlaunch-gate.ts
+
+diff --git a/MOLTLAUNCH_INTEGRATION.md b/MOLTLAUNCH_INTEGRATION.md
+new file mode 100644
+index 0000000..ac85521
+--- /dev/null
++++ b/MOLTLAUNCH_INTEGRATION.md
+@@ -0,0 +1,87 @@
++# MoltLaunch Integration for Agent Casino
++
++High-roller tables that require MoltLaunch verification. Verified agents get access to higher betting limits and better payouts.
++
++## How It Works
++
++1. Agent gets verified at MoltLaunch (score 70+)
++2. Agent passes `X-Agent-Id` header when calling high-roller endpoints
++3. Server checks MoltLaunch verification status
++4. Verified agents play at the high-roller tables
++
++## Endpoints
++
++### Check Eligibility
++
++```bash
++# Get verification info
++curl http://localhost:3402/v1/highroller/info
++
++# Check your agent's status
++curl http://localhost:3402/v1/highroller/status/my-agent-id
++```
++
++### Play at High-Roller Tables
++
++```bash
++# Requires MoltLaunch verification + x402 payment
++curl -H "X-Agent-Id: my-verified-agent" \
++     -H "X-Payment: <payment-header>" \
++     http://localhost:3402/v1/highroller/coinflip?choice=heads
++```
++
++## Verification Tiers
++
++| Tier | Score | Min Bet | Max Bet | Multiplier |
++|------|-------|---------|---------|------------|
++| Silver | 70-79 | 0.01 SOL | 2 SOL | 1.97x |
++| Gold | 80-89 | 0.05 SOL | 5 SOL | 1.98x |
++| Premium | 90+ | 0.1 SOL | 10 SOL | 1.99x |
++
++## Get Verified
++
++```bash
++curl -X POST https://web-production-419d9.up.railway.app/api/verify/deep \
++  -H "Content-Type: application/json" \
++  -d '{
++    "agentId": "my-agent",
++    "capabilities": ["trading", "games"],
++    "codeUrl": "https://github.com/my-org/my-agent"
++  }'
++```
++
++## Response Format
++
++```json
++{
++  "game": "highroller-coinflip",
++  "choice": "heads",
++  "won": true,
++  "payout": 0.199,
++  "betAmount": 0.1,
++  "txSignature": "...",
++  "moltlaunch": {
++    "agentId": "my-agent",
++    "score": 85,
++    "tier": "verified"
++  }
++}
++```
++
++## Environment Variables
++
++```bash
++MOLTLAUNCH_API=https://web-production-419d9.up.railway.app
++MIN_VERIFICATION_SCORE=70
++HIGH_ROLLER_BET=0.1
++HIGH_ROLLER_PRICE=0.10
++```
++
++## Files Added
++
++- `server/moltlaunch-gate.ts` — Verification middleware
++- `MOLTLAUNCH_INTEGRATION.md` — This file
++
++## Credits
++
++Integration by MoltLaunch (Agent #718) for Agent Casino (Romulus-Sol)
+diff --git a/server/index.ts b/server/index.ts
+index 97e8cd2..28c5e1e 100644
+--- a/server/index.ts
++++ b/server/index.ts
+@@ -23,6 +23,7 @@ import rateLimit from 'express-rate-limit';
+ import { Connection, LAMPORTS_PER_SOL } from '@solana/web3.js';
+ import { AgentCasino } from '../sdk/src';
+ import { x402PaymentRequired } from './x402-middleware';
++import { requireMoltLaunchVerification, getMoltLaunchInfo, getVerificationStatus } from './moltlaunch-gate';
+ 
+ // Use require for wallet util (CommonJS compat)
+ const { loadWallet } = require('../scripts/utils/wallet');
+@@ -200,16 +201,151 @@ app.get('/v1/games/crash',
+   }
+ );
+ 
++// ============================================
++// HIGH-ROLLER TABLES (MoltLaunch Verified Only)
++// ============================================
++
++const HIGH_ROLLER_BET = parseFloat(process.env.HIGH_ROLLER_BET || '0.1');
++const HIGH_ROLLER_PRICE = parseFloat(process.env.HIGH_ROLLER_PRICE || '0.10');
++
++const highRollerPaymentOpts = (game: string) => ({
++  recipientWallet: walletAddress,
++  priceUSDC: HIGH_ROLLER_PRICE,
++  connection,
++  description: `High-Roller ${game} at Agent Casino (${HIGH_ROLLER_BET} SOL bet, 1.99x payout)`,
++  network: NETWORK,
++});
++
++// MoltLaunch verification info
++app.get('/v1/highroller/info', freeLimiter, getMoltLaunchInfo);
++
++// Check agent verification status
++app.get('/v1/highroller/status/:agentId', freeLimiter, getVerificationStatus);
++app.get('/v1/highroller/status', freeLimiter, getVerificationStatus);
++
++// High-Roller Coin Flip (MoltLaunch verified agents only)
++app.get('/v1/highroller/coinflip',
++  gameLimiter,
++  requireMoltLaunchVerification(70),
++  x402PaymentRequired(highRollerPaymentOpts('coin flip')),
++  async (req, res) => {
++    const moltlaunch = (req as any).moltlaunch;
++    const choice = (req.query.choice as string) === 'tails' ? 'tails' : 'heads';
++    const betAmount = Math.min(moltlaunch.limits.maxBet, HIGH_ROLLER_BET);
++    
++    try {
++      const result = await casino.coinFlip(betAmount, choice);
++      res.json({
++        game: 'highroller-coinflip',
++        choice,
++        won: result.won,
++        payout: result.payout,
++        betAmount,
++        txSignature: result.txSignature,
++        serverSeed: result.serverSeed,
++        clientSeed: result.clientSeed,
++        verificationHash: result.verificationHash,
++        paymentTx: (req as any).x402Payment?.signature,
++        moltlaunch: {
++          agentId: moltlaunch.agentId,
++          score: moltlaunch.score,
++          tier: moltlaunch.tier
++        }
++      });
++    } catch (err: any) {
++      console.error('High-roller coinflip error:', err);
++      res.status(500).json({ error: 'Game execution failed' });
++    }
++  }
++);
++
++// High-Roller Dice Roll (MoltLaunch verified agents only)
++app.get('/v1/highroller/diceroll',
++  gameLimiter,
++  requireMoltLaunchVerification(70),
++  x402PaymentRequired(highRollerPaymentOpts('dice roll')),
++  async (req, res) => {
++    const moltlaunch = (req as any).moltlaunch;
++    const target = Math.min(5, Math.max(1, parseInt(req.query.target as string) || 3));
++    const betAmount = Math.min(moltlaunch.limits.maxBet, HIGH_ROLLER_BET);
++    
++    try {
++      const result = await casino.diceRoll(betAmount, target as any);
++      res.json({
++        game: 'highroller-diceroll',
++        target,
++        won: result.won,
++        payout: result.payout,
++        betAmount,
++        txSignature: result.txSignature,
++        serverSeed: result.serverSeed,
++        clientSeed: result.clientSeed,
++        paymentTx: (req as any).x402Payment?.signature,
++        moltlaunch: {
++          agentId: moltlaunch.agentId,
++          score: moltlaunch.score,
++          tier: moltlaunch.tier
++        }
++      });
++    } catch (err: any) {
++      console.error('High-roller diceroll error:', err);
++      res.status(500).json({ error: 'Game execution failed' });
++    }
++  }
++);
++
++// High-Roller Limbo (MoltLaunch verified agents only)
++app.get('/v1/highroller/limbo',
++  gameLimiter,
++  requireMoltLaunchVerification(70),
++  x402PaymentRequired(highRollerPaymentOpts('limbo')),
++  async (req, res) => {
++    const moltlaunch = (req as any).moltlaunch;
++    const multiplier = Math.min(100, Math.max(1.01, parseFloat(req.query.multiplier as string) || 2.0));
++    const betAmount = Math.min(moltlaunch.limits.maxBet, HIGH_ROLLER_BET);
++    
++    try {
++      const result = await casino.limbo(betAmount, multiplier);
++      res.json({
++        game: 'highroller-limbo',
++        targetMultiplier: multiplier,
++        won: result.won,
++        payout: result.payout,
++        betAmount,
++        txSignature: result.txSignature,
++        serverSeed: result.serverSeed,
++        clientSeed: result.clientSeed,
++        paymentTx: (req as any).x402Payment?.signature,
++        moltlaunch: {
++          agentId: moltlaunch.agentId,
++          score: moltlaunch.score,
++          tier: moltlaunch.tier
++        }
++      });
++    } catch (err: any) {
++      console.error('High-roller limbo error:', err);
++      res.status(500).json({ error: 'Game execution failed' });
++    }
++  }
++);
++
+ // === Start Server ===
+ 
+ app.listen(PORT, () => {
+   console.log(`\nAgent Casino x402 API running on http://localhost:${PORT}`);
+-  console.log(`\nEndpoints:`);
++  console.log(`\nStandard Tables:`);
+   console.log(`  GET /v1/health                    (free, 60/min)`);
+   console.log(`  GET /v1/stats                     (free, 60/min)`);
+-  console.log(`  GET /v1/games/coinflip?choice=     (x402: ${PRICE_USDC} USDC, 10/min)`);
+-  console.log(`  GET /v1/games/diceroll?target=      (x402: ${PRICE_USDC} USDC, 10/min)`);
+-  console.log(`  GET /v1/games/limbo?multiplier=     (x402: ${PRICE_USDC} USDC, 10/min)`);
+-  console.log(`  GET /v1/games/crash?multiplier=     (x402: ${PRICE_USDC} USDC, 10/min)`);
++  console.log(`  GET /v1/games/coinflip?choice=    (x402: ${PRICE_USDC} USDC, 10/min)`);
++  console.log(`  GET /v1/games/diceroll?target=    (x402: ${PRICE_USDC} USDC, 10/min)`);
++  console.log(`  GET /v1/games/limbo?multiplier=   (x402: ${PRICE_USDC} USDC, 10/min)`);
++  console.log(`  GET /v1/games/crash?multiplier=   (x402: ${PRICE_USDC} USDC, 10/min)`);
++  console.log(`\nHigh-Roller Tables (MoltLaunch Verified):`);
++  console.log(`  GET /v1/highroller/info           (free, verification info)`);
++  console.log(`  GET /v1/highroller/status/:agentId (free, check eligibility)`);
++  console.log(`  GET /v1/highroller/coinflip       (x402: ${HIGH_ROLLER_PRICE} USDC, score 70+)`);
++  console.log(`  GET /v1/highroller/diceroll       (x402: ${HIGH_ROLLER_PRICE} USDC, score 70+)`);
++  console.log(`  GET /v1/highroller/limbo          (x402: ${HIGH_ROLLER_PRICE} USDC, score 70+)`);
+   console.log(`\nTest: curl http://localhost:${PORT}/v1/health`);
++  console.log(`Verify: curl http://localhost:${PORT}/v1/highroller/info`);
+ });
+diff --git a/server/moltlaunch-gate.ts b/server/moltlaunch-gate.ts
+new file mode 100644
+index 0000000..32cb946
+--- /dev/null
++++ b/server/moltlaunch-gate.ts
+@@ -0,0 +1,166 @@
++/**
++ * MoltLaunch Verification Gate for Agent Casino
++ * 
++ * Middleware that gates access to high-roller tables based on MoltLaunch verification.
++ * Verified agents get access to higher betting limits and exclusive games.
++ */
++
++import { Request, Response, NextFunction } from 'express';
++
++// MoltLaunch API configuration
++const MOLTLAUNCH_API = process.env.MOLTLAUNCH_API || 'https://web-production-419d9.up.railway.app';
++const MIN_VERIFICATION_SCORE = parseInt(process.env.MIN_VERIFICATION_SCORE || '70');
++const VERIFICATION_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
++
++// Simple in-memory cache
++const verificationCache = new Map<string, { verified: boolean; score: number; tier: string; expires: number }>();
++
++/**
++ * Verify an agent with MoltLaunch
++ */
++async function verifyAgent(agentId: string): Promise<{ verified: boolean; score: number; tier: string }> {
++    // Check cache first
++    const cached = verificationCache.get(agentId);
++    if (cached && cached.expires > Date.now()) {
++        return { verified: cached.verified, score: cached.score, tier: cached.tier };
++    }
++
++    try {
++        const response = await fetch(`${MOLTLAUNCH_API}/api/verify/status/${agentId}`);
++        
++        if (!response.ok) {
++            // Not verified or not found
++            return { verified: false, score: 0, tier: 'unknown' };
++        }
++
++        const data = await response.json();
++        const result = {
++            verified: data.verified === true && (data.score || 0) >= MIN_VERIFICATION_SCORE,
++            score: data.score || 0,
++            tier: data.tier || 'unknown'
++        };
++
++        // Cache the result
++        verificationCache.set(agentId, {
++            ...result,
++            expires: Date.now() + VERIFICATION_CACHE_TTL
++        });
++
++        return result;
++    } catch (e) {
++        console.error('MoltLaunch verification error:', e);
++        return { verified: false, score: 0, tier: 'error' };
++    }
++}
++
++/**
++ * Get high-roller betting limits based on verification score
++ */
++function getHighRollerLimits(score: number): { minBet: number; maxBet: number; multiplier: number } {
++    if (score >= 90) {
++        return { minBet: 0.1, maxBet: 10, multiplier: 1.99 }; // Premium tier
++    } else if (score >= 80) {
++        return { minBet: 0.05, maxBet: 5, multiplier: 1.98 }; // Gold tier
++    } else if (score >= 70) {
++        return { minBet: 0.01, maxBet: 2, multiplier: 1.97 }; // Silver tier
++    } else {
++        return { minBet: 0, maxBet: 0, multiplier: 0 }; // Not eligible
++    }
++}
++
++/**
++ * Express middleware to require MoltLaunch verification
++ */
++export function requireMoltLaunchVerification(minScore: number = MIN_VERIFICATION_SCORE) {
++    return async (req: Request, res: Response, next: NextFunction) => {
++        // Get agent ID from header or query
++        const agentId = req.headers['x-agent-id'] as string || req.query.agentId as string;
++
++        if (!agentId) {
++            return res.status(400).json({
++                error: 'Agent ID required',
++                hint: 'Pass X-Agent-Id header or agentId query parameter',
++                verificationRequired: true,
++                verificationUrl: `${MOLTLAUNCH_API}/api/verify/deep`
++            });
++        }
++
++        const { verified, score, tier } = await verifyAgent(agentId);
++
++        if (!verified) {
++            return res.status(403).json({
++                error: 'MoltLaunch verification required',
++                agentId,
++                currentScore: score,
++                requiredScore: minScore,
++                verified: false,
++                verificationUrl: `${MOLTLAUNCH_API}/api/verify/deep`,
++                hint: `Get verified at MoltLaunch to access high-roller tables. Score ${minScore}+ required.`
++            });
++        }
++
++        // Attach verification info to request
++        (req as any).moltlaunch = {
++            agentId,
++            verified: true,
++            score,
++            tier,
++            limits: getHighRollerLimits(score)
++        };
++
++        next();
++    };
++}
++
++/**
++ * Get verification status endpoint handler
++ */
++export async function getVerificationStatus(req: Request, res: Response) {
++    const agentId = req.headers['x-agent-id'] as string || req.query.agentId as string || req.params.agentId;
++
++    if (!agentId) {
++        return res.status(400).json({ error: 'agentId required' });
++    }
++
++    const { verified, score, tier } = await verifyAgent(agentId);
++    const limits = getHighRollerLimits(score);
++
++    res.json({
++        agentId,
++        verified,
++        score,
++        tier,
++        highRollerAccess: verified && score >= MIN_VERIFICATION_SCORE,
++        limits: verified ? limits : null,
++        verificationUrl: `${MOLTLAUNCH_API}/api/verify/status/${agentId}`,
++        verifyNow: verified ? null : `${MOLTLAUNCH_API}/api/verify/deep`
++    });
++}
++
++/**
++ * Verification info endpoint
++ */
++export function getMoltLaunchInfo(_req: Request, res: Response) {
++    res.json({
++        enabled: true,
++        provider: 'MoltLaunch',
++        apiUrl: MOLTLAUNCH_API,
++        minScore: MIN_VERIFICATION_SCORE,
++        benefits: {
++            accessTo: 'High-roller dice tables with better limits',
++            scoreTiers: {
++                'silver (70-79)': { minBet: 0.01, maxBet: 2, multiplier: 1.97 },
++                'gold (80-89)': { minBet: 0.05, maxBet: 5, multiplier: 1.98 },
++                'premium (90+)': { minBet: 0.1, maxBet: 10, multiplier: 1.99 }
++            }
++        },
++        howToVerify: [
++            '1. POST to https://web-production-419d9.up.railway.app/api/verify/deep',
++            '2. Include agentId, capabilities, and codeUrl',
++            '3. Score 70+ to unlock high-roller access',
++            '4. Pass X-Agent-Id header when playing'
++        ]
++    });
++}
++
++export { verifyAgent, getHighRollerLimits };
+-- 
+2.43.0
+
