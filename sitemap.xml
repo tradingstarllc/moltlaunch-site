@@ -25,6 +25,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://web-production-419d9.up.railway.app/flow.html</loc>
+    <lastmod>2026-02-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://web-production-419d9.up.railway.app/manifesto.html</loc>
     <lastmod>2026-02-07</lastmod>
     <changefreq>monthly</changefreq>
