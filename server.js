@@ -2510,7 +2510,13 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: 'Internal server error' });
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`MoltLaunch API v2.2.0 running on 0.0.0.0:${PORT}`);
-    console.log(`Stats: /api/stats | Logs: ${LOG_FILE}`);
-});
+// Start server only if not in test mode
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(PORT, '0.0.0.0', () => {
+        console.log(`MoltLaunch API v3.2.0 running on 0.0.0.0:${PORT}`);
+        console.log(`Stats: /api/stats | Logs: ${LOG_FILE}`);
+    });
+}
+
+// Export for testing
+module.exports = app;
