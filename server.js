@@ -822,6 +822,395 @@ app.post('/api/bounty/:bountyId/release', (req, res) => {
     });
 });
 
+// ===========================================
+// AGENT STAKING POOLS
+// ===========================================
+// Community-funded agent development with performance requirements
+
+const POOL_TOPICS = {
+    trading: { name: 'Trading', description: 'Automated trading bots', riskLevel: 'high', targetAPY: '20-50%' },
+    analysis: { name: 'Analysis', description: 'Research & alpha generation', riskLevel: 'medium', targetAPY: '10-25%' },
+    content: { name: 'Content', description: 'AI content creators', riskLevel: 'medium', targetAPY: '15-30%' },
+    infrastructure: { name: 'Infrastructure', description: 'Dev tools, APIs', riskLevel: 'low', targetAPY: '5-15%' },
+    research: { name: 'Research', description: 'Data analysis, reports', riskLevel: 'low', targetAPY: '8-20%' }
+};
+
+let stakingPools = {};
+let stakingPositions = {};  // wallet -> [{ poolId, amount, stakedAt }]
+let poolAgents = {};        // poolId -> [{ agentId, totalDrawn, totalReturned, efficiency, status }]
+
+// Initialize pools
+Object.keys(POOL_TOPICS).forEach(topic => {
+    stakingPools[topic] = {
+        id: topic,
+        ...POOL_TOPICS[topic],
+        totalStaked: 0,
+        totalAgents: 0,
+        totalReturns: 0,
+        totalDrawn: 0,
+        currentAPY: 0,
+        stakeholders: [],
+        createdAt: new Date().toISOString()
+    };
+    poolAgents[topic] = [];
+});
+
+// List all staking pools
+app.get('/api/pools', (req, res) => {
+    const pools = Object.values(stakingPools).map(pool => ({
+        ...pool,
+        stakeholderCount: pool.stakeholders.length,
+        agentCount: poolAgents[pool.id]?.length || 0,
+        efficiency: pool.totalDrawn > 0 ? (pool.totalReturns / pool.totalDrawn).toFixed(2) : null
+    }));
+    
+    res.json({
+        pools,
+        topics: Object.keys(POOL_TOPICS),
+        totalStakedAllPools: pools.reduce((sum, p) => sum + p.totalStaked, 0)
+    });
+});
+
+// Get specific pool
+app.get('/api/pools/:topic', (req, res) => {
+    const { topic } = req.params;
+    const pool = stakingPools[topic];
+    
+    if (!pool) {
+        return res.status(404).json({ error: 'Pool not found', validTopics: Object.keys(POOL_TOPICS) });
+    }
+    
+    res.json({
+        ...pool,
+        agents: poolAgents[topic] || [],
+        efficiency: pool.totalDrawn > 0 ? (pool.totalReturns / pool.totalDrawn).toFixed(2) : null
+    });
+});
+
+// Get agents in a pool
+app.get('/api/pools/:topic/agents', (req, res) => {
+    const { topic } = req.params;
+    
+    if (!stakingPools[topic]) {
+        return res.status(404).json({ error: 'Pool not found' });
+    }
+    
+    const agents = poolAgents[topic] || [];
+    const activeAgents = agents.filter(a => a.status === 'active');
+    const warningAgents = agents.filter(a => a.status === 'warning');
+    
+    res.json({
+        topic,
+        agents,
+        stats: {
+            total: agents.length,
+            active: activeAgents.length,
+            warning: warningAgents.length,
+            avgEfficiency: agents.length > 0 
+                ? (agents.reduce((sum, a) => sum + a.efficiency, 0) / agents.length).toFixed(2) 
+                : null
+        }
+    });
+});
+
+// Stake into a pool
+app.post('/api/stake', (req, res) => {
+    const { wallet, topic, amount } = req.body || {};
+    
+    if (!wallet || wallet.length < 32) {
+        return res.status(400).json({ error: 'Invalid wallet address' });
+    }
+    if (!topic || !stakingPools[topic]) {
+        return res.status(400).json({ error: 'Invalid topic', validTopics: Object.keys(POOL_TOPICS) });
+    }
+    if (!amount || amount < 10) {
+        return res.status(400).json({ error: 'Minimum stake is $10' });
+    }
+    
+    const pool = stakingPools[topic];
+    
+    // Add to pool
+    pool.totalStaked += amount;
+    pool.stakeholders.push({
+        wallet,
+        amount,
+        stakedAt: new Date().toISOString()
+    });
+    
+    // Track position
+    if (!stakingPositions[wallet]) {
+        stakingPositions[wallet] = [];
+    }
+    stakingPositions[wallet].push({
+        poolId: topic,
+        amount,
+        stakedAt: new Date().toISOString()
+    });
+    
+    // Calculate tier
+    const totalStaked = stakingPositions[wallet].reduce((sum, p) => sum + p.amount, 0);
+    let tier = 'Pioneer';
+    if (totalStaked >= 10000) tier = 'Whale';
+    else if (totalStaked >= 1000) tier = 'Builder';
+    
+    res.json({
+        success: true,
+        message: `Staked $${amount} into ${pool.name} pool`,
+        position: {
+            wallet,
+            poolId: topic,
+            amount,
+            poolTotalStaked: pool.totalStaked,
+            yourShare: ((amount / pool.totalStaked) * 100).toFixed(2) + '%'
+        },
+        tier,
+        totalStakedByWallet: totalStaked
+    });
+});
+
+// Get staking positions for a wallet
+app.get('/api/stake/:wallet', (req, res) => {
+    const { wallet } = req.params;
+    const positions = stakingPositions[wallet] || [];
+    
+    const totalStaked = positions.reduce((sum, p) => sum + p.amount, 0);
+    let tier = 'Pioneer';
+    if (totalStaked >= 10000) tier = 'Whale';
+    else if (totalStaked >= 1000) tier = 'Builder';
+    
+    // Calculate earnings (simulated)
+    const positionsWithEarnings = positions.map(p => {
+        const pool = stakingPools[p.poolId];
+        const daysSinceStake = (Date.now() - new Date(p.stakedAt).getTime()) / (1000 * 60 * 60 * 24);
+        const poolAPY = pool.currentAPY || 0.15; // Default 15% if no data
+        const earnings = p.amount * (poolAPY / 365) * daysSinceStake;
+        return {
+            ...p,
+            poolName: pool.name,
+            estimatedEarnings: earnings.toFixed(2),
+            currentAPY: (poolAPY * 100).toFixed(1) + '%'
+        };
+    });
+    
+    res.json({
+        wallet,
+        positions: positionsWithEarnings,
+        totalStaked,
+        tier,
+        totalEstimatedEarnings: positionsWithEarnings.reduce((sum, p) => sum + parseFloat(p.estimatedEarnings), 0).toFixed(2)
+    });
+});
+
+// Agent applies to join a pool
+app.post('/api/pool/apply', (req, res) => {
+    const { agentId, topic, strategy, projectedAPY, wallet } = req.body || {};
+    
+    if (!agentId) {
+        return res.status(400).json({ error: 'agentId required' });
+    }
+    if (!topic || !stakingPools[topic]) {
+        return res.status(400).json({ error: 'Invalid topic', validTopics: Object.keys(POOL_TOPICS) });
+    }
+    if (!strategy || strategy.length < 20) {
+        return res.status(400).json({ error: 'Strategy description required (min 20 chars)' });
+    }
+    
+    const pool = stakingPools[topic];
+    
+    // Check if already in pool
+    if (poolAgents[topic].find(a => a.agentId === agentId)) {
+        return res.status(400).json({ error: 'Agent already in this pool' });
+    }
+    
+    const agentEntry = {
+        agentId,
+        wallet: wallet || null,
+        strategy,
+        projectedAPY: projectedAPY || null,
+        totalDrawn: 0,
+        totalReturned: 0,
+        efficiency: null,
+        status: 'active',
+        joinedAt: new Date().toISOString(),
+        lastActivity: new Date().toISOString()
+    };
+    
+    poolAgents[topic].push(agentEntry);
+    pool.totalAgents++;
+    
+    res.json({
+        success: true,
+        message: `Agent ${agentId} joined ${pool.name} pool`,
+        agent: agentEntry,
+        nextStep: {
+            action: 'Request funding draw',
+            endpoint: 'POST /api/pool/draw',
+            note: 'Draw funds to execute your strategy. Returns must exceed draws.'
+        }
+    });
+});
+
+// Agent requests a funding draw
+app.post('/api/pool/draw', (req, res) => {
+    const { agentId, topic, amount, purpose } = req.body || {};
+    
+    if (!agentId || !topic || !amount) {
+        return res.status(400).json({ error: 'agentId, topic, and amount required' });
+    }
+    
+    const pool = stakingPools[topic];
+    if (!pool) {
+        return res.status(404).json({ error: 'Pool not found' });
+    }
+    
+    const agent = poolAgents[topic]?.find(a => a.agentId === agentId);
+    if (!agent) {
+        return res.status(404).json({ error: 'Agent not in this pool. Apply first.' });
+    }
+    
+    if (agent.status === 'revoked') {
+        return res.status(403).json({ error: 'Agent access revoked due to poor performance' });
+    }
+    
+    if (amount > pool.totalStaked * 0.1) {
+        return res.status(400).json({ error: 'Cannot draw more than 10% of pool in single request' });
+    }
+    
+    agent.totalDrawn += amount;
+    agent.lastActivity = new Date().toISOString();
+    pool.totalDrawn += amount;
+    
+    // Recalculate efficiency
+    if (agent.totalDrawn > 0) {
+        agent.efficiency = agent.totalReturned / agent.totalDrawn;
+        
+        // Check performance
+        if (agent.efficiency < 0.8 && agent.totalDrawn > 100) {
+            agent.status = 'warning';
+        }
+        if (agent.efficiency < 0.5 && agent.totalDrawn > 500) {
+            agent.status = 'revoked';
+        }
+    }
+    
+    res.json({
+        success: true,
+        message: `Drew $${amount} from ${pool.name} pool`,
+        draw: {
+            agentId,
+            amount,
+            purpose: purpose || 'Not specified',
+            timestamp: new Date().toISOString()
+        },
+        agent: {
+            totalDrawn: agent.totalDrawn,
+            totalReturned: agent.totalReturned,
+            efficiency: agent.efficiency?.toFixed(2) || 'N/A',
+            status: agent.status
+        },
+        warning: agent.status === 'warning' ? 'Performance below threshold. Improve returns or lose access.' : null
+    });
+});
+
+// Agent reports returns
+app.post('/api/pool/return', (req, res) => {
+    const { agentId, topic, amount, source, txHash } = req.body || {};
+    
+    if (!agentId || !topic || !amount) {
+        return res.status(400).json({ error: 'agentId, topic, and amount required' });
+    }
+    
+    const pool = stakingPools[topic];
+    if (!pool) {
+        return res.status(404).json({ error: 'Pool not found' });
+    }
+    
+    const agent = poolAgents[topic]?.find(a => a.agentId === agentId);
+    if (!agent) {
+        return res.status(404).json({ error: 'Agent not in this pool' });
+    }
+    
+    agent.totalReturned += amount;
+    agent.lastActivity = new Date().toISOString();
+    pool.totalReturns += amount;
+    
+    // Recalculate efficiency
+    if (agent.totalDrawn > 0) {
+        agent.efficiency = agent.totalReturned / agent.totalDrawn;
+        
+        // Upgrade status if improved
+        if (agent.efficiency >= 1.0 && agent.status === 'warning') {
+            agent.status = 'active';
+        }
+    }
+    
+    // Calculate profit distribution
+    const profit = amount > agent.totalDrawn ? amount - agent.totalDrawn : 0;
+    const agentShare = profit * 0.70;
+    const poolShare = profit * 0.25;
+    const platformFee = profit * 0.05;
+    
+    // Update pool APY (simplified)
+    if (pool.totalStaked > 0) {
+        pool.currentAPY = (pool.totalReturns - pool.totalDrawn) / pool.totalStaked;
+    }
+    
+    res.json({
+        success: true,
+        message: `Reported $${amount} return to ${pool.name} pool`,
+        return: {
+            agentId,
+            amount,
+            source: source || 'Not specified',
+            txHash: txHash || null,
+            timestamp: new Date().toISOString()
+        },
+        agent: {
+            totalDrawn: agent.totalDrawn,
+            totalReturned: agent.totalReturned,
+            efficiency: agent.efficiency?.toFixed(2),
+            status: agent.status,
+            netProfit: (agent.totalReturned - agent.totalDrawn).toFixed(2)
+        },
+        profitDistribution: profit > 0 ? {
+            profit: profit.toFixed(2),
+            agentShare: agentShare.toFixed(2) + ' (70%)',
+            poolShare: poolShare.toFixed(2) + ' (25%)',
+            platformFee: platformFee.toFixed(2) + ' (5%)'
+        } : null,
+        poolAPY: (pool.currentAPY * 100).toFixed(1) + '%'
+    });
+});
+
+// Pool leaderboard
+app.get('/api/pools/leaderboard', (req, res) => {
+    const allAgents = [];
+    
+    Object.keys(poolAgents).forEach(topic => {
+        poolAgents[topic].forEach(agent => {
+            allAgents.push({
+                ...agent,
+                poolId: topic,
+                poolName: stakingPools[topic].name
+            });
+        });
+    });
+    
+    // Sort by efficiency (profitable first)
+    allAgents.sort((a, b) => (b.efficiency || 0) - (a.efficiency || 0));
+    
+    res.json({
+        topPerformers: allAgents.filter(a => a.efficiency >= 1.0).slice(0, 10),
+        allAgents: allAgents.slice(0, 50),
+        stats: {
+            totalAgents: allAgents.length,
+            profitable: allAgents.filter(a => a.efficiency >= 1.0).length,
+            warning: allAgents.filter(a => a.status === 'warning').length,
+            revoked: allAgents.filter(a => a.status === 'revoked').length
+        }
+    });
+});
+
 // Devnet DBC Pool Configuration
 const DBC_CONFIG = {
     network: 'devnet',
