@@ -14,6 +14,18 @@ try {
     console.log('Verification will use local scoring only');
 }
 
+// STARK Prover for privacy-preserving proofs (Week 2)
+let starkProver = null;
+try {
+    const { MoltLaunchStarkProver } = require('./stark-prover');
+    starkProver = new MoltLaunchStarkProver();
+    console.log('STARK prover loaded');
+    console.log('  Backend:', starkProver.getInfo().backend);
+} catch (e) {
+    console.log('STARK prover not available:', e.message);
+    console.log('Proofs will not be generated');
+}
+
 // x402 payment protocol (optional - graceful degradation if not available)
 let x402Available = false;
 let paymentMiddleware, x402ResourceServer, HTTPFacilitatorClient, ExactSvmScheme;
@@ -596,6 +608,35 @@ app.post('/api/verify/deep', async (req, res) => {
                 expiresAt.toISOString()
             );
             
+            // Generate STARK proof if available and requested
+            let starkProofData = null;
+            const generateProof = req.body.generateProof || req.query.proof === 'true';
+            
+            if (starkProver && generateProof && result.score >= 60) {
+                try {
+                    const proofResult = await starkProver.generateProof({
+                        agentId,
+                        score: result.score,
+                        features: {
+                            hasGithub: !!codeUrl,
+                            hasApiEndpoint: !!apiEndpoint || capabilities?.includes('api'),
+                            capabilityCount: capabilities?.length || 0,
+                            codeLines: codeLines || 0,
+                            hasDocumentation: !!documentation,
+                            testCoverage: testCoverage || 0
+                        },
+                        threshold: 60,
+                        validityDays: validDays
+                    });
+                    
+                    if (proofResult.success) {
+                        starkProofData = proofResult.proof;
+                    }
+                } catch (proofError) {
+                    console.error('STARK proof generation error:', proofError.message);
+                }
+            }
+            
             // Cache the verification result with expiry
             verificationCache[agentId] = {
                 score: result.score,
@@ -605,16 +646,18 @@ app.post('/api/verify/deep', async (req, res) => {
                 attestationHash,
                 features: result.features,
                 onChain: result.onChain,
-                secureMode
+                secureMode,
+                hasStarkProof: !!starkProofData
             };
             
-            return res.json({
+            // Build response
+            const response = {
                 verified: true,
                 tier: 'deep',
                 agentId,
                 score: result.score,
                 scoreTier: result.tier,
-                passed: result.score >= 60, // v3.0: Boolean pass/fail for privacy
+                passed: result.score >= 60,
                 features: result.features,
                 onChainAI: {
                     enabled: true,
@@ -626,7 +669,7 @@ app.post('/api/verify/deep', async (req, res) => {
                 },
                 attestation: {
                     type: 'deep-verification-onchain',
-                    version: '3.0',
+                    version: '3.1',
                     issuedAt: issuedAt.toISOString(),
                     expiresAt: expiresAt.toISOString(),
                     validityDays: validDays,
@@ -640,7 +683,29 @@ app.post('/api/verify/deep', async (req, res) => {
                     signatureVerified: !!(signature && wallet)
                 },
                 paidVia: req.headers['x-payment-verified'] ? 'x402' : 'credits'
-            });
+            };
+            
+            // Add STARK proof if generated
+            if (starkProofData) {
+                response.starkProof = {
+                    enabled: true,
+                    type: starkProofData.type,
+                    version: starkProofData.version,
+                    commitment: starkProofData.commitment,
+                    publicInputs: starkProofData.publicInputs,
+                    proof: starkProofData.proof,
+                    metadata: starkProofData.metadata,
+                    // Privacy note: score is NOT included in proof response
+                    privacyNote: 'Proof demonstrates score >= threshold without revealing exact score'
+                };
+            } else if (generateProof) {
+                response.starkProof = {
+                    enabled: false,
+                    reason: result.score >= 60 ? 'Prover not available' : 'Score below threshold'
+                };
+            }
+            
+            return res.json(response);
         } catch (e) {
             console.error('Cauldron verification error:', e.message);
             // Fall through to legacy scoring
@@ -808,6 +873,124 @@ app.post('/api/verify/renew/:agentId', async (req, res) => {
     
     // This will re-run verification and update the cache
     res.redirect(307, '/api/verify/deep');
+});
+
+// ===========================================
+// STARK PROOF ENDPOINTS (Week 2)
+// ===========================================
+
+// Get STARK prover info
+app.get('/api/stark/info', (req, res) => {
+    if (starkProver) {
+        res.json({
+            enabled: true,
+            ...starkProver.getInfo(),
+            endpoints: {
+                generate: 'POST /api/verify/deep?proof=true',
+                verify: 'POST /api/stark/verify',
+                info: 'GET /api/stark/info'
+            },
+            collaboration: {
+                partner: 'Murkl/Sable',
+                protocol: 'Circle STARKs (STWO)',
+                field: 'M31 (Mersenne-31)'
+            }
+        });
+    } else {
+        res.json({
+            enabled: false,
+            reason: 'STARK prover not loaded',
+            status: 'Integration in progress'
+        });
+    }
+});
+
+// Verify a STARK proof (off-chain verification)
+app.post('/api/stark/verify', async (req, res) => {
+    const { proof } = req.body || {};
+    
+    if (!proof) {
+        return res.status(400).json({ error: 'proof object required' });
+    }
+    
+    if (!starkProver) {
+        return res.status(503).json({ 
+            error: 'STARK prover not available',
+            hint: 'Use attestation hash verification instead'
+        });
+    }
+    
+    try {
+        const result = await starkProver.verifyProof(proof);
+        res.json({
+            ...result,
+            verificationMethod: 'off-chain',
+            onChainVerification: {
+                available: false,
+                hint: 'On-chain STARK verification requires Murkl verifier program'
+            }
+        });
+    } catch (e) {
+        res.status(400).json({ 
+            valid: false, 
+            error: e.message 
+        });
+    }
+});
+
+// Generate STARK proof for existing verification
+app.post('/api/stark/generate/:agentId', async (req, res) => {
+    const { agentId } = req.params;
+    const verification = verificationCache[agentId];
+    
+    if (!verification) {
+        return res.status(404).json({
+            error: 'No verification found for this agent',
+            hint: 'Run POST /api/verify/deep first'
+        });
+    }
+    
+    if (!starkProver) {
+        return res.status(503).json({ 
+            error: 'STARK prover not available'
+        });
+    }
+    
+    if (verification.score < 60) {
+        return res.status(400).json({
+            error: 'Agent did not pass verification threshold',
+            score: verification.score,
+            threshold: 60
+        });
+    }
+    
+    try {
+        const proofResult = await starkProver.generateProof({
+            agentId,
+            score: verification.score,
+            features: verification.features || {},
+            threshold: 60,
+            validityDays: 30
+        });
+        
+        if (proofResult.success) {
+            res.json({
+                success: true,
+                agentId,
+                proof: proofResult.proof,
+                publicInputs: proofResult.publicInputs,
+                commitment: proofResult.commitment,
+                privacyNote: 'Score is not included - proof demonstrates threshold passage only'
+            });
+        } else {
+            res.status(400).json(proofResult);
+        }
+    } catch (e) {
+        res.status(500).json({ 
+            error: 'Proof generation failed', 
+            details: e.message 
+        });
+    }
 });
 
 // Batch verification status - check multiple agents
