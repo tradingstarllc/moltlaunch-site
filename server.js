@@ -651,6 +651,20 @@ app.get('/api/bounty/list', (req, res) => {
     });
 });
 
+// Bounty stats (must be before /:bountyId to avoid matching)
+app.get('/api/bounty/stats', (req, res) => {
+    res.json({
+        ...bountyRegistry.stats,
+        recentBounties: Object.values(bountyRegistry.bounties)
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .slice(0, 5),
+        topRewards: Object.values(bountyRegistry.bounties)
+            .filter(b => b.status === 'open')
+            .sort((a, b) => b.reward - a.reward)
+            .slice(0, 5)
+    });
+});
+
 // Get specific bounty
 app.get('/api/bounty/:bountyId', (req, res) => {
     const { bountyId } = req.params;
@@ -805,20 +819,6 @@ app.post('/api/bounty/:bountyId/release', (req, res) => {
             txHash: bounty.paymentTxHash,
             method: 'x402'
         }
-    });
-});
-
-// Bounty stats
-app.get('/api/bounty/stats', (req, res) => {
-    res.json({
-        ...bountyRegistry.stats,
-        recentBounties: Object.values(bountyRegistry.bounties)
-            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-            .slice(0, 5),
-        topRewards: Object.values(bountyRegistry.bounties)
-            .filter(b => b.status === 'open')
-            .sort((a, b) => b.reward - a.reward)
-            .slice(0, 5)
     });
 });
 
