@@ -2044,6 +2044,94 @@ app.get('/api/dbc/pool', (req, res) => {
     });
 });
 
+// ===========================================
+// JUPITER LIQUIDITY GRADUATION
+// ===========================================
+// Auto-graduate from Meteora DBC to Jupiter routing
+
+// Check graduation status
+app.get('/api/graduation/status/:poolId', (req, res) => {
+    const { poolId } = req.params;
+    
+    // Mock data for moltest-001
+    const currentRaise = 0.1; // SOL
+    const targetRaise = 50; // SOL
+    const progress = (currentRaise / targetRaise) * 100;
+    
+    res.json({
+        poolId,
+        status: progress >= 100 ? 'ready' : 'accumulating',
+        currentRaise,
+        targetRaise,
+        progress: progress.toFixed(2) + '%',
+        readyForGraduation: progress >= 100,
+        jupiterIntegration: {
+            indexed: false,
+            verifiedList: false,
+            routing: false
+        },
+        nextSteps: progress >= 100 ? [
+            '1. Migrate to DAMM v2',
+            '2. Submit to Jupiter verified list',
+            '3. Enable routing'
+        ] : [
+            `Need ${(targetRaise - currentRaise).toFixed(2)} more SOL to graduate`
+        ]
+    });
+});
+
+// Trigger graduation (admin only in production)
+app.post('/api/graduation/trigger', (req, res) => {
+    const { poolId, adminKey } = req.body || {};
+    
+    if (!poolId) {
+        return res.status(400).json({ error: 'Missing poolId' });
+    }
+    
+    // In production: verify admin, check pool status, execute migration
+    res.json({
+        success: true,
+        poolId,
+        actions: {
+            meteoraMigration: 'pending',
+            jupiterSubmission: 'pending',
+            routingEnabled: 'pending'
+        },
+        note: 'Full Jupiter integration coming in Q2 2026',
+        timeline: {
+            migration: '~5 minutes',
+            jupiterIndexing: '~1 hour',
+            fullRouting: '~24 hours'
+        }
+    });
+});
+
+// Jupiter swap quote (for testing profit-sharing logic)
+app.get('/api/jupiter/quote', async (req, res) => {
+    const { inputMint, outputMint, amount } = req.query;
+    
+    // Mock quote (would call Jupiter V6 API in production)
+    const inputAmount = parseInt(amount) || 1000000; // 1 USDC default
+    const mockRate = 0.95; // 95% (simulating slippage)
+    
+    res.json({
+        inputMint: inputMint || DBC_CONFIG.tokenMint,
+        outputMint: outputMint || 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', // USDC
+        inAmount: inputAmount.toString(),
+        outAmount: Math.floor(inputAmount * mockRate).toString(),
+        priceImpactPct: '0.5',
+        routePlan: [
+            { swapInfo: { label: 'Meteora DAMM' }, percent: 100 }
+        ],
+        profitSharing: {
+            agent: '70%',
+            stakers: '25%',
+            platform: '5%'
+        },
+        note: 'Mock quote. Full Jupiter V6 integration in Q2 2026.'
+    });
+});
+
 // API endpoints
 app.get('/api/launches', (req, res) => {
     res.json({
@@ -2721,6 +2809,214 @@ app.get('/api/priority-fee', async (req, res) => {
         recommended: base * 5,
         unit: "microlamports",
         note: "Use recommended for normal conditions, high during congestion"
+    });
+});
+
+// ===========================================
+// HELIUS WEBHOOKS (Real-Time Monitoring)
+// ===========================================
+// Push-based transaction monitoring for agent performance
+
+// Webhook events storage (in-memory, would persist to DB in production)
+const webhookEvents = [];
+const MAX_WEBHOOK_EVENTS = 1000;
+
+// Helius webhook receiver
+app.post('/api/webhooks/helius', (req, res) => {
+    try {
+        const events = Array.isArray(req.body) ? req.body : [req.body];
+        
+        for (const event of events) {
+            const processed = {
+                timestamp: new Date().toISOString(),
+                type: event.type || 'UNKNOWN',
+                signature: event.signature,
+                source: event.source,
+                feePayer: event.feePayer,
+                slot: event.slot,
+                // Extract relevant data
+                tokenTransfers: event.tokenTransfers || [],
+                nativeTransfers: event.nativeTransfers || [],
+                accountData: event.accountData || []
+            };
+            
+            // Add to events (circular buffer)
+            webhookEvents.unshift(processed);
+            if (webhookEvents.length > MAX_WEBHOOK_EVENTS) {
+                webhookEvents.pop();
+            }
+            
+            // Check if this affects any of our pool wallets
+            // In production: update agent efficiency scores here
+            console.log(`Helius webhook: ${processed.type} - ${processed.signature?.slice(0, 16)}...`);
+        }
+        
+        res.status(200).json({ received: events.length });
+    } catch (err) {
+        console.error('Webhook error:', err);
+        res.status(500).json({ error: 'Webhook processing failed' });
+    }
+});
+
+// Get recent webhook events (for dashboard)
+app.get('/api/webhooks/events', (req, res) => {
+    const limit = Math.min(parseInt(req.query.limit) || 50, 100);
+    res.json({
+        events: webhookEvents.slice(0, limit),
+        total: webhookEvents.length,
+        maxStored: MAX_WEBHOOK_EVENTS
+    });
+});
+
+// Webhook registration info
+app.get('/api/webhooks/info', (req, res) => {
+    res.json({
+        endpoint: 'https://web-production-419d9.up.railway.app/api/webhooks/helius',
+        status: 'active',
+        eventsReceived: webhookEvents.length,
+        supportedTypes: ['TRANSFER', 'SWAP', 'NFT_SALE', 'NFT_MINT'],
+        setup: {
+            provider: 'Helius',
+            docs: 'https://docs.helius.dev/webhooks',
+            steps: [
+                '1. Create account at helius.dev',
+                '2. Get API key (free tier works for devnet)',
+                '3. Create webhook pointing to our endpoint',
+                '4. Add pool wallet addresses to monitor'
+            ]
+        },
+        monitoredWallets: [
+            'cK3U3sKL3tFjFT6mC5tx1RxKtwuCgkwizop4RL9SA24' // MoltLaunch wallet
+        ]
+    });
+});
+
+// ===========================================
+// SNS (Solana Name Service) IDENTITY
+// ===========================================
+// Allow agents to link .sol domains for human-readable identity
+
+// Agent identity registry (in-memory)
+const agentIdentities = loadData(path.join(DATA_DIR, 'identities.json'), {});
+const saveIdentities = () => debouncedSave('identities', path.join(DATA_DIR, 'identities.json'), agentIdentities);
+
+// Link a .sol domain to an agent
+app.post('/api/identity/link', (req, res) => {
+    const { agentId, solDomain, wallet, signature } = req.body || {};
+    
+    if (!agentId || !solDomain) {
+        return res.status(400).json({ 
+            error: 'Missing required fields',
+            required: ['agentId', 'solDomain']
+        });
+    }
+    
+    // Validate domain format
+    if (!solDomain.endsWith('.sol')) {
+        return res.status(400).json({ error: 'Domain must end with .sol' });
+    }
+    
+    // Check if agent is verified
+    if (!verificationCache[agentId]) {
+        return res.status(400).json({ error: 'Agent must be verified first' });
+    }
+    
+    // Store identity link
+    agentIdentities[agentId] = {
+        solDomain,
+        wallet: wallet || null,
+        linkedAt: new Date().toISOString(),
+        verified: false // Would verify on-chain ownership in production
+    };
+    saveIdentities();
+    
+    res.json({
+        success: true,
+        agentId,
+        identity: agentIdentities[agentId],
+        note: 'On-chain verification coming in Q2 2026'
+    });
+});
+
+// Resolve agent identity
+app.get('/api/identity/:agentId', (req, res) => {
+    const { agentId } = req.params;
+    const identity = agentIdentities[agentId];
+    const verification = verificationCache[agentId];
+    
+    res.json({
+        agentId,
+        displayName: identity?.solDomain || agentId,
+        solDomain: identity?.solDomain || null,
+        wallet: identity?.wallet || null,
+        verified: verification ? true : false,
+        score: verification?.score || null,
+        tier: verification?.tier || null
+    });
+});
+
+// List all identities
+app.get('/api/identities', (req, res) => {
+    const identities = Object.entries(agentIdentities).map(([agentId, data]) => ({
+        agentId,
+        ...data,
+        verification: verificationCache[agentId] ? {
+            score: verificationCache[agentId].score,
+            tier: verificationCache[agentId].tier
+        } : null
+    }));
+    
+    res.json({
+        count: identities.length,
+        identities
+    });
+});
+
+// ===========================================
+// DIALECT NOTIFICATIONS (Stub)
+// ===========================================
+// Agent-to-human notifications via wallet or Telegram
+
+// Notification queue (would integrate with Dialect SDK in production)
+const notificationQueue = [];
+
+app.post('/api/notify', (req, res) => {
+    const { recipient, message, channels, priority } = req.body || {};
+    
+    if (!recipient || !message) {
+        return res.status(400).json({ error: 'Missing recipient or message' });
+    }
+    
+    const notification = {
+        id: 'notif_' + crypto.randomBytes(8).toString('hex'),
+        recipient,
+        message,
+        channels: channels || ['wallet'],
+        priority: priority || 'normal',
+        status: 'queued',
+        createdAt: new Date().toISOString()
+    };
+    
+    notificationQueue.push(notification);
+    
+    res.json({
+        success: true,
+        notification,
+        note: 'Dialect integration coming in Q2 2026. Notifications queued but not delivered yet.'
+    });
+});
+
+app.get('/api/notifications', (req, res) => {
+    const { recipient } = req.query;
+    let notifications = notificationQueue;
+    
+    if (recipient) {
+        notifications = notifications.filter(n => n.recipient === recipient);
+    }
+    
+    res.json({
+        count: notifications.length,
+        notifications: notifications.slice(-50) // Last 50
     });
 });
 

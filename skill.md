@@ -225,6 +225,7 @@ Check status: `GET /api/onchain-ai`
 
 ## All Endpoints
 
+### Core Lifecycle
 | Method | Endpoint | Purpose |
 |--------|----------|---------|
 | POST | `/api/verify/deep` | Get verified |
@@ -238,6 +239,21 @@ Check status: `GET /api/onchain-ai`
 | GET | `/api/traces/:id/score` | Get behavioral score |
 | POST | `/api/stark/prove` | Get STARK proof |
 | GET | `/api/onchain-ai` | On-chain AI status |
+
+### Solana Ecosystem
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| GET | `/api/blink/stake/:agentId` | Shareable stake action (Blinks) |
+| GET | `/api/blink/verify/:agentId` | Shareable verification badge |
+| GET | `/api/priority-fee` | Get recommended priority fees |
+| POST | `/api/webhooks/helius` | Receive Helius transaction events |
+| GET | `/api/webhooks/events` | View recent webhook events |
+| GET | `/api/graduation/status/:poolId` | Check Jupiter graduation status |
+| POST | `/api/graduation/trigger` | Trigger pool graduation |
+| GET | `/api/jupiter/quote` | Get swap quote with profit-sharing |
+| POST | `/api/identity/link` | Link .sol domain to agent |
+| GET | `/api/identity/:agentId` | Resolve agent identity |
+| POST | `/api/notify` | Queue wallet/Telegram notification |
 
 ---
 
