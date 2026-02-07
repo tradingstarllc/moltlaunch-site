@@ -1032,6 +1032,52 @@ app.post('/api/stark/generate/:agentId', async (req, res) => {
 // EXECUTION TRACES ENDPOINTS (Week 3)
 // ===========================================
 
+// Get trace info (must be before parameterized routes)
+app.get('/api/traces/info', (req, res) => {
+    res.json({
+        enabled: !!executionTraces,
+        version: '1.0',
+        features: [
+            'Behavioral scoring from execution history',
+            'Merkle commitments for privacy',
+            'On-chain anchoring (optional)',
+            'Action-level proofs'
+        ],
+        scoring: {
+            hasTraces: '+5 points',
+            verified: '+5 points (if anchored)',
+            history7d: '+5 points (7+ day history)',
+            successRate: '+3 points (>90%)',
+            lowErrors: '+2 points (<5%)',
+            uptime: '+5 points (100+ actions)',
+            maximum: '+25 points'
+        },
+        endpoints: {
+            submit: 'POST /api/traces',
+            list: 'GET /api/traces/:agentId',
+            score: 'GET /api/traces/:agentId/score',
+            anchor: 'POST /api/traces/:traceId/anchor',
+            verify: 'POST /api/traces/verify'
+        }
+    });
+});
+
+// Verify action proof (must be before parameterized routes)
+app.post('/api/traces/verify', (req, res) => {
+    if (!executionTraces) {
+        return res.status(503).json({ error: 'Execution traces module not available' });
+    }
+    
+    const { traceId, actionIndex, merkleProof } = req.body || {};
+    
+    if (!traceId) {
+        return res.status(400).json({ error: 'traceId required' });
+    }
+    
+    const result = executionTraces.verifyActionProof(traceId, actionIndex || 0, merkleProof);
+    res.json(result);
+});
+
 // Submit execution trace
 app.post('/api/traces', (req, res) => {
     if (!executionTraces) {
@@ -1109,52 +1155,6 @@ app.post('/api/traces/:traceId/anchor', (req, res) => {
     }
     
     res.json(result);
-});
-
-// Verify action proof
-app.post('/api/traces/verify', (req, res) => {
-    if (!executionTraces) {
-        return res.status(503).json({ error: 'Execution traces module not available' });
-    }
-    
-    const { traceId, actionIndex, merkleProof } = req.body || {};
-    
-    if (!traceId) {
-        return res.status(400).json({ error: 'traceId required' });
-    }
-    
-    const result = executionTraces.verifyActionProof(traceId, actionIndex || 0, merkleProof);
-    res.json(result);
-});
-
-// Get trace info
-app.get('/api/traces/info', (req, res) => {
-    res.json({
-        enabled: !!executionTraces,
-        version: '1.0',
-        features: [
-            'Behavioral scoring from execution history',
-            'Merkle commitments for privacy',
-            'On-chain anchoring (optional)',
-            'Action-level proofs'
-        ],
-        scoring: {
-            hasTraces: '+5 points',
-            verified: '+5 points (if anchored)',
-            history7d: '+5 points (7+ day history)',
-            successRate: '+3 points (>90%)',
-            lowErrors: '+2 points (<5%)',
-            uptime: '+5 points (100+ actions)',
-            maximum: '+25 points'
-        },
-        endpoints: {
-            submit: 'POST /api/traces',
-            list: 'GET /api/traces/:agentId',
-            score: 'GET /api/traces/:agentId/score',
-            anchor: 'POST /api/traces/:traceId/anchor',
-            verify: 'POST /api/traces/verify'
-        }
-    });
 });
 
 // Batch verification status - check multiple agents
