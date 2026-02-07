@@ -1,6 +1,6 @@
 module.exports = {
   testEnvironment: 'node',
-  testTimeout: 30000,
+  testTimeout: 60000,  // Increased for Cauldron calls
   verbose: true,
   collectCoverageFrom: [
     'server.js',
