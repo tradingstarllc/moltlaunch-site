@@ -57,7 +57,7 @@ describe('Verification Flow', () => {
             
             expect(res.status).toBe(400);
             expect(res.body.error).toBeDefined();
-        });
+        }, 60000);
         
         it('should generate STARK proof when requested', async () => {
             const res = await request(app)
