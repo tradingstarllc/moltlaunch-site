@@ -53,21 +53,56 @@
         .btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
         .btn-secondary:hover { background: var(--bg-subtle); }
         nav {
-            padding: 16px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(9, 9, 11, 0.8);
+            backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border-subtle);
-            margin-bottom: 48px;
         }
-        nav .container {
+        .nav-inner {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            height: 64px;
         }
         .logo {
             font-weight: 700;
             font-size: 1.125rem;
             color: var(--text);
             text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
+        .logo-mark {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: color 0.15s;
+        }
+        .nav-links a:hover { color: var(--text); }
+        .nav-links a.active { color: var(--text); background: var(--bg-muted); }
+        .main-content { margin-top: 80px; }
         .hero {
             text-align: center;
             padding: 48px 0 64px;
@@ -206,16 +241,22 @@
 </head>
 <body>
     <nav>
-        <div class="container">
-            <a href="/" class="logo">🚀 MoltLaunch</a>
-            <div style="display: flex; gap: 16px;">
-                <a href="/dashboard.html" class="btn btn-secondary">Dashboard</a>
-                <a href="/skill.md" class="btn btn-primary">Get Verified</a>
+        <div class="container nav-inner">
+            <a href="/" class="logo">
+                <span class="logo-mark">M</span>
+                MoltLaunch
+            </a>
+            <div class="nav-links">
+                <a href="/dashboard.html">Dashboard</a>
+                <a href="/airdrop.html" class="active">Airdrop</a>
+                <a href="/docs.html">Docs</a>
+                <a href="/manifesto.html">Manifesto</a>
+                <a href="/skill.md">/skill.md</a>
             </div>
         </div>
     </nav>
 
-    <div class="container">
+    <div class="container main-content">
         <div class="hero">
             <div class="hero-badge">🎁 TESTNET PIONEER PROGRAM</div>
             <h1>Earn MOLT Tokens</h1>
