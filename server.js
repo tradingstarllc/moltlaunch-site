@@ -2496,6 +2496,11 @@ app.get('/docs/verification-v2', (req, res) => {
     res.sendFile(path.join(__dirname, 'docs/VERIFICATION_V2_PLAN.md'));
 });
 
+app.get('/docs/execution-traces', (req, res) => {
+    res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+    res.sendFile(path.join(__dirname, 'docs/EXECUTION_TRACES.md'));
+});
+
 // Serve docs directory
 app.use('/docs', express.static(path.join(__dirname, 'docs')));
 
