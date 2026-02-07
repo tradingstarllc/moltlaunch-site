@@ -3,6 +3,17 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 
+// Cauldron On-Chain AI Client
+let cauldronClient = null;
+try {
+    cauldronClient = require('./cauldron-client');
+    console.log('Cauldron on-chain AI client loaded');
+    console.log('  VM:', cauldronClient.DEPLOYED.vm);
+} catch (e) {
+    console.log('Cauldron client not available:', e.message);
+    console.log('Verification will use local scoring only');
+}
+
 // x402 payment protocol (optional - graceful degradation if not available)
 let x402Available = false;
 let paymentMiddleware, x402ResourceServer, HTTPFacilitatorClient, ExactSvmScheme;
@@ -419,8 +430,9 @@ if (x402Available && process.env.X402_ENABLED === 'true') {
 }
 
 // Deep verification endpoint (paid via x402 or credits)
+// Now powered by ON-CHAIN AI via Cauldron/Frostbite!
 app.post('/api/verify/deep', async (req, res) => {
-    const { agentId, capabilities, codeUrl, wallet } = req.body || {};
+    const { agentId, capabilities, codeUrl, wallet, documentation, testCoverage, codeLines, apiEndpoint, forceLocal } = req.body || {};
     
     // If we got here via x402, payment is already verified
     // Otherwise check credits
@@ -445,7 +457,51 @@ app.post('/api/verify/deep', async (req, res) => {
         }
     }
     
-    // Perform deep verification
+    // Use Cauldron on-chain AI if available
+    if (cauldronClient && !forceLocal) {
+        try {
+            const agentData = {
+                agentId,
+                capabilities: capabilities || [],
+                codeUrl,
+                documentation,
+                testCoverage: testCoverage || 0,
+                codeLines: codeLines || 0,
+                apiEndpoint
+            };
+            
+            const result = await cauldronClient.verifyAgent(agentData);
+            
+            return res.json({
+                verified: true,
+                tier: 'deep',
+                agentId,
+                score: result.score,
+                scoreTier: result.tier,
+                features: result.features,
+                onChainAI: {
+                    enabled: true,
+                    executedOnChain: result.onChain,
+                    vm: result.vm || cauldronClient.DEPLOYED.vm,
+                    program: result.program || cauldronClient.DEPLOYED.program,
+                    rawOutput: result.rawOutput,
+                    fallback: result.fallback || false
+                },
+                attestation: {
+                    type: 'deep-verification-onchain',
+                    timestamp: result.timestamp,
+                    hash: crypto.createHash('sha256').update(agentId + result.score + Date.now()).digest('hex'),
+                    solanaExplorer: `https://explorer.solana.com/address/${cauldronClient.DEPLOYED.vm}?cluster=devnet`
+                },
+                paidVia: req.headers['x-payment-verified'] ? 'x402' : 'credits'
+            });
+        } catch (e) {
+            console.error('Cauldron verification error:', e.message);
+            // Fall through to legacy scoring
+        }
+    }
+    
+    // Legacy fallback scoring (if Cauldron not available)
     const checks = {
         hasAgentId: !!agentId,
         hasCapabilities: Array.isArray(capabilities) && capabilities.length > 0,
@@ -470,6 +526,10 @@ app.post('/api/verify/deep', async (req, res) => {
         agentId,
         score: Math.min(overallScore, 100),
         checks,
+        onChainAI: {
+            enabled: false,
+            reason: 'Cauldron client not available or forceLocal=true'
+        },
         attestation: {
             type: 'deep-verification',
             timestamp: new Date().toISOString(),
@@ -1637,6 +1697,57 @@ app.get('/api/activity', (req, res) => {
         total: activities.length,
         timestamp: new Date().toISOString()
     });
+});
+
+// ===========================================
+// ON-CHAIN AI STATUS
+// ===========================================
+app.get('/api/onchain-ai', (req, res) => {
+    if (cauldronClient) {
+        res.json({
+            enabled: true,
+            model: 'poa-scorer-v1',
+            deployment: cauldronClient.getDeploymentInfo(),
+            status: 'live',
+            description: 'Proof-of-Agent verification scoring runs ON Solana via Cauldron/Frostbite RISC-V VM',
+            features: [
+                { name: 'hasGithub', weight: 15, description: 'Agent has GitHub repository' },
+                { name: 'hasApiEndpoint', weight: 20, description: 'Agent exposes working API' },
+                { name: 'capabilityCount', weight: '5 per cap', description: 'Number of declared capabilities' },
+                { name: 'codeLines', weight: '0.3 per 100', description: 'Lines of code (normalized)' },
+                { name: 'hasDocumentation', weight: 10, description: 'Agent has documentation' },
+                { name: 'testCoverage', weight: '0.2 per %', description: 'Test coverage percentage' }
+            ],
+            scoring: {
+                formula: 'score = 10 + (github*15) + (api*20) + (caps*5) + (code*0.3) + (docs*10) + (tests*0.2)',
+                range: '0-100',
+                tiers: {
+                    excellent: '80-100',
+                    good: '60-79',
+                    fair: '40-59',
+                    'needs-work': '0-39'
+                }
+            },
+            howToUse: {
+                endpoint: 'POST /api/verify/deep',
+                body: {
+                    agentId: 'your-agent-id',
+                    capabilities: ['trading', 'analysis'],
+                    codeUrl: 'https://github.com/you/agent',
+                    documentation: true,
+                    testCoverage: 80,
+                    codeLines: 5000,
+                    apiEndpoint: 'https://your-agent.com/api'
+                }
+            }
+        });
+    } else {
+        res.json({
+            enabled: false,
+            reason: 'Cauldron client not loaded',
+            fallback: 'Using local scoring algorithm'
+        });
+    }
 });
 
 // skill.md
