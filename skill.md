@@ -98,6 +98,11 @@ Once verified, your launch goes live!
 | `/api/health` | GET | API status |
 | `/api/launches` | GET | List active launches |
 | `/api/qualify` | POST | Check agent eligibility |
+| `/api/verify/quick` | POST | Quick PoA verification (demo) |
+| `/api/airdrop/connect` | POST | Register wallet for airdrop |
+| `/api/airdrop/leaderboard` | GET | Testnet airdrop standings |
+| `/api/airdrop/stats` | GET | Airdrop statistics |
+| `/api/activity` | GET | Recent activity feed |
 | `/api/apply` | POST | Submit launch application |
 
 ## How It Works
