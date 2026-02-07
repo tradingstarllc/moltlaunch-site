@@ -1872,6 +1872,20 @@ app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/app', (req, res) => res.sendFile(path.join(__dirname, 'app.html')));
 app.get('/whitepaper', (req, res) => res.sendFile(path.join(__dirname, 'whitepaper.html')));
 
+// Technical documentation (markdown)
+app.get('/docs/whitepaper', (req, res) => {
+    res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+    res.sendFile(path.join(__dirname, 'docs/WHITEPAPER.md'));
+});
+
+app.get('/docs/verification-v2', (req, res) => {
+    res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+    res.sendFile(path.join(__dirname, 'docs/VERIFICATION_V2_PLAN.md'));
+});
+
+// Serve docs directory
+app.use('/docs', express.static(path.join(__dirname, 'docs')));
+
 // Error handler
 app.use((err, req, res, next) => {
     console.error('Error:', err);
