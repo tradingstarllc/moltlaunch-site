@@ -3,24 +3,23 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 
-// x402 payment protocol - DISABLED until Railway supports Node 20+
-// Code is ready for x402 but packages require Node 20.18+
+// x402 payment protocol (optional - graceful degradation if not available)
 let x402Available = false;
-console.log('x402 disabled (requires Node 20+, Railway uses Node 18)');
-// When Node 20+ is available, uncomment below:
-// try {
-//     const x402Express = require('@x402/express');
-//     const x402Core = require('@x402/core/server');
-//     const x402Svm = require('@x402/svm');
-//     paymentMiddleware = x402Express.paymentMiddleware;
-//     x402ResourceServer = x402Express.x402ResourceServer;
-//     HTTPFacilitatorClient = x402Core.HTTPFacilitatorClient;
-//     ExactSvmScheme = x402Svm.ExactSvmServer;
-//     x402Available = true;
-//     console.log('x402 payment protocol loaded successfully');
-// } catch (e) {
-//     console.log('x402 not available, paid endpoints will use credit system only');
-// }
+let paymentMiddleware, x402ResourceServer, HTTPFacilitatorClient, ExactSvmScheme;
+try {
+    const x402Express = require('@x402/express');
+    const x402Core = require('@x402/core/server');
+    const x402Svm = require('@x402/svm');
+    paymentMiddleware = x402Express.paymentMiddleware;
+    x402ResourceServer = x402Express.x402ResourceServer;
+    HTTPFacilitatorClient = x402Core.HTTPFacilitatorClient;
+    ExactSvmScheme = x402Svm.ExactSvmServer;
+    x402Available = true;
+    console.log('x402 payment protocol loaded successfully');
+} catch (e) {
+    console.log('x402 not available:', e.message);
+    console.log('Paid endpoints will use credit system only');
+}
 
 const app = express();
 
