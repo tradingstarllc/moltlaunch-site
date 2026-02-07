@@ -29,6 +29,16 @@ try {
     console.log('Proofs will not be generated');
 }
 
+// Execution Traces for behavioral scoring (Week 3)
+let executionTraces = null;
+try {
+    const tracesPath = path.join(__dirname, 'execution-traces');
+    executionTraces = require(tracesPath);
+    console.log('Execution traces module loaded');
+} catch (e) {
+    console.log('Execution traces not available:', e.message);
+}
+
 // x402 payment protocol (optional - graceful degradation if not available)
 let x402Available = false;
 let paymentMiddleware, x402ResourceServer, HTTPFacilitatorClient, ExactSvmScheme;
@@ -513,11 +523,14 @@ if (x402Available && process.env.X402_ENABLED === 'true') {
 // Deep verification endpoint (paid via x402 or credits)
 // Now powered by ON-CHAIN AI via Cauldron/Frostbite!
 // v3.0: Added replay protection, time-bound attestations
+// v3.2: Added behavioral scoring from execution traces
 app.post('/api/verify/deep', async (req, res) => {
     const { 
         agentId, capabilities, codeUrl, wallet, documentation, testCoverage, codeLines, apiEndpoint, forceLocal,
         // v3.0 security fields
-        nonce, timestamp, signature, validityDays
+        nonce, timestamp, signature, validityDays,
+        // v3.2 execution traces
+        executionTraces: traceIds
     } = req.body || {};
     
     // ===========================================
@@ -705,6 +718,25 @@ app.post('/api/verify/deep', async (req, res) => {
                 response.starkProof = {
                     enabled: false,
                     reason: result.score >= 60 ? 'Prover not available' : 'Score below threshold'
+                };
+            }
+            
+            // v3.2: Add behavioral scoring if traces provided
+            if (executionTraces && traceIds && traceIds.length > 0) {
+                const behavioralResult = executionTraces.getAgentBehavioralScore(agentId, traceIds);
+                response.behavioral = {
+                    enabled: true,
+                    score: behavioralResult.total,
+                    breakdown: behavioralResult.breakdown,
+                    traceCount: behavioralResult.traceCount,
+                    totalPeriod: behavioralResult.totalPeriod
+                };
+                // Add behavioral bonus to total score (capped)
+                response.score = Math.min(100, result.score + behavioralResult.total);
+                response.scoreBreakdown = {
+                    base: result.score,
+                    behavioral: behavioralResult.total,
+                    total: response.score
                 };
             }
             
@@ -994,6 +1026,135 @@ app.post('/api/stark/generate/:agentId', async (req, res) => {
             details: e.message 
         });
     }
+});
+
+// ===========================================
+// EXECUTION TRACES ENDPOINTS (Week 3)
+// ===========================================
+
+// Submit execution trace
+app.post('/api/traces', (req, res) => {
+    if (!executionTraces) {
+        return res.status(503).json({ error: 'Execution traces module not available' });
+    }
+    
+    const { agentId, trace } = req.body || {};
+    
+    if (!agentId) {
+        return res.status(400).json({ error: 'agentId required' });
+    }
+    
+    if (!trace) {
+        return res.status(400).json({ error: 'trace object required' });
+    }
+    
+    try {
+        const result = executionTraces.submitTrace(agentId, trace);
+        res.json(result);
+    } catch (e) {
+        res.status(400).json({ error: e.message });
+    }
+});
+
+// Get traces for an agent
+app.get('/api/traces/:agentId', (req, res) => {
+    if (!executionTraces) {
+        return res.status(503).json({ error: 'Execution traces module not available' });
+    }
+    
+    const { agentId } = req.params;
+    const traces = executionTraces.getTraces(agentId);
+    
+    res.json({
+        agentId,
+        traces,
+        count: traces.length
+    });
+});
+
+// Get behavioral score for an agent
+app.get('/api/traces/:agentId/score', (req, res) => {
+    if (!executionTraces) {
+        return res.status(503).json({ error: 'Execution traces module not available' });
+    }
+    
+    const { agentId } = req.params;
+    const score = executionTraces.getAgentBehavioralScore(agentId);
+    
+    res.json({
+        agentId,
+        behavioralScore: score.total,
+        breakdown: score.breakdown,
+        traceCount: score.traceCount,
+        totalPeriod: score.totalPeriod
+    });
+});
+
+// Anchor trace on-chain
+app.post('/api/traces/:traceId/anchor', (req, res) => {
+    if (!executionTraces) {
+        return res.status(503).json({ error: 'Execution traces module not available' });
+    }
+    
+    const { traceId } = req.params;
+    const { txHash } = req.body || {};
+    
+    if (!txHash) {
+        return res.status(400).json({ error: 'txHash required' });
+    }
+    
+    const result = executionTraces.anchorTrace(traceId, txHash);
+    if (!result.success) {
+        return res.status(404).json(result);
+    }
+    
+    res.json(result);
+});
+
+// Verify action proof
+app.post('/api/traces/verify', (req, res) => {
+    if (!executionTraces) {
+        return res.status(503).json({ error: 'Execution traces module not available' });
+    }
+    
+    const { traceId, actionIndex, merkleProof } = req.body || {};
+    
+    if (!traceId) {
+        return res.status(400).json({ error: 'traceId required' });
+    }
+    
+    const result = executionTraces.verifyActionProof(traceId, actionIndex || 0, merkleProof);
+    res.json(result);
+});
+
+// Get trace info
+app.get('/api/traces/info', (req, res) => {
+    res.json({
+        enabled: !!executionTraces,
+        version: '1.0',
+        features: [
+            'Behavioral scoring from execution history',
+            'Merkle commitments for privacy',
+            'On-chain anchoring (optional)',
+            'Action-level proofs'
+        ],
+        scoring: {
+            hasTraces: '+5 points',
+            verified: '+5 points (if anchored)',
+            history7d: '+5 points (7+ day history)',
+            successRate: '+3 points (>90%)',
+            lowErrors: '+2 points (<5%)',
+            uptime: '+5 points (100+ actions)',
+            maximum: '+25 points'
+        },
+        endpoints: {
+            submit: 'POST /api/traces',
+            list: 'GET /api/traces/:agentId',
+            score: 'GET /api/traces/:agentId/score',
+            anchor: 'POST /api/traces/:traceId/anchor',
+            verify: 'POST /api/traces/verify'
+        }
+    });
 });
 
 // Batch verification status - check multiple agents
