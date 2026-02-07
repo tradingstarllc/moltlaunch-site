@@ -837,6 +837,28 @@ app.post('/api/verify/deep', async (req, res) => {
     });
 });
 
+// List all verified agents
+app.get('/api/verify/list', (req, res) => {
+    const agents = Object.entries(verificationCache)
+        .filter(([_, v]) => v.score >= 60)
+        .map(([agentId, v]) => ({
+            agentId,
+            score: v.score,
+            tier: v.tier,
+            verifiedAt: v.timestamp,
+            expiresAt: v.expiresAt,
+            hasStarkProof: v.hasStarkProof || false,
+            onChain: v.onChain || false
+        }))
+        .sort((a, b) => b.score - a.score);
+    
+    res.json({
+        count: agents.length,
+        agents,
+        timestamp: new Date().toISOString()
+    });
+});
+
 // Verification status endpoint - check if agent is verified
 // v3.0: Added expiry check and revocation status
 app.get('/api/verify/status/:agentId', (req, res) => {
