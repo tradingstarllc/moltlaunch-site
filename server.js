@@ -403,11 +403,12 @@ if (x402Available) {
             resourceServer.register(SOLANA_DEVNET, new ExactSvmScheme());
         }
         
-        // Apply x402 middleware for paid routes
-        app.use(paymentMiddleware(X402_ROUTES, resourceServer));
+        // Apply x402 middleware for paid routes (disable sync on start to avoid blocking)
+        app.use(paymentMiddleware(X402_ROUTES, resourceServer, undefined, undefined, false));
         console.log('x402 middleware enabled for paid endpoints');
     } catch (e) {
         console.log('x402 middleware setup failed:', e.message);
+        console.log(e.stack);
         x402Available = false;
     }
 }
