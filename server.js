@@ -390,7 +390,9 @@ const X402_ROUTES = {
 };
 
 // Initialize x402 middleware if available
-if (x402Available) {
+// DISABLED: x402 middleware crashes on request handling (needs further debugging)
+// Set X402_ENABLED=true env var to enable
+if (x402Available && process.env.X402_ENABLED === 'true') {
     try {
         // Use testnet facilitator
         const facilitatorClient = new HTTPFacilitatorClient({ 
@@ -411,6 +413,9 @@ if (x402Available) {
         console.log(e.stack);
         x402Available = false;
     }
+} else if (x402Available) {
+    console.log('x402 SDK loaded but middleware disabled (set X402_ENABLED=true to enable)');
+    x402Available = false; // Mark as not active
 }
 
 // Deep verification endpoint (paid via x402 or credits)
