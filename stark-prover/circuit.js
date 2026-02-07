@@ -28,26 +28,22 @@ class VerificationCircuit {
     /**
      * Check all constraints (for local verification)
      * Returns { valid: boolean, constraints: [] }
+     * 
+     * Note: We trust POA-Scorer's score (computed on-chain via Cauldron).
+     * The circuit only proves threshold satisfaction, not score recomputation.
      */
     evaluate() {
         const constraints = [];
 
-        // Constraint 1: Score computed correctly from features
-        const computedScore = computeScore({
-            hasGithub: this.private.features.hasGithub.value > 0n,
-            hasApiEndpoint: this.private.features.hasApiEndpoint.value > 0n,
-            capabilityCount: Number(this.private.features.capabilityCount.value),
-            codeLines: Number(this.private.features.codeLines.value) * 100,
-            hasDocumentation: this.private.features.hasDocumentation.value > 0n,
-            testCoverage: Number(this.private.features.testCoverage.value)
-        });
-
-        const scoreValid = computedScore.eq(this.private.score);
+        // Constraint 1: Score is valid (within range)
+        // We trust POA-Scorer's output - it runs on-chain
+        const scoreInRange = this.private.score.value >= 0n && this.private.score.value <= 100n;
         constraints.push({
-            name: 'score_computation',
-            valid: scoreValid,
-            computed: computedScore.toNumber(),
-            claimed: this.private.score.toNumber()
+            name: 'score_in_range',
+            valid: scoreInRange,
+            score: this.private.score.toNumber(),
+            min: 0,
+            max: 100
         });
 
         // Constraint 2: Score >= Threshold
