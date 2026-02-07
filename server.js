@@ -546,6 +546,282 @@ app.get('/api/x402/status', (req, res) => {
     });
 });
 
+// ===========================================
+// VERIFICATION BOUNTIES (uBounty-style)
+// ===========================================
+// Bounty registry - agents can post bounties for verification tasks
+let bountyRegistry = {
+    bounties: {},    // bountyId -> { agentId, reward, status, taskType, claimer, completedAt }
+    claims: {},      // claimId -> { bountyId, verifier, submittedAt, evidence }
+    stats: {
+        totalBounties: 0,
+        activeBounties: 0,
+        completedBounties: 0,
+        totalPaidOut: 0
+    }
+};
+
+// Create a verification bounty
+app.post('/api/bounty/create', (req, res) => {
+    const { agentId, agentName, taskType, description, reward, githubIssue, contactWallet } = req.body || {};
+    
+    if (!agentId || !taskType || !reward) {
+        return res.status(400).json({ 
+            error: 'Missing required fields',
+            required: ['agentId', 'taskType', 'reward']
+        });
+    }
+    
+    const validTaskTypes = ['capability_test', 'code_review', 'security_audit', 'api_integration', 'documentation'];
+    if (!validTaskTypes.includes(taskType)) {
+        return res.status(400).json({ 
+            error: 'Invalid taskType',
+            validTypes: validTaskTypes
+        });
+    }
+    
+    if (reward < 1 || reward > 1000) {
+        return res.status(400).json({ error: 'Reward must be between $1-$1000 USDC' });
+    }
+    
+    const bountyId = 'bounty-' + crypto.randomBytes(8).toString('hex');
+    const intentFee = 0.99; // uBounty-style intent fee
+    
+    bountyRegistry.bounties[bountyId] = {
+        bountyId,
+        agentId,
+        agentName: agentName || agentId,
+        taskType,
+        description: description || `Verify ${taskType} for ${agentId}`,
+        reward,
+        intentFee,
+        status: 'open',
+        githubIssue: githubIssue || null,
+        contactWallet: contactWallet || null,
+        createdAt: new Date().toISOString(),
+        claimer: null,
+        completedAt: null
+    };
+    
+    bountyRegistry.stats.totalBounties++;
+    bountyRegistry.stats.activeBounties++;
+    
+    res.json({
+        success: true,
+        bountyId,
+        message: 'Bounty created! Pay $0.99 intent fee to activate.',
+        bounty: bountyRegistry.bounties[bountyId],
+        paymentRequired: {
+            amount: intentFee,
+            currency: 'USDC',
+            method: 'x402 or /api/deposit',
+            note: 'Intent fee shows commitment. Full reward paid on completion.'
+        }
+    });
+});
+
+// List open bounties
+app.get('/api/bounty/list', (req, res) => {
+    const { status, taskType, minReward } = req.query;
+    
+    let bounties = Object.values(bountyRegistry.bounties);
+    
+    if (status) {
+        bounties = bounties.filter(b => b.status === status);
+    } else {
+        bounties = bounties.filter(b => b.status === 'open' || b.status === 'claimed');
+    }
+    
+    if (taskType) {
+        bounties = bounties.filter(b => b.taskType === taskType);
+    }
+    
+    if (minReward) {
+        bounties = bounties.filter(b => b.reward >= parseFloat(minReward));
+    }
+    
+    // Sort by reward descending
+    bounties.sort((a, b) => b.reward - a.reward);
+    
+    res.json({
+        bounties,
+        count: bounties.length,
+        stats: bountyRegistry.stats,
+        taskTypes: ['capability_test', 'code_review', 'security_audit', 'api_integration', 'documentation']
+    });
+});
+
+// Get specific bounty
+app.get('/api/bounty/:bountyId', (req, res) => {
+    const { bountyId } = req.params;
+    const bounty = bountyRegistry.bounties[bountyId];
+    
+    if (!bounty) {
+        return res.status(404).json({ error: 'Bounty not found' });
+    }
+    
+    res.json(bounty);
+});
+
+// Claim a bounty (verifier starts work)
+app.post('/api/bounty/:bountyId/claim', (req, res) => {
+    const { bountyId } = req.params;
+    const { verifierWallet, verifierName, estimatedCompletion } = req.body || {};
+    
+    const bounty = bountyRegistry.bounties[bountyId];
+    
+    if (!bounty) {
+        return res.status(404).json({ error: 'Bounty not found' });
+    }
+    
+    if (bounty.status !== 'open') {
+        return res.status(400).json({ error: 'Bounty is not open', currentStatus: bounty.status });
+    }
+    
+    if (!verifierWallet) {
+        return res.status(400).json({ error: 'verifierWallet required' });
+    }
+    
+    const claimId = 'claim-' + crypto.randomBytes(8).toString('hex');
+    
+    bounty.status = 'claimed';
+    bounty.claimer = {
+        wallet: verifierWallet,
+        name: verifierName || 'Anonymous Verifier',
+        claimedAt: new Date().toISOString(),
+        estimatedCompletion: estimatedCompletion || null
+    };
+    
+    bountyRegistry.claims[claimId] = {
+        claimId,
+        bountyId,
+        verifier: bounty.claimer,
+        submittedAt: null,
+        evidence: null,
+        status: 'in_progress'
+    };
+    
+    res.json({
+        success: true,
+        claimId,
+        message: `Bounty claimed! Complete ${bounty.taskType} and submit evidence.`,
+        bounty,
+        nextStep: {
+            endpoint: `POST /api/bounty/${bountyId}/submit`,
+            required: ['evidence', 'claimId'],
+            description: 'Submit proof of completed verification'
+        }
+    });
+});
+
+// Submit completed verification
+app.post('/api/bounty/:bountyId/submit', (req, res) => {
+    const { bountyId } = req.params;
+    const { claimId, evidence, verificationScore, notes, prUrl } = req.body || {};
+    
+    const bounty = bountyRegistry.bounties[bountyId];
+    const claim = bountyRegistry.claims[claimId];
+    
+    if (!bounty) {
+        return res.status(404).json({ error: 'Bounty not found' });
+    }
+    
+    if (!claim || claim.bountyId !== bountyId) {
+        return res.status(400).json({ error: 'Invalid claim for this bounty' });
+    }
+    
+    if (bounty.status !== 'claimed') {
+        return res.status(400).json({ error: 'Bounty not in claimed status' });
+    }
+    
+    if (!evidence) {
+        return res.status(400).json({ error: 'Evidence required (description of work done)' });
+    }
+    
+    claim.submittedAt = new Date().toISOString();
+    claim.evidence = evidence;
+    claim.verificationScore = verificationScore || null;
+    claim.notes = notes || null;
+    claim.prUrl = prUrl || null;
+    claim.status = 'submitted';
+    
+    bounty.status = 'pending_review';
+    
+    res.json({
+        success: true,
+        message: 'Verification submitted! Awaiting sponsor review.',
+        bounty,
+        claim,
+        nextStep: {
+            action: 'Sponsor reviews and releases payment via x402',
+            endpoint: `POST /api/bounty/${bountyId}/release`,
+            note: 'Sponsor pays full reward amount on approval'
+        }
+    });
+});
+
+// Release payment (sponsor approves)
+app.post('/api/bounty/:bountyId/release', (req, res) => {
+    const { bountyId } = req.params;
+    const { approved, txHash, feedback } = req.body || {};
+    
+    const bounty = bountyRegistry.bounties[bountyId];
+    
+    if (!bounty) {
+        return res.status(404).json({ error: 'Bounty not found' });
+    }
+    
+    if (bounty.status !== 'pending_review') {
+        return res.status(400).json({ error: 'Bounty not pending review' });
+    }
+    
+    if (approved === false) {
+        bounty.status = 'disputed';
+        return res.json({
+            success: false,
+            message: 'Payment disputed. Contact support.',
+            bounty,
+            feedback
+        });
+    }
+    
+    bounty.status = 'completed';
+    bounty.completedAt = new Date().toISOString();
+    bounty.paymentTxHash = txHash || 'pending_x402_' + crypto.randomBytes(8).toString('hex');
+    bounty.feedback = feedback || null;
+    
+    bountyRegistry.stats.activeBounties--;
+    bountyRegistry.stats.completedBounties++;
+    bountyRegistry.stats.totalPaidOut += bounty.reward;
+    
+    res.json({
+        success: true,
+        message: `Payment of $${bounty.reward} USDC released to verifier!`,
+        bounty,
+        payment: {
+            amount: bounty.reward,
+            currency: 'USDC',
+            recipient: bounty.claimer?.wallet,
+            txHash: bounty.paymentTxHash,
+            method: 'x402'
+        }
+    });
+});
+
+// Bounty stats
+app.get('/api/bounty/stats', (req, res) => {
+    res.json({
+        ...bountyRegistry.stats,
+        recentBounties: Object.values(bountyRegistry.bounties)
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .slice(0, 5),
+        topRewards: Object.values(bountyRegistry.bounties)
+            .filter(b => b.status === 'open')
+            .sort((a, b) => b.reward - a.reward)
+            .slice(0, 5)
+    });
+});
+
 // Devnet DBC Pool Configuration
 const DBC_CONFIG = {
     network: 'devnet',
