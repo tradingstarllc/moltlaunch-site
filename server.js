@@ -2775,6 +2775,35 @@ app.options('/api/blink/*', (req, res) => {
     res.status(200).end();
 });
 
+// Blink: Execute stake - GET for browser testing
+app.get('/api/blink/stake/:agentId/execute', (req, res) => {
+    const { agentId } = req.params;
+    const { amount, account } = req.query;
+    
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    
+    const amountNum = parseFloat(amount) || 10;
+    const staker = account || 'demo-wallet';
+    
+    res.json({
+        info: "This is a POST endpoint for Solana Actions. GET is for testing only.",
+        agentId,
+        amount: amountNum,
+        mockTransaction: Buffer.from(JSON.stringify({
+            type: 'stake_intent',
+            agent: agentId,
+            amount: amountNum,
+            staker,
+            timestamp: Date.now()
+        })).toString('base64'),
+        usage: {
+            method: "POST",
+            body: { account: "YOUR_WALLET_ADDRESS" },
+            example: `curl -X POST '${BLINK_BASE}/api/blink/stake/${agentId}/execute?amount=${amountNum}' -H 'Content-Type: application/json' -d '{"account": "YOUR_WALLET"}'`
+        }
+    });
+});
+
 // Blink: Execute stake (returns transaction for signing)
 app.post('/api/blink/stake/:agentId/execute', async (req, res) => {
     const { agentId } = req.params;
