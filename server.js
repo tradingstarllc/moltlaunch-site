@@ -102,6 +102,9 @@ const getAllocation = (tier) => {
     }
 };
 
+// Verification cache (for status lookups)
+const verificationCache = {};
+
 // In-memory stats
 const stats = {
     startedAt: new Date().toISOString(),
@@ -472,6 +475,16 @@ app.post('/api/verify/deep', async (req, res) => {
             
             const result = await cauldronClient.verifyAgent(agentData);
             
+            // Cache the verification result
+            const timestamp = result.timestamp || new Date().toISOString();
+            verificationCache[agentId] = {
+                score: result.score,
+                tier: result.tier,
+                timestamp,
+                features: result.features,
+                onChain: result.onChain
+            };
+            
             return res.json({
                 verified: true,
                 tier: 'deep',
@@ -489,7 +502,7 @@ app.post('/api/verify/deep', async (req, res) => {
                 },
                 attestation: {
                     type: 'deep-verification-onchain',
-                    timestamp: result.timestamp,
+                    timestamp,
                     hash: crypto.createHash('sha256').update(agentId + result.score + Date.now()).digest('hex'),
                     solanaExplorer: `https://explorer.solana.com/address/${cauldronClient.DEPLOYED.vm}?cluster=devnet`
                 },
@@ -536,6 +549,67 @@ app.post('/api/verify/deep', async (req, res) => {
             hash: crypto.createHash('sha256').update(agentId + Date.now()).digest('hex')
         },
         paidVia: req.headers['x-payment-verified'] ? 'x402' : 'credits'
+    });
+});
+
+// Verification status endpoint - check if agent is verified
+app.get('/api/verify/status/:agentId', (req, res) => {
+    const { agentId } = req.params;
+    
+    // Check if we have a cached verification for this agent
+    // In production, this would query a database
+    const verification = verificationCache[agentId];
+    
+    if (verification) {
+        res.json({
+            agentId,
+            verified: verification.score >= 60,
+            score: verification.score,
+            tier: verification.tier,
+            level: verification.score >= 80 ? 'excellent' : verification.score >= 60 ? 'verified' : 'unverified',
+            verifiedAt: verification.timestamp,
+            onChainAI: {
+                enabled: true,
+                vm: 'FHcy35f4NGZK9b6j5TGMYstfB6PXEtmNbMLvjfR1y2Li',
+                program: 'FRsToriMLgDc1Ud53ngzHUZvCRoazCaGeGUuzkwoha7m'
+            },
+            expiresAt: new Date(new Date(verification.timestamp).getTime() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days
+        });
+    } else {
+        res.json({
+            agentId,
+            verified: false,
+            score: null,
+            tier: null,
+            level: 'unverified',
+            verifiedAt: null,
+            message: 'Agent has not been verified. Call POST /api/verify/deep to verify.'
+        });
+    }
+});
+
+// Batch verification status - check multiple agents
+app.post('/api/verify/status/batch', (req, res) => {
+    const { agentIds } = req.body || {};
+    
+    if (!Array.isArray(agentIds)) {
+        return res.status(400).json({ error: 'agentIds must be an array' });
+    }
+    
+    const results = agentIds.slice(0, 100).map(agentId => {
+        const verification = verificationCache[agentId];
+        return {
+            agentId,
+            verified: verification ? verification.score >= 60 : false,
+            score: verification?.score || null,
+            tier: verification?.tier || null
+        };
+    });
+    
+    res.json({
+        results,
+        count: results.length,
+        verified: results.filter(r => r.verified).length
     });
 });
 
@@ -1754,6 +1828,17 @@ app.get('/api/onchain-ai', (req, res) => {
 app.get('/skill.md', (req, res) => {
     res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
     res.sendFile(path.join(__dirname, 'skill.md'));
+});
+
+// INTEGRATION.md - Partner integration guide
+app.get('/INTEGRATION.md', (req, res) => {
+    res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+    res.sendFile(path.join(__dirname, 'INTEGRATION.md'));
+});
+
+app.get('/integration', (req, res) => {
+    res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+    res.sendFile(path.join(__dirname, 'INTEGRATION.md'));
 });
 
 // PWA manifest
