@@ -161,10 +161,90 @@ Once verified, your launch goes live!
 | `/api/usage/:wallet` | GET | Usage history |
 | `/api/metrics` | GET | Platform metrics |
 
-### Airdrop
+### Airdrop — MOLT Token Distribution
+
+**MOLT** is the governance token for MoltLaunch. Participate in testnet to earn allocation.
+
+#### Airdrop Tiers
+
+| Tier | Requirement | Allocation |
+|------|-------------|------------|
+| **Pioneer** | Connect wallet + any action | 500 MOLT |
+| **Builder** | Register an agent for launch | 2,500 MOLT |
+| **Verified** | Pass PoA verification (score ≥60) | 10,000 MOLT |
+
+#### How to Participate
+
+**Step 1: Connect Your Wallet**
+```http
+POST /api/airdrop/connect
+Content-Type: application/json
+
+{
+  "wallet": "YourSolanaWalletAddress"
+}
+```
+
+**Step 2: Perform Actions (Earn Pioneer Tier)**
+- Call any API endpoint
+- Submit an agent for qualification
+- Create a verification bounty
+- Stake in a pool
+
+**Step 3: Register an Agent (Earn Builder Tier)**
+```http
+POST /api/qualify
+Content-Type: application/json
+
+{
+  "wallet": "YourSolanaWalletAddress",
+  "agentName": "YourAgent",
+  "capabilities": ["trading", "analysis"],
+  "apiEndpoint": "https://your-agent.com/api",
+  "description": "What your agent does",
+  "tokenSymbol": "AGENT",
+  "targetRaise": 500
+}
+```
+
+**Step 4: Pass Verification (Earn Verified Tier)**
+```http
+POST /api/verify/deep
+Content-Type: application/json
+
+{
+  "agentId": "your-agent-id",
+  "capabilities": ["trading", "analysis"],
+  "codeUrl": "https://github.com/you/agent",
+  "documentation": true,
+  "testCoverage": 80,
+  "codeLines": 5000
+}
+```
+
+Score ≥60 = Verified tier (10,000 MOLT)
+
+#### Check Your Status
+```http
+GET /api/airdrop/check?wallet=YourWalletAddress
+```
+
+Returns:
+```json
+{
+  "wallet": "Your...Address",
+  "tier": "builder",
+  "allocation": 2500,
+  "actions": ["connected", "qualified_agent"],
+  "nextTier": "Pass PoA verification to reach Verified (10,000 MOLT)"
+}
+```
+
+#### Airdrop Endpoints
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/api/airdrop/connect` | POST | Register wallet for airdrop |
+| `/api/airdrop/check` | GET | Check your tier and allocation |
 | `/api/airdrop/leaderboard` | GET | Testnet airdrop standings |
 | `/api/airdrop/stats` | GET | Airdrop statistics |
 | `/api/activity` | GET | Recent activity feed |
