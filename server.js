@@ -433,6 +433,150 @@ app.get('/api/airdrop/export', (req, res) => {
     res.json(airdropRegistry);
 });
 
+// ===========================================
+// LEADERBOARD - Public airdrop standings
+// ===========================================
+app.get('/api/airdrop/leaderboard', (req, res) => {
+    const limit = Math.min(parseInt(req.query.limit) || 50, 100);
+    
+    // Build leaderboard from wallets
+    const leaderboard = Object.entries(airdropRegistry.wallets)
+        .map(([wallet, data]) => ({
+            wallet: wallet.substring(0, 6) + '...' + wallet.substring(wallet.length - 4),
+            walletFull: wallet,
+            tier: data.tier || 'pioneer',
+            allocation: data.tier === 'verified' ? 10000 : 
+                        data.tier === 'builder' ? 2500 : 500,
+            registeredAt: data.registeredAt,
+            actionsCount: data.actions?.length || 0,
+            hasAgent: !!data.agentId,
+            poaScore: data.poaScore || null
+        }))
+        .sort((a, b) => b.allocation - a.allocation || 
+                        new Date(a.registeredAt) - new Date(b.registeredAt))
+        .slice(0, limit);
+    
+    res.json({
+        leaderboard,
+        stats: {
+            totalParticipants: Object.keys(airdropRegistry.wallets).length,
+            totalAllocated: (airdropRegistry.stats.pioneers * 500) + 
+                            (airdropRegistry.stats.builders * 2500) + 
+                            (airdropRegistry.stats.verified * 10000),
+            tiers: {
+                verified: airdropRegistry.stats.verified,
+                builders: airdropRegistry.stats.builders,
+                pioneers: airdropRegistry.stats.pioneers
+            }
+        },
+        timestamp: new Date().toISOString()
+    });
+});
+
+// ===========================================
+// QUICK VERIFY - Demo endpoint for agents to test verification
+// ===========================================
+app.post('/api/verify/quick', async (req, res) => {
+    const { agentName, endpoint, capabilities } = req.body || {};
+    
+    if (!agentName) {
+        return res.status(400).json({ error: 'agentName required' });
+    }
+    
+    // Quick capability check
+    let score = 30; // Base score for attempting
+    const checks = [];
+    
+    // Check 1: Has endpoint?
+    if (endpoint) {
+        score += 20;
+        checks.push({ check: 'endpoint_provided', passed: true, points: 20 });
+        
+        // Try to fetch endpoint
+        try {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 5000);
+            const resp = await fetch(endpoint, { 
+                signal: controller.signal,
+                headers: { 'User-Agent': 'MoltLaunch-PoA-Verifier/1.0' }
+            });
+            clearTimeout(timeout);
+            
+            if (resp.ok) {
+                score += 20;
+                checks.push({ check: 'endpoint_reachable', passed: true, points: 20 });
+            } else {
+                checks.push({ check: 'endpoint_reachable', passed: false, points: 0, reason: `HTTP ${resp.status}` });
+            }
+        } catch (e) {
+            checks.push({ check: 'endpoint_reachable', passed: false, points: 0, reason: e.message });
+        }
+    } else {
+        checks.push({ check: 'endpoint_provided', passed: false, points: 0 });
+    }
+    
+    // Check 2: Capabilities declared?
+    if (capabilities && Array.isArray(capabilities) && capabilities.length > 0) {
+        score += 10 + Math.min(capabilities.length * 2, 10);
+        checks.push({ check: 'capabilities_declared', passed: true, points: 10, count: capabilities.length });
+    } else {
+        checks.push({ check: 'capabilities_declared', passed: false, points: 0 });
+    }
+    
+    // Generate verification ID
+    const verificationId = 'poa_' + crypto.randomBytes(8).toString('hex');
+    
+    res.json({
+        verificationId,
+        agentName,
+        score,
+        maxScore: 100,
+        tier: score >= 70 ? 'verified' : score >= 50 ? 'builder' : 'pioneer',
+        checks,
+        message: score >= 70 ? 
+            'Verification passed! Register for airdrop with your wallet.' :
+            score >= 50 ?
+            'Partial verification. Add reachable endpoint for full score.' :
+            'Basic verification. Provide endpoint and capabilities for higher tier.',
+        nextSteps: [
+            score < 70 ? 'Add a reachable API endpoint' : null,
+            !capabilities?.length ? 'Declare your capabilities array' : null,
+            'Connect wallet at /api/airdrop/connect to claim allocation'
+        ].filter(Boolean)
+    });
+});
+
+// ===========================================
+// LIVE FEED - Recent activity stream
+// ===========================================
+app.get('/api/activity', (req, res) => {
+    const limit = Math.min(parseInt(req.query.limit) || 20, 50);
+    
+    // Collect recent actions from all wallets
+    const activities = [];
+    
+    for (const [wallet, data] of Object.entries(airdropRegistry.wallets)) {
+        for (const action of (data.actions || [])) {
+            activities.push({
+                wallet: wallet.substring(0, 6) + '...' + wallet.substring(wallet.length - 4),
+                type: action.type,
+                at: action.at,
+                details: action.txHash ? { txHash: action.txHash } : 
+                         action.score ? { score: action.score } : null
+            });
+        }
+    }
+    
+    // Sort by time, newest first
+    activities.sort((a, b) => new Date(b.at) - new Date(a.at));
+    
+    res.json({
+        activities: activities.slice(0, limit),
+        total: activities.length,
+        timestamp: new Date().toISOString()
+    });
+});
+
 // skill.md
 app.get('/skill.md', (req, res) => {
     res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
