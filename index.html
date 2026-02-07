@@ -1880,56 +1880,8 @@
                     });
                 }
                 
-                // Show launches (token launches)
-                if (launchData.launches?.length) {
-                    launchData.launches.forEach(agent => {
-                        html += `
-                            <div style="background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 16px; padding: 24px;">
-                                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-                                    <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #22d3ee, #4ade80); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
-                                        ${agent.symbol?.[0] || '🤖'}
-                                    </div>
-                                    <div>
-                                        <div style="font-weight: 600;">${agent.name || agent.id}</div>
-                                        <div style="font-size: 0.85rem; color: var(--text-muted);">${agent.symbol || 'Agent'}</div>
-                                    </div>
-                                    <div style="margin-left: auto; background: rgba(74,222,128,0.2); color: #4ade80; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem;">
-                                        ✓ Verified
-                                    </div>
-                                </div>
-                                <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
-                                    Status: <span style="color: ${agent.status === 'live' ? '#4ade80' : 'var(--warning)'}">${agent.status}</span>
-                                </div>
-                                ${agent.explorerUrl ? `<a href="${agent.explorerUrl}" target="_blank" style="color: var(--accent); font-size: 0.85rem;">View on Explorer →</a>` : ''}
-                            </div>
-                        `;
-                    });
-                }
-                
-                // Show recent verified agents from activity
-                if (activityData.recentAgents?.length) {
-                    activityData.recentAgents.slice(0, 6).forEach(agent => {
-                        html += `
-                            <div style="background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 16px; padding: 24px;">
-                                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-                                    <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #a855f7, #22d3ee); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
-                                        🤖
-                                    </div>
-                                    <div>
-                                        <div style="font-weight: 600;">${agent.agentId || 'Agent'}</div>
-                                        <div style="font-size: 0.85rem; color: var(--text-muted);">Score: ${agent.score || 'N/A'}</div>
-                                    </div>
-                                    <div style="margin-left: auto; background: rgba(34,211,238,0.2); color: var(--accent); padding: 4px 8px; border-radius: 6px; font-size: 0.75rem;">
-                                        ${agent.tier || 'Verified'}
-                                    </div>
-                                </div>
-                                <div style="font-size: 0.85rem; color: var(--text-muted);">
-                                    Verified ${new Date(agent.timestamp).toLocaleDateString()}
-                                </div>
-                            </div>
-                        `;
-                    });
-                }
+                // NOTE: Launches are token pools, NOT verified agents
+                // NOTE: recentAgents from /api/activity is deprecated - use /api/verify/list instead
                 
                 if (!html) {
                     html = `
