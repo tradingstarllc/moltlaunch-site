@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 250">
+  <defs>
+    <linearGradient id="bgPool" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#052e16"/>
+      <stop offset="100%" stop-color="#09090b"/>
+    </linearGradient>
+    <linearGradient id="greenGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4ade80"/>
+      <stop offset="100%" stop-color="#22c55e"/>
+    </linearGradient>
+    <linearGradient id="poolGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4ade80" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#4ade80" stop-opacity="0.05"/>
+    </linearGradient>
+    <filter id="poolGlow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="400" height="250" fill="url(#bgPool)"/>
+  
+  <!-- Pool container -->
+  <g transform="translate(200, 125)">
+    <!-- Main pool -->
+    <ellipse cx="0" cy="30" rx="100" ry="25" fill="url(#poolGradient)" stroke="#4ade80" stroke-width="2"/>
+    <rect x="-100" y="-40" width="200" height="70" fill="url(#poolGradient)" stroke="none"/>
+    <ellipse cx="0" cy="-40" rx="100" ry="25" fill="#09090b" stroke="#4ade80" stroke-width="2"/>
+    
+    <!-- Pool liquid level lines -->
+    <ellipse cx="0" cy="-20" rx="80" ry="18" fill="none" stroke="#4ade80" stroke-width="1" opacity="0.3"/>
+    <ellipse cx="0" cy="0" rx="60" ry="12" fill="none" stroke="#4ade80" stroke-width="1" opacity="0.2"/>
+  </g>
+  
+  <!-- Coins flowing in from left (stakers) -->
+  <g filter="url(#poolGlow)">
+    <circle cx="40" cy="60" r="15" fill="#fbbf24" stroke="#f59e0b" stroke-width="2"/>
+    <text x="40" y="65" text-anchor="middle" fill="#78350f" font-size="10" font-weight="bold">$</text>
+    
+    <circle cx="70" cy="90" r="12" fill="#fbbf24" stroke="#f59e0b" stroke-width="2"/>
+    <text x="70" y="94" text-anchor="middle" fill="#78350f" font-size="8" font-weight="bold">$</text>
+    
+    <circle cx="55" cy="130" r="10" fill="#fbbf24" stroke="#f59e0b" stroke-width="2"/>
+    <text x="55" y="134" text-anchor="middle" fill="#78350f" font-size="7" font-weight="bold">$</text>
+  </g>
+  
+  <!-- Arrow in -->
+  <path d="M80 90 Q120 100 130 85" fill="none" stroke="#4ade80" stroke-width="2" marker-end="url(#arrowGreen)"/>
+  
+  <!-- Coins flowing out to right (returns) -->
+  <g filter="url(#poolGlow)">
+    <circle cx="340" cy="50" r="14" fill="#4ade80" stroke="#22c55e" stroke-width="2"/>
+    <text x="340" y="55" text-anchor="middle" fill="#052e16" font-size="9" font-weight="bold">+$</text>
+    
+    <circle cx="360" cy="85" r="12" fill="#4ade80" stroke="#22c55e" stroke-width="2"/>
+    <text x="360" y="89" text-anchor="middle" fill="#052e16" font-size="8" font-weight="bold">+$</text>
+    
+    <circle cx="350" cy="120" r="10" fill="#4ade80" stroke="#22c55e" stroke-width="2"/>
+    <text x="350" y="124" text-anchor="middle" fill="#052e16" font-size="6" font-weight="bold">+$</text>
+  </g>
+  
+  <!-- Arrow out -->
+  <path d="M270 90 Q300 80 330 70" fill="none" stroke="#4ade80" stroke-width="2"/>
+  
+  <!-- Labels -->
+  <text x="55" y="170" text-anchor="middle" fill="#a1a1aa" font-size="10">STAKE</text>
+  <text x="200" y="195" text-anchor="middle" fill="#4ade80" font-size="12" font-weight="600">POOL</text>
+  <text x="345" y="160" text-anchor="middle" fill="#a1a1aa" font-size="10">RETURNS</text>
+  
+  <!-- Topics -->
+  <g font-size="8" font-family="monospace" fill="#4ade80" opacity="0.7">
+    <text x="200" y="220" text-anchor="middle">Trading · Analysis · Content · Infra · Research</text>
+  </g>
+  
+  <!-- Agent icons in pool -->
+  <g font-size="16" text-anchor="middle">
+    <text x="170" y="125">🤖</text>
+    <text x="200" y="115">🤖</text>
+    <text x="230" y="125">🤖</text>
+  </g>
+</svg>
