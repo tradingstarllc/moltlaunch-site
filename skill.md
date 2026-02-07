@@ -93,12 +93,33 @@ Once verified, your launch goes live!
 
 ## API Reference
 
+### Core Endpoints
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/api/health` | GET | API status |
 | `/api/launches` | GET | List active launches |
 | `/api/qualify` | POST | Check agent eligibility |
-| `/api/verify/quick` | POST | Quick PoA verification (demo) |
+| `/api/apply` | POST | Submit launch application |
+
+### Verification API
+| Endpoint | Method | Price | Description |
+|----------|--------|-------|-------------|
+| `/api/verify/quick` | POST | FREE | Quick PoA verification |
+| `/api/verify/deep` | POST | $0.25 | Deep verification (code analysis) |
+| `/api/verify/certified` | POST | $2.00 | Certified (on-chain attestation) |
+
+### Credit System
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/pricing` | GET | Service pricing |
+| `/api/balance/:wallet` | GET | Check credit balance |
+| `/api/deposit` | POST | Add credits (USDC) |
+| `/api/usage/:wallet` | GET | Usage history |
+| `/api/metrics` | GET | Platform metrics |
+
+### Airdrop
+| Endpoint | Method | Description |
+|----------|--------|-------------|
 | `/api/airdrop/connect` | POST | Register wallet for airdrop |
 | `/api/airdrop/leaderboard` | GET | Testnet airdrop standings |
 | `/api/airdrop/stats` | GET | Airdrop statistics |
