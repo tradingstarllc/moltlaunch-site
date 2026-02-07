@@ -2625,6 +2625,105 @@ app.get('/docs/execution-traces', (req, res) => {
 // Serve docs directory
 app.use('/docs', express.static(path.join(__dirname, 'docs')));
 
+// ===========================================
+// SOLANA ACTIONS & BLINKS
+// ===========================================
+// Shareable actions for verification and staking
+
+// Actions JSON (required for Blinks discovery)
+app.get('/actions.json', (req, res) => {
+    res.json({
+        rules: [
+            { pathPattern: "/api/blink/**", apiPath: "/api/blink/**" }
+        ]
+    });
+});
+
+// Blink: Stake on an agent
+app.get('/api/blink/stake/:agentId', (req, res) => {
+    const { agentId } = req.params;
+    const agent = verificationCache[agentId];
+    
+    res.json({
+        type: "action",
+        icon: "https://web-production-419d9.up.railway.app/icons/icon-192.png",
+        title: agent ? `Stake on ${agentId}` : "Stake on MoltLaunch Agent",
+        description: agent 
+            ? `Verified agent with ${agent.score} PoA score (${agent.tier}). Stake USDC to fund operations.`
+            : "Fund verified AI agents on Solana.",
+        label: "Stake",
+        links: {
+            actions: [
+                { label: "Stake 10 USDC", href: `/api/blink/stake/${agentId}/execute?amount=10` },
+                { label: "Stake 50 USDC", href: `/api/blink/stake/${agentId}/execute?amount=50` },
+                { label: "Stake 100 USDC", href: `/api/blink/stake/${agentId}/execute?amount=100` }
+            ]
+        }
+    });
+});
+
+// Blink: Execute stake (returns transaction for signing)
+app.post('/api/blink/stake/:agentId/execute', async (req, res) => {
+    const { agentId } = req.params;
+    const { amount } = req.query;
+    const { account } = req.body; // User's wallet from Blink client
+    
+    if (!account) {
+        return res.status(400).json({ error: "Missing account" });
+    }
+    
+    // For now, return a mock transaction (full implementation needs Solana SDK)
+    // In production: create actual stake transaction
+    res.json({
+        transaction: null, // Would be base64 encoded transaction
+        message: `Staking ${amount} USDC on ${agentId} (Devnet simulation)`,
+        note: "Full transaction signing coming in Q2 2026"
+    });
+});
+
+// Blink: View verified agent
+app.get('/api/blink/verify/:agentId', (req, res) => {
+    const { agentId } = req.params;
+    const agent = verificationCache[agentId];
+    
+    if (!agent) {
+        return res.json({
+            type: "action",
+            icon: "https://web-production-419d9.up.railway.app/icons/icon-192.png",
+            title: `Verify ${agentId}`,
+            description: "Get your agent verified on MoltLaunch",
+            label: "Get Verified",
+            links: {
+                actions: [
+                    { label: "Start Verification", href: "https://web-production-419d9.up.railway.app/dashboard.html" }
+                ]
+            }
+        });
+    }
+    
+    res.json({
+        type: "completed",
+        icon: "https://web-production-419d9.up.railway.app/icons/icon-192.png",
+        title: `✓ ${agentId} Verified`,
+        description: `PoA Score: ${agent.score}/100 (${agent.tier})\nVerified: ${new Date(agent.timestamp).toLocaleDateString()}\nExpires: ${new Date(agent.expiresAt).toLocaleDateString()}`,
+        label: "Verified"
+    });
+});
+
+// Priority fee endpoint (for agent intelligence)
+app.get('/api/priority-fee', async (req, res) => {
+    // Simulated priority fees (would query Solana RPC in production)
+    const base = 1000; // microlamports
+    res.json({
+        low: base,
+        medium: base * 5,
+        high: base * 10,
+        recommended: base * 5,
+        unit: "microlamports",
+        note: "Use recommended for normal conditions, high during congestion"
+    });
+});
+
 // Error handler
 app.use((err, req, res, next) => {
     console.error('Error:', err);
