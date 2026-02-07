@@ -871,6 +871,35 @@ app.get('/api/pools', (req, res) => {
     });
 });
 
+// Pool leaderboard (must be before :topic to avoid matching)
+app.get('/api/pools/leaderboard', (req, res) => {
+    const allAgents = [];
+    
+    Object.keys(poolAgents).forEach(topic => {
+        poolAgents[topic].forEach(agent => {
+            allAgents.push({
+                ...agent,
+                poolId: topic,
+                poolName: stakingPools[topic].name
+            });
+        });
+    });
+    
+    // Sort by efficiency (profitable first)
+    allAgents.sort((a, b) => (b.efficiency || 0) - (a.efficiency || 0));
+    
+    res.json({
+        topPerformers: allAgents.filter(a => a.efficiency >= 1.0).slice(0, 10),
+        allAgents: allAgents.slice(0, 50),
+        stats: {
+            totalAgents: allAgents.length,
+            profitable: allAgents.filter(a => a.efficiency >= 1.0).length,
+            warning: allAgents.filter(a => a.status === 'warning').length,
+            revoked: allAgents.filter(a => a.status === 'revoked').length
+        }
+    });
+});
+
 // Get specific pool
 app.get('/api/pools/:topic', (req, res) => {
     const { topic } = req.params;
@@ -1179,35 +1208,6 @@ app.post('/api/pool/return', (req, res) => {
             platformFee: platformFee.toFixed(2) + ' (5%)'
         } : null,
         poolAPY: (pool.currentAPY * 100).toFixed(1) + '%'
-    });
-});
-
-// Pool leaderboard
-app.get('/api/pools/leaderboard', (req, res) => {
-    const allAgents = [];
-    
-    Object.keys(poolAgents).forEach(topic => {
-        poolAgents[topic].forEach(agent => {
-            allAgents.push({
-                ...agent,
-                poolId: topic,
-                poolName: stakingPools[topic].name
-            });
-        });
-    });
-    
-    // Sort by efficiency (profitable first)
-    allAgents.sort((a, b) => (b.efficiency || 0) - (a.efficiency || 0));
-    
-    res.json({
-        topPerformers: allAgents.filter(a => a.efficiency >= 1.0).slice(0, 10),
-        allAgents: allAgents.slice(0, 50),
-        stats: {
-            totalAgents: allAgents.length,
-            profitable: allAgents.filter(a => a.efficiency >= 1.0).length,
-            warning: allAgents.filter(a => a.status === 'warning').length,
-            revoked: allAgents.filter(a => a.status === 'revoked').length
-        }
     });
 });
 
