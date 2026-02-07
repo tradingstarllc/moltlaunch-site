@@ -1066,12 +1066,13 @@
                 <div class="hero-content">
                     <div class="hero-badge">
                         <span class="hero-badge-dot" style="background: #4ade80;"></span>
-                        LIVE ON DEVNET
+                        LIVE ON DEVNET • x402 READY
                     </div>
                     <h1>The <span class="hero-highlight">AI Agent</span> Launchpad on Solana</h1>
                     <p class="hero-description">
-                        Launch verified AI agent tokens on Meteora Dynamic Bonding Curves. 
-                        Proof-of-agent verification, fair price discovery, and anti-rug protection built in.
+                        Launch verified AI agent tokens with Proof-of-Agent verification, 
+                        x402 micropayments, and anti-rug protection. 
+                        The infrastructure layer for the agentic economy.
                     </p>
                     <div class="hero-actions">
                         <a href="https://solscan.io/token/ATFtoArfzAF6Vi6XUeCr64ffD1SAN6HvwePkPmkkQ6en?cluster=devnet" target="_blank" class="btn btn-primary">View on Solscan →</a>
@@ -1083,12 +1084,12 @@
                             <div class="stat-label">Network</div>
                         </div>
                         <div class="stat">
-                            <div class="stat-value">Meteora</div>
-                            <div class="stat-label">DBC Protocol</div>
+                            <div class="stat-value">x402</div>
+                            <div class="stat-label">Payment Protocol</div>
                         </div>
                         <div class="stat">
-                            <div class="stat-value">1B</div>
-                            <div class="stat-label">Token Supply</div>
+                            <div class="stat-value">$0.25+</div>
+                            <div class="stat-label">Verification API</div>
                         </div>
                     </div>
                 </div>
@@ -1308,6 +1309,121 @@
                 </div>
                 <div style="margin-top: 16px; font-size: 0.8rem; color: var(--text-muted);">
                     Devnet SOL: <a href="https://faucet.solana.com" target="_blank" style="color: var(--accent);">faucet.solana.com</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- API & PRICING SECTION -->
+    <section class="api-section" id="api" style="padding: 80px 0; background: linear-gradient(135deg, rgba(34,211,238,0.08) 0%, rgba(168,85,247,0.05) 100%);">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-label" style="background: rgba(34,211,238,0.2); color: var(--accent);">💳 VERIFICATION API</span>
+                <h2>Proof-of-Agent Verification</h2>
+                <p>Verify AI agents programmatically. Pay with USDC via x402 or credits.</p>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 48px;">
+                <!-- Free Tier -->
+                <div style="background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 16px; padding: 24px; position: relative;">
+                    <div style="position: absolute; top: -12px; left: 24px; background: var(--bg); padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border); font-size: 0.75rem; color: var(--success);">FREE</div>
+                    <h3 style="margin-top: 16px; margin-bottom: 8px;">Quick Verify</h3>
+                    <div style="font-size: 2rem; font-weight: 700; color: var(--accent); margin-bottom: 16px;">$0 <span style="font-size: 0.9rem; font-weight: 400; color: var(--text-muted);">/ request</span></div>
+                    <ul style="list-style: none; padding: 0; margin: 0 0 24px 0; font-size: 0.9rem;">
+                        <li style="padding: 8px 0; display: flex; align-items: center; gap: 8px;"><span style="color: var(--success);">✓</span> Basic capability checks</li>
+                        <li style="padding: 8px 0; display: flex; align-items: center; gap: 8px;"><span style="color: var(--success);">✓</span> Instant results</li>
+                        <li style="padding: 8px 0; display: flex; align-items: center; gap: 8px;"><span style="color: var(--success);">✓</span> PoA score 0-100</li>
+                        <li style="padding: 8px 0; display: flex; align-items: center; gap: 8px; color: var(--text-muted);"><span>○</span> No attestation</li>
+                    </ul>
+                    <code style="display: block; background: var(--bg); padding: 12px; border-radius: 8px; font-size: 0.75rem; color: var(--accent);">POST /api/verify/quick</code>
+                </div>
+                
+                <!-- Deep Tier -->
+                <div style="background: var(--bg-subtle); border: 2px solid var(--accent); border-radius: 16px; padding: 24px; position: relative;">
+                    <div style="position: absolute; top: -12px; left: 24px; background: var(--accent); color: var(--bg); padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">POPULAR</div>
+                    <h3 style="margin-top: 16px; margin-bottom: 8px;">Deep Verify</h3>
+                    <div style="font-size: 2rem; font-weight: 700; color: var(--accent); margin-bottom: 16px;">$0.25 <span style="font-size: 0.9rem; font-weight: 400; color: var(--text-muted);">/ request</span></div>
+                    <ul style="list-style: none; padding: 0; margin: 0 0 24px 0; font-size: 0.9rem;">
+                        <li style="padding: 8px 0; display: flex; align-items: center; gap: 8px;"><span style="color: var(--success);">✓</span> Code analysis</li>
+                        <li style="padding: 8px 0; display: flex; align-items: center; gap: 8px;"><span style="color: var(--success);">✓</span> Capability testing</li>
+                        <li style="padding: 8px 0; display: flex; align-items: center; gap: 8px;"><span style="color: var(--success);">✓</span> Security scoring</li>
+                        <li style="padding: 8px 0; display: flex; align-items: center; gap: 8px;"><span style="color: var(--success);">✓</span> Attestation hash</li>
+                    </ul>
+                    <code style="display: block; background: var(--bg); padding: 12px; border-radius: 8px; font-size: 0.75rem; color: var(--accent);">POST /api/verify/deep</code>
+                </div>
+                
+                <!-- Certified Tier -->
+                <div style="background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 16px; padding: 24px; position: relative;">
+                    <div style="position: absolute; top: -12px; left: 24px; background: linear-gradient(90deg, #a855f7, #22d3ee); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">PREMIUM</div>
+                    <h3 style="margin-top: 16px; margin-bottom: 8px;">Certified</h3>
+                    <div style="font-size: 2rem; font-weight: 700; color: var(--accent); margin-bottom: 16px;">$2.00 <span style="font-size: 0.9rem; font-weight: 400; color: var(--text-muted);">/ request</span></div>
+                    <ul style="list-style: none; padding: 0; margin: 0 0 24px 0; font-size: 0.9rem;">
+                        <li style="padding: 8px 0; display: flex; align-items: center; gap: 8px;"><span style="color: var(--success);">✓</span> Everything in Deep</li>
+                        <li style="padding: 8px 0; display: flex; align-items: center; gap: 8px;"><span style="color: var(--success);">✓</span> On-chain attestation</li>
+                        <li style="padding: 8px 0; display: flex; align-items: center; gap: 8px;"><span style="color: var(--success);">✓</span> Manual review option</li>
+                        <li style="padding: 8px 0; display: flex; align-items: center; gap: 8px;"><span style="color: var(--success);">✓</span> 90-day validity</li>
+                    </ul>
+                    <code style="display: block; background: var(--bg); padding: 12px; border-radius: 8px; font-size: 0.75rem; color: var(--accent);">POST /api/verify/certified</code>
+                </div>
+            </div>
+            
+            <!-- x402 Banner -->
+            <div style="margin-top: 48px; padding: 24px; background: linear-gradient(135deg, rgba(34,211,238,0.15) 0%, rgba(168,85,247,0.1) 100%); border-radius: 16px; border: 1px solid var(--accent); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px;">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                        <span style="font-size: 1.5rem;">💳</span>
+                        <h3 style="margin: 0;">x402 Payment Protocol</h3>
+                    </div>
+                    <p style="color: var(--text-muted); margin: 0; max-width: 500px;">Pay for verifications with USDC directly via HTTP. No accounts, no sessions — just send payment with your request. Powered by Coinbase x402.</p>
+                </div>
+                <a href="https://x402.org" target="_blank" class="btn btn-secondary" style="white-space: nowrap;">Learn about x402 →</a>
+            </div>
+            
+            <!-- API Endpoints -->
+            <div style="margin-top: 48px;">
+                <h3 style="margin-bottom: 24px;">All Endpoints</h3>
+                <div style="background: var(--bg-subtle); border-radius: 12px; overflow: hidden; border: 1px solid var(--border);">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+                        <thead>
+                            <tr style="background: var(--bg-muted);">
+                                <th style="padding: 12px 16px; text-align: left; font-weight: 500; color: var(--text-muted);">Endpoint</th>
+                                <th style="padding: 12px 16px; text-align: left; font-weight: 500; color: var(--text-muted);">Price</th>
+                                <th style="padding: 12px 16px; text-align: left; font-weight: 500; color: var(--text-muted);">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-top: 1px solid var(--border-subtle);">
+                                <td style="padding: 12px 16px;"><code style="color: var(--accent);">/api/verify/quick</code></td>
+                                <td style="padding: 12px 16px; color: var(--success);">Free</td>
+                                <td style="padding: 12px 16px; color: var(--text-muted);">Quick PoA verification</td>
+                            </tr>
+                            <tr style="border-top: 1px solid var(--border-subtle);">
+                                <td style="padding: 12px 16px;"><code style="color: var(--accent);">/api/verify/deep</code></td>
+                                <td style="padding: 12px 16px;">$0.25</td>
+                                <td style="padding: 12px 16px; color: var(--text-muted);">Deep verification with code analysis</td>
+                            </tr>
+                            <tr style="border-top: 1px solid var(--border-subtle);">
+                                <td style="padding: 12px 16px;"><code style="color: var(--accent);">/api/verify/certified</code></td>
+                                <td style="padding: 12px 16px;">$2.00</td>
+                                <td style="padding: 12px 16px; color: var(--text-muted);">Certified with on-chain attestation</td>
+                            </tr>
+                            <tr style="border-top: 1px solid var(--border-subtle);">
+                                <td style="padding: 12px 16px;"><code style="color: var(--accent);">/api/pricing</code></td>
+                                <td style="padding: 12px 16px; color: var(--success);">Free</td>
+                                <td style="padding: 12px 16px; color: var(--text-muted);">Get all service pricing</td>
+                            </tr>
+                            <tr style="border-top: 1px solid var(--border-subtle);">
+                                <td style="padding: 12px 16px;"><code style="color: var(--accent);">/api/x402/status</code></td>
+                                <td style="padding: 12px 16px; color: var(--success);">Free</td>
+                                <td style="padding: 12px 16px; color: var(--text-muted);">x402 payment configuration</td>
+                            </tr>
+                            <tr style="border-top: 1px solid var(--border-subtle);">
+                                <td style="padding: 12px 16px;"><code style="color: var(--accent);">/api/airdrop/leaderboard</code></td>
+                                <td style="padding: 12px 16px; color: var(--success);">Free</td>
+                                <td style="padding: 12px 16px; color: var(--text-muted);">Testnet airdrop standings</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
