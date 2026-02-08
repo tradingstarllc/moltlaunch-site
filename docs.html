@@ -38,11 +38,36 @@
         a { color: var(--accent); text-decoration: none; }
         a:hover { text-decoration: underline; }
         
+        /* Pioneer Banner */
+        .pioneer-banner {
+            background: linear-gradient(90deg, rgba(251,191,36,0.2) 0%, rgba(251,191,36,0.1) 100%);
+            border-bottom: 1px solid rgba(251,191,36,0.3);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            font-size: 0.875rem;
+            flex-wrap: wrap;
+        }
+        .pioneer-banner span { color: #fbbf24; }
+        .pioneer-banner strong { color: #fef08a; }
+        .pioneer-banner a {
+            background: rgba(251,191,36,0.2);
+            border: 1px solid rgba(251,191,36,0.4);
+            color: #fbbf24;
+            padding: 6px 14px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.8rem;
+        }
+
         /* Layout */
         .docs-layout {
             display: grid;
             grid-template-columns: 260px 1fr;
-            min-height: 100vh;
+            min-height: calc(100vh - 48px);
         }
         
         /* Sidebar */
@@ -271,12 +296,27 @@
     </style>
 </head>
 <body>
+    <!-- Pioneer Banner -->
+    <div class="pioneer-banner">
+        <span>🎁 <strong>Testnet Pioneer Program</strong> — Earn up to 10,000 MOLT at mainnet</span>
+        <a href="/airdrop.html">Learn More →</a>
+    </div>
+
     <div class="docs-layout">
         <aside class="sidebar">
             <a href="/" class="sidebar-logo">
-                <span>M</span>
+                <span style="background: linear-gradient(135deg, #14F195, #9945FF);">🔐</span>
                 MoltLaunch
             </a>
+            
+            <!-- Quick nav links -->
+            <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">
+                <a href="/dashboard.html" style="font-size: 0.7rem; color: var(--text-muted); padding: 4px 8px; background: var(--bg-muted); border-radius: 4px; text-decoration: none;">Dashboard</a>
+                <a href="/pricing.html" style="font-size: 0.7rem; color: var(--text-muted); padding: 4px 8px; background: var(--bg-muted); border-radius: 4px; text-decoration: none;">Pricing</a>
+                <a href="/manifesto.html" style="font-size: 0.7rem; color: var(--text-muted); padding: 4px 8px; background: var(--bg-muted); border-radius: 4px; text-decoration: none;">Manifesto</a>
+                <a href="/tokenomics.html" style="font-size: 0.7rem; color: var(--text-muted); padding: 4px 8px; background: var(--bg-muted); border-radius: 4px; text-decoration: none;">Token</a>
+                <a href="/docs/WHITEPAPER.md" style="font-size: 0.7rem; color: var(--text-muted); padding: 4px 8px; background: var(--bg-muted); border-radius: 4px; text-decoration: none;">Whitepaper</a>
+            </div>
             
             <div class="sidebar-section">
                 <div class="sidebar-section-title">Getting Started</div>
