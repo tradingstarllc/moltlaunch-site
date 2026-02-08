@@ -3118,6 +3118,275 @@ app.get('/api/notifications', (req, res) => {
     });
 });
 
+// ==========================================
+// PYTH ORACLE INTEGRATION
+// ==========================================
+
+const PYTH_PRICE_FEEDS = {
+    'SOL/USD': '0xef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d',
+    'BTC/USD': '0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43',
+    'ETH/USD': '0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace',
+    'USDC/USD': '0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a',
+    'BONK/USD': '0x72b021217ca3fe68922a19aaf990109cb9d84e9ad004b4d2025ad6f529314419',
+    'JUP/USD': '0x0a0408d619e9380abad35060f9192039ed5042fa6f82301d0e48bb52be830996'
+};
+
+app.get('/api/oracles/pyth/feeds', (req, res) => {
+    res.json({
+        provider: 'Pyth Network',
+        network: 'solana',
+        feeds: Object.entries(PYTH_PRICE_FEEDS).map(([symbol, id]) => ({
+            symbol,
+            feedId: id,
+            endpoint: `/api/oracles/pyth/price/${encodeURIComponent(symbol)}`
+        })),
+        docs: 'https://docs.pyth.network/price-feeds'
+    });
+});
+
+app.get('/api/oracles/pyth/price/:symbol', async (req, res) => {
+    const { symbol } = req.params;
+    const feedId = PYTH_PRICE_FEEDS[symbol.toUpperCase()];
+    
+    if (!feedId) {
+        return res.status(404).json({ 
+            error: 'Price feed not found',
+            availableFeeds: Object.keys(PYTH_PRICE_FEEDS)
+        });
+    }
+    
+    try {
+        // Fetch from Pyth Hermes API
+        const response = await fetch(`https://hermes.pyth.network/v2/updates/price/latest?ids[]=${feedId}`);
+        const data = await response.json();
+        
+        if (data.parsed && data.parsed[0]) {
+            const priceData = data.parsed[0].price;
+            const price = Number(priceData.price) * Math.pow(10, priceData.expo);
+            
+            res.json({
+                symbol: symbol.toUpperCase(),
+                feedId,
+                price: price.toFixed(6),
+                confidence: Number(priceData.conf) * Math.pow(10, priceData.expo),
+                publishTime: new Date(data.parsed[0].price.publish_time * 1000).toISOString(),
+                source: 'pyth-hermes',
+                verificationBonus: '+10 PoA score for using Pyth oracles'
+            });
+        } else {
+            res.status(502).json({ error: 'Unable to fetch price from Pyth' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: 'Pyth API error', details: err.message });
+    }
+});
+
+// ==========================================
+// JITO MEV INTEGRATION
+// ==========================================
+
+const JITO_TIP_ACCOUNTS = [
+    '96gYZGLnJYVFmbjzopPSU6QiEV5fGqZNyN9nmNhvrZU5',
+    'HFqU5x63VTqvQss8hp11i4bVBAAqvAJxMvD3f7cuNQhe',
+    'Cw8CFyM9FkoMi7K7Crf6HNQqf4uEMzpKw6QNghXLvLkY',
+    'ADaUMid9yfUytqMBgopwjb2DTLSdBGpK3JmBvFmNc94h'
+];
+
+app.get('/api/mev/jito/tip-accounts', (req, res) => {
+    res.json({
+        provider: 'Jito Labs',
+        accounts: JITO_TIP_ACCOUNTS,
+        note: 'Include a SOL transfer to one of these accounts as the last instruction in your bundle'
+    });
+});
+
+app.get('/api/mev/jito/tip-estimate', async (req, res) => {
+    const { urgency = 'medium' } = req.query;
+    
+    // Simulated tip estimates based on network conditions
+    // In production, would query Jito block engine
+    const baseTip = 10000; // 10k lamports
+    const multipliers = { low: 0.5, medium: 1, high: 2, urgent: 5 };
+    const multiplier = multipliers[urgency] || 1;
+    
+    res.json({
+        urgency,
+        estimatedTip: Math.floor(baseTip * multiplier),
+        tipAccountsSample: JITO_TIP_ACCOUNTS.slice(0, 2),
+        bundles: {
+            endpoint: 'https://mainnet.block-engine.jito.wtf',
+            docs: 'https://docs.jito.wtf/lowlatencytxnsend/'
+        },
+        verificationBonus: '+15 PoA score for using Jito bundles (MEV protection)'
+    });
+});
+
+app.get('/api/verify/mev-protection/:agentId', (req, res) => {
+    const { agentId } = req.params;
+    
+    // Check if agent uses Jito (would check transaction history in production)
+    // For now, return stub data
+    res.json({
+        agentId,
+        usesJito: false,
+        bundleCount: 0,
+        avgTip: 0,
+        recommendation: 'Enable Jito bundles for +15 PoA score boost',
+        howToEnable: {
+            npm: 'npm install jito-ts',
+            docs: 'https://docs.jito.wtf/'
+        }
+    });
+});
+
+// ==========================================
+// METAPLEX VERIFICATION BADGES
+// ==========================================
+
+const verificationBadges = new Map();
+
+app.get('/api/badge/:agentId', (req, res) => {
+    const { agentId } = req.params;
+    const badge = verificationBadges.get(agentId);
+    
+    if (!badge) {
+        // Check if agent is verified
+        const verified = verifiedAgents.get(agentId);
+        if (verified && verified.score >= 60) {
+            // Generate badge metadata (not minted yet)
+            res.json({
+                agentId,
+                minted: false,
+                eligible: true,
+                score: verified.score,
+                tier: verified.tier,
+                metadata: {
+                    name: `MoltLaunch Verified: ${agentId}`,
+                    symbol: 'MOLT-V',
+                    description: `This agent achieved a Proof-of-Agent score of ${verified.score}/100 on MoltLaunch.`,
+                    image: `https://web-production-419d9.up.railway.app/images/branding/x402-badge-2.png`,
+                    attributes: [
+                        { trait_type: 'PoA Score', value: verified.score },
+                        { trait_type: 'Tier', value: verified.tier },
+                        { trait_type: 'Verified Date', value: new Date().toISOString().split('T')[0] }
+                    ],
+                    external_url: `https://web-production-419d9.up.railway.app/api/verify/status/${agentId}`
+                },
+                mintEndpoint: `/api/badge/mint/${agentId}`
+            });
+        } else {
+            res.status(404).json({ 
+                error: 'Agent not verified or score below 60',
+                eligibleScore: 60,
+                currentScore: verified?.score || 0
+            });
+        }
+    } else {
+        res.json(badge);
+    }
+});
+
+app.post('/api/badge/mint/:agentId', async (req, res) => {
+    const { agentId } = req.params;
+    const { wallet } = req.body;
+    
+    const verified = verifiedAgents.get(agentId);
+    if (!verified || verified.score < 60) {
+        return res.status(400).json({ error: 'Agent not eligible for badge' });
+    }
+    
+    // In production, would use Metaplex to mint NFT
+    // For now, create a mock badge
+    const badge = {
+        agentId,
+        minted: true,
+        mintedAt: new Date().toISOString(),
+        recipient: wallet || 'simulation-mode',
+        nft: {
+            mint: `BADGE${Date.now().toString(36).toUpperCase()}`,
+            collection: 'MoltLaunch Verified Agents',
+            metadata: {
+                name: `MoltLaunch Verified: ${agentId}`,
+                score: verified.score,
+                tier: verified.tier
+            }
+        },
+        note: 'Metaplex minting requires mainnet deployment. Badge metadata is ready.'
+    };
+    
+    verificationBadges.set(agentId, badge);
+    
+    res.json({
+        success: true,
+        badge,
+        shareUrl: `https://tensor.trade/item/${badge.nft.mint}` // Would be real URL
+    });
+});
+
+// ==========================================
+// SOLANA AGENT KIT DETECTION
+// ==========================================
+
+const AGENT_KIT_PLUGINS = [
+    '@solana-agent-kit/plugin-token',
+    '@solana-agent-kit/plugin-nft',
+    '@solana-agent-kit/plugin-defi',
+    '@solana-agent-kit/plugin-misc',
+    '@solana-agent-kit/plugin-blinks'
+];
+
+app.post('/api/verify/agent-kit', async (req, res) => {
+    const { agentId, repoUrl, packageJson } = req.body;
+    
+    if (!agentId) {
+        return res.status(400).json({ error: 'agentId required' });
+    }
+    
+    let detectedPlugins = [];
+    let scoreBoost = 0;
+    
+    if (packageJson) {
+        // Parse provided package.json
+        const deps = { ...packageJson.dependencies, ...packageJson.devDependencies };
+        
+        if (deps['solana-agent-kit']) {
+            scoreBoost += 5;
+            detectedPlugins.push('solana-agent-kit (core)');
+        }
+        
+        for (const plugin of AGENT_KIT_PLUGINS) {
+            if (deps[plugin]) {
+                scoreBoost += 3;
+                detectedPlugins.push(plugin);
+            }
+        }
+    }
+    
+    res.json({
+        agentId,
+        usesAgentKit: detectedPlugins.length > 0,
+        detectedPlugins,
+        capabilities: detectedPlugins.map(p => p.replace('@solana-agent-kit/plugin-', '')),
+        scoreBoost,
+        note: 'Using solana-agent-kit with plugins demonstrates Solana ecosystem integration'
+    });
+});
+
+app.get('/api/capabilities/solana-agent-kit', (req, res) => {
+    res.json({
+        name: 'Solana Agent Kit',
+        repo: 'https://github.com/sendaifun/solana-agent-kit',
+        plugins: AGENT_KIT_PLUGINS.map(p => ({
+            name: p,
+            scoreBoost: 3,
+            capabilities: p.split('-').pop()
+        })),
+        coreBoost: 5,
+        maxBoost: 5 + (AGENT_KIT_PLUGINS.length * 3),
+        integration: 'Submit your package.json to /api/verify/agent-kit for detection'
+    });
+});
+
 // Error handler
 app.use((err, req, res, next) => {
     console.error('Error:', err);
