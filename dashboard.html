@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agent Dashboard — MoltLaunch</title>
-    <meta name="description" content="Register, verify, and track your AI agent on MoltLaunch">
+    <title>Dashboard — MoltLaunch</title>
+    <meta name="description" content="Manage your AI agents on MoltLaunch">
     <link rel="icon" href="/icons/icon-192.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
     <style>
         :root {
             --bg: #09090b;
@@ -24,924 +24,1511 @@
             --success: #4ade80;
             --warning: #fbbf24;
             --error: #ef4444;
-            --phase-verify: #22d3ee;
-            --phase-fund: #4ade80;
-            --phase-operate: #a855f7;
-            --phase-survive: #f97316;
+            --solana-green: #14F195;
+            --solana-purple: #9945FF;
         }
+        
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Inter', -apple-system, sans-serif;
             background: var(--bg);
             color: var(--text);
             line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
         }
-        .container { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
-        h1, h2, h3 { font-weight: 600; line-height: 1.2; letter-spacing: -0.02em; }
-        h1 { font-size: 2rem; }
-        h2 { font-size: 1.5rem; }
-        h3 { font-size: 1.125rem; }
-        code { font-family: 'JetBrains Mono', monospace; background: var(--bg-muted); padding: 2px 6px; border-radius: 4px; font-size: 0.85rem; }
         
-        /* Buttons */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 24px;
-            font-size: 0.875rem;
-            font-weight: 500;
-            text-decoration: none;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.15s ease;
+        code { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
+        
+        /* Layout */
+        .app {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            min-height: 100vh;
         }
-        .btn-primary { background: var(--accent); color: var(--bg); }
-        .btn-primary:hover { background: #06b6d4; }
-        .btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
-        .btn-secondary:hover { background: var(--bg-subtle); }
-        .btn-success { background: var(--success); color: var(--bg); }
-        .btn-warning { background: var(--warning); color: var(--bg); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
         
-        /* Loading spinner */
-        .spinner {
-            width: 16px;
-            height: 16px;
-            border: 2px solid transparent;
-            border-top-color: currentColor;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .btn.loading .spinner { display: inline-block; }
-        .btn.loading .btn-text { display: none; }
-        .btn .spinner { display: none; }
-        
-        /* Navigation */
-        nav {
-            position: fixed;
+        /* Sidebar */
+        .sidebar {
+            background: var(--bg-subtle);
+            border-right: 1px solid var(--border-subtle);
+            padding: 20px 0;
+            position: sticky;
             top: 0;
-            left: 0;
-            right: 0;
-            z-index: 100;
-            background: rgba(9, 9, 11, 0.8);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border-subtle);
+            height: 100vh;
+            overflow-y: auto;
         }
-        .nav-inner {
+        
+        .sidebar-logo {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            height: 64px;
-        }
-        .logo {
-            font-weight: 700;
-            font-size: 1.125rem;
-            color: var(--text);
+            gap: 10px;
+            padding: 0 20px 20px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
             text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            color: var(--text);
+            font-weight: 700;
+            font-size: 1.1rem;
         }
-        .logo-mark {
-            width: 28px;
-            height: 28px;
-            background: linear-gradient(135deg, var(--accent), #a855f7);
-            border-radius: 6px;
+        
+        .sidebar-logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--solana-green), var(--solana-purple));
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: 16px;
         }
-        .nav-links {
+        
+        .sidebar-nav {
+            padding: 0 12px;
+        }
+        
+        .nav-item {
             display: flex;
             align-items: center;
-            gap: 8px;
-        }
-        .nav-links a {
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
             color: var(--text-muted);
             text-decoration: none;
-            font-size: 0.875rem;
-            padding: 8px 12px;
-            border-radius: 6px;
-            transition: color 0.15s;
+            font-size: 0.9rem;
+            transition: all 0.15s;
+            cursor: pointer;
         }
-        .nav-links a:hover { color: var(--text); }
-        .nav-links a.active { color: var(--text); background: var(--bg-muted); }
-        .wallet-status {
+        
+        .nav-item:hover {
+            background: var(--bg-muted);
+            color: var(--text);
+        }
+        
+        .nav-item.active {
+            background: var(--accent-muted);
+            color: var(--accent);
+        }
+        
+        .nav-item-icon {
+            font-size: 1.1rem;
+        }
+        
+        .nav-section {
+            margin-top: 24px;
+            padding: 0 12px;
+        }
+        
+        .nav-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-subtle);
+            padding: 0 12px;
+            margin-bottom: 8px;
+        }
+        
+        /* Wallet */
+        .wallet-section {
+            padding: 16px;
+            margin: 12px;
+            background: var(--bg-muted);
+            border-radius: 12px;
+        }
+        
+        .wallet-connected {
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 8px 12px;
-            background: var(--bg-subtle);
-            border: 1px solid var(--border);
-            border-radius: 8px;
             font-size: 0.85rem;
         }
+        
         .wallet-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
+            background: var(--success);
+        }
+        
+        .wallet-dot.disconnected {
             background: var(--error);
         }
-        .wallet-dot.connected { background: var(--success); }
         
-        /* Mobile nav toggle */
-        .nav-toggle {
-            display: none;
-            background: none;
-            border: none;
-            color: var(--text);
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 8px;
+        .wallet-address {
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
         }
-        @media (max-width: 768px) {
-            .nav-toggle { display: block; }
-            .nav-links {
-                display: none;
-                position: absolute;
-                top: 64px;
-                left: 0;
-                right: 0;
-                background: var(--bg);
-                border-bottom: 1px solid var(--border);
-                flex-direction: column;
-                padding: 16px;
-            }
-            .nav-links.open { display: flex; }
-            .nav-links a { width: 100%; padding: 12px; }
-            .wallet-status { width: 100%; justify-content: center; }
+        
+        .btn-connect {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(135deg, var(--solana-green), var(--accent));
+            color: var(--bg);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        
+        .btn-connect:hover {
+            opacity: 0.9;
         }
         
         /* Main content */
-        .main-content { margin-top: 80px; }
-        
-        /* Hero section */
-        .hero {
-            text-align: center;
-            padding: 32px 0 48px;
-        }
-        .hero-illustration {
-            max-width: 400px;
-            margin: 0 auto 24px;
-        }
-        .hero h1 { margin-bottom: 8px; }
-        .hero p { color: var(--text-muted); }
-        
-        /* Lifecycle phases */
-        .lifecycle-phases {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin: 32px 0;
-            overflow-x: auto;
-            padding: 8px 0;
-        }
-        .phase {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 16px 24px;
-            background: var(--bg-subtle);
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            min-width: 100px;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-        .phase:hover { transform: translateY(-2px); }
-        .phase.active { border-color: var(--phase-color); background: rgba(var(--phase-rgb), 0.1); }
-        .phase.completed { border-color: var(--success); }
-        .phase.completed::after {
-            content: '✓';
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            width: 20px;
-            height: 20px;
-            background: var(--success);
-            border-radius: 50%;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--bg);
-        }
-        .phase { position: relative; }
-        .phase-icon { font-size: 1.5rem; margin-bottom: 4px; }
-        .phase-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
-        .phase[data-phase="1"] { --phase-color: var(--phase-verify); --phase-rgb: 34, 211, 238; }
-        .phase[data-phase="2"] { --phase-color: var(--phase-fund); --phase-rgb: 74, 222, 128; }
-        .phase[data-phase="3"] { --phase-color: var(--phase-operate); --phase-rgb: 168, 85, 247; }
-        .phase[data-phase="4"] { --phase-color: var(--phase-survive); --phase-rgb: 249, 115, 22; }
-        .phase.active .phase-label { color: var(--phase-color); }
-        
-        /* Phase arrow */
-        .phase-arrow {
-            display: flex;
-            align-items: center;
-            color: var(--border);
-            font-size: 1.2rem;
+        .main {
+            padding: 32px;
+            max-width: 1200px;
         }
         
-        /* Alerts */
-        .alert {
-            padding: 16px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .page-header {
+            margin-bottom: 32px;
         }
-        .alert-success { background: rgba(74, 222, 128, 0.1); border: 1px solid var(--success); color: var(--success); }
-        .alert-error { background: rgba(239, 68, 68, 0.1); border: 1px solid var(--error); color: var(--error); }
-        .alert-info { background: rgba(34, 211, 238, 0.1); border: 1px solid var(--accent); color: var(--accent); }
+        
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .page-subtitle {
+            color: var(--text-muted);
+        }
         
         /* Cards */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-        }
         .card {
             background: var(--bg-subtle);
             border: 1px solid var(--border);
             border-radius: 16px;
             padding: 24px;
+            margin-bottom: 24px;
         }
+        
         .card-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
             margin-bottom: 20px;
         }
-        .card-header h3 { margin: 0; display: flex; align-items: center; gap: 8px; }
-        .full-width { grid-column: 1 / -1; }
         
-        /* Score display */
-        .score-display { text-align: center; padding: 24px; }
-        .score-circle {
-            width: 140px;
-            height: 140px;
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* Agent Grid */
+        .agents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .agent-card {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .agent-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+        
+        .agent-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        
+        .agent-name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .agent-id {
+            font-size: 0.8rem;
+            color: var(--text-subtle);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .agent-score {
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
-            background: conic-gradient(var(--accent) calc(var(--score) * 1%), var(--bg-muted) 0);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 16px;
-            position: relative;
-        }
-        .score-circle::before {
-            content: '';
-            width: 110px;
-            height: 110px;
-            background: var(--bg-subtle);
-            border-radius: 50%;
-            position: absolute;
-        }
-        .score-value {
-            position: relative;
-            font-size: 2.5rem;
             font-weight: 700;
-            color: var(--accent);
+            font-size: 1rem;
         }
-        .score-label { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 8px; }
-        .tier-badge {
-            display: inline-block;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        .tier-excellent { background: rgba(74, 222, 128, 0.2); color: #4ade80; }
-        .tier-good { background: rgba(34, 211, 238, 0.2); color: #22d3ee; }
-        .tier-fair { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
-        .tier-needs-work { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
-        .tier-unverified { background: var(--bg-muted); color: var(--text-muted); }
         
-        /* Verified badge share */
-        .badge-share {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border);
+        .score-excellent { background: rgba(74, 222, 128, 0.2); color: var(--success); }
+        .score-good { background: rgba(34, 211, 238, 0.2); color: var(--accent); }
+        .score-fair { background: rgba(251, 191, 36, 0.2); color: var(--warning); }
+        .score-poor { background: rgba(239, 68, 68, 0.2); color: var(--error); }
+        .score-unverified { background: var(--bg-muted); color: var(--text-subtle); }
+        
+        .agent-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
         }
-        .badge-share-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; }
-        .badge-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
-        .badge-actions .btn { padding: 8px 16px; font-size: 0.8rem; }
+        
+        .agent-capabilities {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 12px;
+        }
+        
+        .capability-tag {
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            background: var(--bg-muted);
+            border-radius: 4px;
+            color: var(--text-muted);
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: var(--bg);
+        }
+        
+        .btn-primary:hover {
+            background: #06b6d4;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--bg-subtle);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: var(--bg);
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
         
         /* Empty state */
         .empty-state {
             text-align: center;
-            padding: 32px 16px;
+            padding: 48px 24px;
         }
-        .empty-state img {
-            max-width: 150px;
+        
+        .empty-state-icon {
+            font-size: 3rem;
             margin-bottom: 16px;
-            opacity: 0.8;
+            opacity: 0.6;
         }
-        .empty-state p { color: var(--text-muted); font-size: 0.9rem; }
+        
+        .empty-state-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .empty-state-text {
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+        }
+        
+        .modal-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 480px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: transform 0.2s;
+        }
+        
+        .modal-overlay.open .modal {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .modal-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 4px;
+        }
+        
+        .modal-body {
+            padding: 24px;
+        }
+        
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
         
         /* Forms */
-        .form-group { margin-bottom: 16px; }
-        .form-group label {
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
             display: block;
             margin-bottom: 6px;
             font-size: 0.85rem;
-            color: var(--text-muted);
             font-weight: 500;
+            color: var(--text-muted);
         }
-        .form-group input, .form-group textarea, .form-group select {
+        
+        .form-input {
             width: 100%;
-            padding: 12px;
+            padding: 10px 14px;
             background: var(--bg);
             border: 1px solid var(--border);
             border-radius: 8px;
             color: var(--text);
             font-size: 0.9rem;
-            font-family: inherit;
-            transition: border-color 0.15s;
         }
-        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+        
+        .form-input:focus {
             outline: none;
             border-color: var(--accent);
         }
-        .form-group input::placeholder { color: var(--text-subtle); }
         
-        /* Trace list */
-        .trace-list { max-height: 280px; overflow-y: auto; }
-        .trace-item {
+        .form-input::placeholder {
+            color: var(--text-subtle);
+        }
+        
+        .form-hint {
+            font-size: 0.75rem;
+            color: var(--text-subtle);
+            margin-top: 4px;
+        }
+        
+        /* Alerts */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 12px;
-            background: var(--bg);
-            border-radius: 8px;
-            margin-bottom: 8px;
-            font-size: 0.85rem;
+            gap: 10px;
         }
-        .trace-date { color: var(--text-muted); }
-        .trace-actions { color: var(--text-subtle); }
-        .trace-score { color: var(--success); font-weight: 600; }
         
-        /* Staking pool section */
-        .pool-section {
-            background: linear-gradient(135deg, rgba(74, 222, 128, 0.05), rgba(34, 211, 238, 0.05));
-            border: 1px solid var(--phase-fund);
+        .alert-success {
+            background: rgba(74, 222, 128, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
         }
-        .pool-illustration {
-            max-width: 180px;
-            margin: 0 auto 16px;
-        }
-        .pool-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            margin-top: 16px;
-        }
-        .pool-stat {
-            text-align: center;
-            padding: 12px;
-            background: var(--bg);
-            border-radius: 8px;
-        }
-        .pool-stat-value { font-size: 1.25rem; font-weight: 700; color: var(--success); }
-        .pool-stat-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
         
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 32px 0;
-            margin-top: 48px;
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--error);
+            color: var(--error);
+        }
+        
+        .alert-info {
+            background: rgba(34, 211, 238, 0.1);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+        }
+        
+        /* Loading */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 48px;
+        }
+        
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Agent Detail View */
+        .agent-detail-header {
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+            margin-bottom: 32px;
+        }
+        
+        .agent-score-large {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+        
+        .agent-score-large .score-value {
+            font-size: 2rem;
+        }
+        
+        .agent-score-large .score-label {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+        
+        .agent-detail-info h1 {
+            font-size: 1.5rem;
+            margin-bottom: 4px;
+        }
+        
+        .agent-detail-info .agent-id {
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+        }
+        
+        .agent-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            font-size: 0.9rem;
             color: var(--text-muted);
-            font-size: 0.85rem;
-            border-top: 1px solid var(--border-subtle);
+            background: none;
+            border: none;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            transition: all 0.15s;
         }
-        footer a { color: var(--accent); text-decoration: none; }
-        footer a:hover { text-decoration: underline; }
         
+        .tab:hover {
+            color: var(--text);
+        }
+        
+        .tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Table */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th, .table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .table th {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        
+        .table tbody tr:hover {
+            background: var(--bg-muted);
+        }
+        
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: var(--bg-muted);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        
+        /* Leaderboard */
+        .rank-badge {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+        
+        .rank-1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #000; }
+        .rank-2 { background: linear-gradient(135deg, #94a3b8, #64748b); color: #000; }
+        .rank-3 { background: linear-gradient(135deg, #f97316, #ea580c); color: #000; }
+        
+        /* View toggles */
+        .view-hidden { display: none !important; }
+        
+        /* Responsive */
         @media (max-width: 768px) {
-            .dashboard-grid { grid-template-columns: 1fr; }
-            .lifecycle-phases { flex-wrap: nowrap; justify-content: flex-start; }
-            .phase { min-width: 80px; padding: 12px 16px; }
-            .phase-arrow { display: none; }
-            .pool-stats { grid-template-columns: 1fr; }
-            .hero-illustration { max-width: 280px; }
+            .app {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .main {
+                padding: 16px;
+            }
+            
+            .agents-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Pioneer Banner -->
-    <div style="background: linear-gradient(90deg, rgba(251,191,36,0.2) 0%, rgba(251,191,36,0.1) 100%); border-bottom: 1px solid rgba(251,191,36,0.3); padding: 12px 0;">
-        <div class="container" style="display: flex; align-items: center; justify-content: center; gap: 16px; font-size: 0.875rem; flex-wrap: wrap;">
-            <span style="color: #fbbf24;">🎁 <strong style="color: #fef08a;">Testnet Pioneer Program</strong> — Earn up to 10,000 MOLT at mainnet</span>
-            <a href="/airdrop.html" style="background: rgba(251,191,36,0.2); border: 1px solid rgba(251,191,36,0.4); color: #fbbf24; padding: 6px 14px; border-radius: 6px; text-decoration: none; font-weight: 500; font-size: 0.8rem;">Learn More →</a>
-        </div>
-    </div>
-
-    <nav>
-        <div class="container nav-inner">
-            <a href="/" class="logo">
-                <span class="logo-icon" style="width: 32px; height: 32px; background: linear-gradient(135deg, #14F195, #9945FF); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px;">🔐</span>
+    <div class="app">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <a href="/" class="sidebar-logo">
+                <span class="sidebar-logo-icon">🔐</span>
                 MoltLaunch
             </a>
-            <button class="nav-toggle" onclick="toggleNav()" aria-label="Toggle menu">☰</button>
-            <div class="nav-links" id="nav-links">
-                <a href="/dashboard.html" class="active">Dashboard</a>
-                <a href="/docs.html">Docs</a>
-                <a href="/manifesto.html">Manifesto</a>
-                <a href="/tokenomics.html">Token</a>
-                <a href="/pricing.html">Pricing</a>
-                <a href="/airdrop.html">Airdrop</a>
-                <a href="/docs/WHITEPAPER.md">Whitepaper</a>
-                <div class="wallet-status" id="wallet-status">
-                    <div class="wallet-dot" id="wallet-dot"></div>
-                    <span id="wallet-text">Connect</span>
+            
+            <nav class="sidebar-nav">
+                <a class="nav-item active" data-view="agents">
+                    <span class="nav-item-icon">📦</span>
+                    My Agents
+                </a>
+                <a class="nav-item" data-view="pools">
+                    <span class="nav-item-icon">💰</span>
+                    Staking Pools
+                </a>
+                <a class="nav-item" data-view="leaderboard">
+                    <span class="nav-item-icon">🏆</span>
+                    Leaderboard
+                </a>
+            </nav>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">Resources</div>
+                <a href="/docs.html" class="nav-item">
+                    <span class="nav-item-icon">📚</span>
+                    Documentation
+                </a>
+                <a href="/pricing.html" class="nav-item">
+                    <span class="nav-item-icon">💳</span>
+                    Pricing
+                </a>
+                <a href="/airdrop.html" class="nav-item">
+                    <span class="nav-item-icon">🎁</span>
+                    Airdrop
+                </a>
+            </div>
+            
+            <div class="wallet-section" id="wallet-section">
+                <button class="btn-connect" id="btn-connect" onclick="connectWallet()">
+                    Connect Wallet
+                </button>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Alert container -->
+            <div id="alerts"></div>
+            
+            <!-- Agents View (Default) -->
+            <section id="view-agents" class="view">
+                <div class="page-header">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h1 class="page-title">My Agents</h1>
+                            <p class="page-subtitle">Register, verify, and manage your AI agents</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="openRegisterModal()">
+                            + Register Agent
+                        </button>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container main-content">
-        <!-- Hero Section -->
-        <div class="hero">
-            <img src="/images/branding/hero-banner-2.png" alt="Agent Verification Flow" class="hero-illustration" style="border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.4);">
-            <h1>Agent Dashboard</h1>
-            <p>Register, verify, and manage your agent's lifecycle</p>
-        </div>
-
-        <!-- Lifecycle Phases -->
-        <div class="lifecycle-phases" id="lifecycle-phases">
-            <div class="phase active" data-phase="1" onclick="setActivePhase(1)">
-                <span class="phase-icon">🔐</span>
-                <span class="phase-label">Verify</span>
-            </div>
-            <div class="phase-arrow">→</div>
-            <div class="phase" data-phase="2" onclick="setActivePhase(2)">
-                <span class="phase-icon">💰</span>
-                <span class="phase-label">Fund</span>
-            </div>
-            <div class="phase-arrow">→</div>
-            <div class="phase" data-phase="3" onclick="setActivePhase(3)">
-                <span class="phase-icon">⚡</span>
-                <span class="phase-label">Operate</span>
-            </div>
-            <div class="phase-arrow">→</div>
-            <div class="phase" data-phase="4" onclick="setActivePhase(4)">
-                <span class="phase-icon">🏆</span>
-                <span class="phase-label">Survive</span>
-            </div>
-        </div>
-
-        <!-- Alerts -->
-        <div id="alert-container"></div>
-
-        <div class="dashboard-grid">
-            <!-- Agent Registration -->
-            <div class="card">
-                <div class="card-header">
-                    <h3>📝 Register Agent</h3>
+                
+                <div id="agents-content">
+                    <!-- Content loaded dynamically -->
                 </div>
-                <form id="register-form" onsubmit="registerAgent(event)">
+            </section>
+            
+            <!-- Agent Detail View -->
+            <section id="view-agent-detail" class="view view-hidden">
+                <div id="agent-detail-content">
+                    <!-- Content loaded dynamically -->
+                </div>
+            </section>
+            
+            <!-- Pools View -->
+            <section id="view-pools" class="view view-hidden">
+                <div class="page-header">
+                    <h1 class="page-title">Staking Pools</h1>
+                    <p class="page-subtitle">Join pools to get capital access for your verified agents</p>
+                </div>
+                
+                <div id="pools-content">
+                    <!-- Content loaded dynamically -->
+                </div>
+            </section>
+            
+            <!-- Leaderboard View -->
+            <section id="view-leaderboard" class="view view-hidden">
+                <div class="page-header">
+                    <h1 class="page-title">Leaderboard</h1>
+                    <p class="page-subtitle">Top verified agents by PoA score</p>
+                </div>
+                
+                <div id="leaderboard-content">
+                    <!-- Content loaded dynamically -->
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Register Agent Modal -->
+    <div class="modal-overlay" id="register-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Register New Agent</h2>
+                <button class="modal-close" onclick="closeRegisterModal()">&times;</button>
+            </div>
+            <form id="register-form" onsubmit="registerAgent(event)">
+                <div class="modal-body">
                     <div class="form-group">
-                        <label>Agent ID *</label>
-                        <input type="text" id="agent-id" placeholder="my-trading-agent" required>
+                        <label class="form-label">Agent ID *</label>
+                        <input type="text" class="form-input" id="reg-agent-id" placeholder="my-trading-bot" required pattern="[a-z0-9-]+" />
+                        <p class="form-hint">Lowercase letters, numbers, and hyphens only</p>
                     </div>
                     <div class="form-group">
-                        <label>GitHub URL</label>
-                        <input type="url" id="github-url" placeholder="https://github.com/user/repo">
+                        <label class="form-label">Display Name</label>
+                        <input type="text" class="form-input" id="reg-name" placeholder="My Trading Bot" />
                     </div>
                     <div class="form-group">
-                        <label>Capabilities</label>
-                        <select id="capabilities" multiple style="height: 80px;">
-                            <option value="trading" selected>Trading</option>
+                        <label class="form-label">GitHub Repository</label>
+                        <input type="url" class="form-input" id="reg-github" placeholder="https://github.com/user/repo" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-input" id="reg-description" rows="3" placeholder="What does your agent do?"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Capabilities</label>
+                        <select class="form-input" id="reg-capabilities" multiple style="height: 100px;">
+                            <option value="trading">Trading</option>
+                            <option value="defi">DeFi</option>
                             <option value="analysis">Analysis</option>
                             <option value="automation">Automation</option>
                             <option value="social">Social</option>
-                            <option value="defi">DeFi</option>
+                            <option value="nft">NFT</option>
                         </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%;" id="register-btn">
-                        <span class="btn-text">Register & Verify</span>
-                        <span class="spinner"></span>
-                    </button>
-                </form>
-            </div>
-
-            <!-- Verification Score -->
-            <div class="card">
-                <div class="card-header">
-                    <h3>🔐 Verification Score</h3>
-                    <button class="btn btn-secondary" onclick="refreshScore()" style="padding: 6px 12px; font-size: 0.75rem;">↻ Refresh</button>
-                </div>
-                <div class="score-display" id="score-display">
-                    <div class="empty-state">
-                        <img src="/images/dashboard/empty-score.svg" alt="No score yet">
-                        <p>Register an agent to get your PoA score</p>
+                        <p class="form-hint">Hold Ctrl/Cmd to select multiple</p>
                     </div>
                 </div>
-            </div>
-
-            <!-- Staking Pool (Phase 2) -->
-            <div class="card pool-section">
-                <div class="card-header">
-                    <h3>💰 Staking Pool</h3>
-                    <span style="font-size: 0.75rem; color: var(--phase-fund);">Phase 2</span>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeRegisterModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-register">Register & Verify</button>
                 </div>
-                <div id="pool-content">
-                    <div class="empty-state">
-                        <img src="/images/branding/staking-pool-1.png" alt="Staking Pool" class="pool-illustration">
-                        <p>Get verified (60+ score) to join a staking pool</p>
-                        <button class="btn btn-secondary" style="margin-top: 12px;" disabled>Join Pool</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Behavioral History -->
-            <div class="card">
-                <div class="card-header">
-                    <h3>📊 Execution Traces</h3>
-                    <span style="font-size: 0.75rem; color: var(--phase-operate);">Phase 3</span>
-                </div>
-                <div class="trace-list" id="trace-list">
-                    <div class="empty-state">
-                        <img src="/images/dashboard/empty-traces.svg" alt="No traces">
-                        <p>Submit traces to build behavioral score</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Submit Trace -->
-            <div class="card full-width">
-                <div class="card-header">
-                    <h3>📋 Submit Execution Trace</h3>
-                    <span style="font-size: 0.75rem; color: var(--text-muted);">Up to +25 bonus points</span>
-                </div>
-                <form id="trace-form" onsubmit="submitTrace(event)">
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px;">
-                        <div class="form-group">
-                            <label>Agent ID *</label>
-                            <input type="text" id="trace-agent-id" placeholder="my-agent" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Total Actions</label>
-                            <input type="number" id="trace-actions" placeholder="100" value="100">
-                        </div>
-                        <div class="form-group">
-                            <label>Success Rate (0-1)</label>
-                            <input type="number" id="trace-success" placeholder="0.95" value="0.95" step="0.01" min="0" max="1">
-                        </div>
-                        <div class="form-group" style="display: flex; align-items: flex-end;">
-                            <button type="submit" class="btn btn-success" style="width: 100%;" id="trace-btn">
-                                <span class="btn-text">Submit Trace</span>
-                                <span class="spinner"></span>
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
+            </form>
         </div>
     </div>
 
-    <footer>
-        <div class="container">
-            <p>MoltLaunch — Trust Infrastructure for AI Agents</p>
-            <p style="margin-top: 8px;">
-                <a href="/">Home</a> · 
-                <a href="/airdrop.html">Airdrop</a> · 
-                <a href="/docs.html">Docs</a> · 
-                <a href="/skill.md">API</a> ·
-                <a href="/api/blink/verify/moltlaunch-agent">Blink</a>
-            </p>
-        </div>
-    </footer>
-
     <script>
-        let walletAddress = null;
-        let registeredAgentId = null;
-        let currentPhase = 1;
-
-        function toggleNav() {
-            document.getElementById('nav-links').classList.toggle('open');
+        // ==========================================
+        // STATE
+        // ==========================================
+        const state = {
+            wallet: null,
+            agents: [],
+            selectedAgent: null,
+            pools: [],
+            leaderboard: [],
+            currentView: 'agents'
+        };
+        
+        // ==========================================
+        // API CLIENT
+        // ==========================================
+        const API_BASE = '';
+        
+        async function api(endpoint, options = {}) {
+            const res = await fetch(API_BASE + endpoint, {
+                ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                },
+                body: options.body ? JSON.stringify(options.body) : undefined
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Request failed');
+            return data;
         }
-
+        
+        // ==========================================
+        // WALLET
+        // ==========================================
+        async function connectWallet() {
+            if (!window.solana?.isPhantom) {
+                window.open('https://phantom.app/', '_blank');
+                return;
+            }
+            
+            try {
+                const resp = await window.solana.connect();
+                state.wallet = resp.publicKey.toString();
+                updateWalletUI();
+                loadAgents();
+                showAlert('Wallet connected!', 'success');
+            } catch (err) {
+                showAlert('Failed to connect: ' + err.message, 'error');
+            }
+        }
+        
+        function disconnectWallet() {
+            if (window.solana) {
+                window.solana.disconnect();
+            }
+            state.wallet = null;
+            state.agents = [];
+            updateWalletUI();
+            renderAgents();
+        }
+        
+        function updateWalletUI() {
+            const section = document.getElementById('wallet-section');
+            if (state.wallet) {
+                const short = state.wallet.slice(0, 4) + '...' + state.wallet.slice(-4);
+                section.innerHTML = `
+                    <div class="wallet-connected">
+                        <span class="wallet-dot"></span>
+                        <span>Connected</span>
+                    </div>
+                    <div class="wallet-address">${short}</div>
+                    <button class="btn btn-secondary btn-sm" style="width: 100%; margin-top: 8px;" onclick="disconnectWallet()">
+                        Disconnect
+                    </button>
+                `;
+            } else {
+                section.innerHTML = `
+                    <button class="btn-connect" onclick="connectWallet()">
+                        Connect Wallet
+                    </button>
+                `;
+            }
+        }
+        
+        // ==========================================
+        // VIEWS
+        // ==========================================
+        function showView(viewName) {
+            // Update nav
+            document.querySelectorAll('.nav-item[data-view]').forEach(item => {
+                item.classList.toggle('active', item.dataset.view === viewName);
+            });
+            
+            // Update views
+            document.querySelectorAll('.view').forEach(view => {
+                view.classList.add('view-hidden');
+            });
+            
+            const targetView = document.getElementById('view-' + viewName);
+            if (targetView) {
+                targetView.classList.remove('view-hidden');
+            }
+            
+            state.currentView = viewName;
+            
+            // Load data for view
+            switch (viewName) {
+                case 'agents':
+                    loadAgents();
+                    break;
+                case 'pools':
+                    loadPools();
+                    break;
+                case 'leaderboard':
+                    loadLeaderboard();
+                    break;
+            }
+        }
+        
+        // ==========================================
+        // AGENTS
+        // ==========================================
+        async function loadAgents() {
+            const container = document.getElementById('agents-content');
+            
+            if (!state.wallet) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔌</div>
+                        <div class="empty-state-title">Connect Your Wallet</div>
+                        <p class="empty-state-text">Connect your Phantom wallet to see your agents</p>
+                        <button class="btn btn-primary" onclick="connectWallet()">Connect Wallet</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+            
+            try {
+                const data = await api('/api/agents?wallet=' + state.wallet);
+                state.agents = data.agents || [];
+                renderAgents();
+            } catch (err) {
+                container.innerHTML = `
+                    <div class="alert alert-error">Failed to load agents: ${err.message}</div>
+                `;
+            }
+        }
+        
+        function renderAgents() {
+            const container = document.getElementById('agents-content');
+            
+            if (state.agents.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🤖</div>
+                        <div class="empty-state-title">No Agents Yet</div>
+                        <p class="empty-state-text">Register your first AI agent to get started</p>
+                        <button class="btn btn-primary" onclick="openRegisterModal()">+ Register Agent</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="agents-grid">
+                    ${state.agents.map(agent => renderAgentCard(agent)).join('')}
+                </div>
+            `;
+        }
+        
+        function renderAgentCard(agent) {
+            const scoreClass = getScoreClass(agent.score);
+            const tierLabel = agent.tier || 'unverified';
+            
+            return `
+                <div class="agent-card" onclick="viewAgent('${agent.agentId}')">
+                    <div class="agent-header">
+                        <div>
+                            <div class="agent-name">${agent.name || agent.agentId}</div>
+                            <div class="agent-id">${agent.agentId}</div>
+                        </div>
+                        <div class="agent-score ${scoreClass}">${agent.score || '?'}</div>
+                    </div>
+                    <div class="agent-meta">
+                        <span>${tierLabel}</span>
+                        ${agent.verified ? '<span>✓ Verified</span>' : '<span>⏳ Pending</span>'}
+                    </div>
+                    ${agent.capabilities?.length ? `
+                        <div class="agent-capabilities">
+                            ${agent.capabilities.slice(0, 3).map(c => `<span class="capability-tag">${c}</span>`).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+        
+        function getScoreClass(score) {
+            if (!score || score === 0) return 'score-unverified';
+            if (score >= 80) return 'score-excellent';
+            if (score >= 60) return 'score-good';
+            if (score >= 40) return 'score-fair';
+            return 'score-poor';
+        }
+        
+        async function viewAgent(agentId) {
+            showView('agent-detail');
+            const container = document.getElementById('agent-detail-content');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+            
+            try {
+                const agent = await api('/api/agents/' + agentId);
+                state.selectedAgent = agent;
+                renderAgentDetail(agent);
+            } catch (err) {
+                container.innerHTML = `
+                    <div class="alert alert-error">Failed to load agent: ${err.message}</div>
+                    <button class="btn btn-secondary" onclick="showView('agents')">← Back to Agents</button>
+                `;
+            }
+        }
+        
+        function renderAgentDetail(agent) {
+            const container = document.getElementById('agent-detail-content');
+            const scoreClass = getScoreClass(agent.score);
+            
+            container.innerHTML = `
+                <button class="btn btn-secondary btn-sm" onclick="showView('agents')" style="margin-bottom: 24px;">
+                    ← Back to Agents
+                </button>
+                
+                <div class="agent-detail-header">
+                    <div class="agent-score-large ${scoreClass}">
+                        <span class="score-value">${agent.score || 0}</span>
+                        <span class="score-label">PoA Score</span>
+                    </div>
+                    <div class="agent-detail-info">
+                        <h1>${agent.name || agent.agentId}</h1>
+                        <div class="agent-id">${agent.agentId}</div>
+                        <div class="agent-actions">
+                            <button class="btn btn-primary btn-sm" onclick="reverifyAgent('${agent.agentId}')">🔄 Re-verify</button>
+                            <button class="btn btn-secondary btn-sm" onclick="copyBlink('${agent.agentId}')">📋 Copy Blink</button>
+                            <button class="btn btn-secondary btn-sm" onclick="shareAgent('${agent.agentId}', ${agent.score})">🐦 Share</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">${agent.score || 0}</div>
+                        <div class="stat-label">PoA Score</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${agent.behavioralScore || 0}</div>
+                        <div class="stat-label">Behavioral Bonus</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${agent.totalTraces || 0}</div>
+                        <div class="stat-label">Traces</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${agent.pools?.length || 0}</div>
+                        <div class="stat-label">Pools</div>
+                    </div>
+                </div>
+                
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('overview', this)">Overview</button>
+                    <button class="tab" onclick="switchTab('traces', this)">Traces</button>
+                    <button class="tab" onclick="switchTab('pool', this)">Pool</button>
+                </div>
+                
+                <div id="tab-overview" class="tab-content active">
+                    ${renderOverviewTab(agent)}
+                </div>
+                
+                <div id="tab-traces" class="tab-content">
+                    ${renderTracesTab(agent)}
+                </div>
+                
+                <div id="tab-pool" class="tab-content">
+                    ${renderPoolTab(agent)}
+                </div>
+            `;
+        }
+        
+        function renderOverviewTab(agent) {
+            return `
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Agent Details</h3>
+                    </div>
+                    <table class="table">
+                        <tr>
+                            <td style="color: var(--text-muted); width: 150px;">Status</td>
+                            <td>${agent.verified ? '✅ Verified' : '⏳ Pending Verification'}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: var(--text-muted);">Tier</td>
+                            <td>${agent.tier || 'Unverified'}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: var(--text-muted);">Capabilities</td>
+                            <td>${agent.capabilities?.join(', ') || 'None'}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: var(--text-muted);">GitHub</td>
+                            <td>${agent.github ? `<a href="${agent.github}" target="_blank">${agent.github}</a>` : 'Not provided'}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: var(--text-muted);">Verified At</td>
+                            <td>${agent.verifiedAt ? new Date(agent.verifiedAt).toLocaleString() : 'N/A'}</td>
+                        </tr>
+                        <tr>
+                            <td style="color: var(--text-muted);">Expires</td>
+                            <td>${agent.expiresAt ? new Date(agent.expiresAt).toLocaleString() : 'N/A'}</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                ${agent.scoreBreakdown ? `
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Score Breakdown</h3>
+                    </div>
+                    <table class="table">
+                        ${Object.entries(agent.scoreBreakdown).map(([key, val]) => `
+                            <tr>
+                                <td style="color: var(--text-muted);">${key}</td>
+                                <td>${val}</td>
+                            </tr>
+                        `).join('')}
+                    </table>
+                </div>
+                ` : ''}
+            `;
+        }
+        
+        function renderTracesTab(agent) {
+            if (!agent.traces?.length) {
+                return `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📊</div>
+                        <div class="empty-state-title">No Traces Yet</div>
+                        <p class="empty-state-text">Submit execution traces to build behavioral score</p>
+                        <button class="btn btn-primary" onclick="openSubmitTraceModal()">Submit Trace</button>
+                    </div>
+                `;
+            }
+            
+            return `
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Execution History</h3>
+                        <button class="btn btn-sm btn-secondary" onclick="openSubmitTraceModal()">+ Submit Trace</button>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Actions</th>
+                                <th>Success Rate</th>
+                                <th>Bonus</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${agent.traces.map(t => `
+                                <tr>
+                                    <td>${new Date(t.createdAt).toLocaleDateString()}</td>
+                                    <td>${t.summary?.totalActions || '?'}</td>
+                                    <td>${((t.summary?.successRate || 0) * 100).toFixed(0)}%</td>
+                                    <td style="color: var(--success);">+${t.behavioralScore || 0}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        
+        function renderPoolTab(agent) {
+            if (!agent.pools?.length) {
+                return `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💰</div>
+                        <div class="empty-state-title">Not in Any Pools</div>
+                        <p class="empty-state-text">${agent.score >= 60 ? 'Join a staking pool to get capital access' : 'Get verified with 60+ score to join pools'}</p>
+                        ${agent.score >= 60 ? `<button class="btn btn-primary" onclick="showView('pools')">Browse Pools</button>` : ''}
+                    </div>
+                `;
+            }
+            
+            return `
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Pool Positions</h3>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Pool</th>
+                                <th>Status</th>
+                                <th>Drawn</th>
+                                <th>Returned</th>
+                                <th>Efficiency</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${agent.pools.map(p => `
+                                <tr>
+                                    <td>${p.topic}</td>
+                                    <td>${p.status || 'active'}</td>
+                                    <td>$${p.totalDrawn || 0}</td>
+                                    <td>$${p.totalReturned || 0}</td>
+                                    <td>${((p.efficiency || 0) * 100).toFixed(1)}%</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        
+        function switchTab(tabName, btn) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('tab-' + tabName).classList.add('active');
+        }
+        
+        // ==========================================
+        // REGISTER AGENT
+        // ==========================================
+        function openRegisterModal() {
+            if (!state.wallet) {
+                showAlert('Connect your wallet first', 'error');
+                return;
+            }
+            document.getElementById('register-modal').classList.add('open');
+        }
+        
+        function closeRegisterModal() {
+            document.getElementById('register-modal').classList.remove('open');
+            document.getElementById('register-form').reset();
+        }
+        
+        async function registerAgent(e) {
+            e.preventDefault();
+            
+            const agentId = document.getElementById('reg-agent-id').value.trim();
+            const name = document.getElementById('reg-name').value.trim();
+            const github = document.getElementById('reg-github').value.trim();
+            const description = document.getElementById('reg-description').value.trim();
+            const capsSelect = document.getElementById('reg-capabilities');
+            const capabilities = Array.from(capsSelect.selectedOptions).map(o => o.value);
+            
+            const btn = document.getElementById('btn-register');
+            btn.disabled = true;
+            btn.textContent = 'Registering...';
+            
+            try {
+                // Register agent
+                await api('/api/agents/register', {
+                    method: 'POST',
+                    body: { agentId, name, github, description, capabilities, wallet: state.wallet }
+                });
+                
+                // Run verification
+                const verification = await api('/api/verify/deep', {
+                    method: 'POST',
+                    body: { agentId, capabilities, codeUrl: github }
+                });
+                
+                showAlert(`Agent registered! Score: ${verification.score}`, 'success');
+                closeRegisterModal();
+                loadAgents();
+                
+            } catch (err) {
+                showAlert('Registration failed: ' + err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Register & Verify';
+            }
+        }
+        
+        async function reverifyAgent(agentId) {
+            try {
+                showAlert('Running verification...', 'info');
+                const verification = await api('/api/verify/deep', {
+                    method: 'POST',
+                    body: { agentId }
+                });
+                showAlert(`Verified! New score: ${verification.score}`, 'success');
+                viewAgent(agentId);
+            } catch (err) {
+                showAlert('Verification failed: ' + err.message, 'error');
+            }
+        }
+        
+        // ==========================================
+        // POOLS
+        // ==========================================
+        async function loadPools() {
+            const container = document.getElementById('pools-content');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+            
+            try {
+                const data = await api('/api/pools');
+                state.pools = data.pools || [];
+                renderPools();
+            } catch (err) {
+                container.innerHTML = `<div class="alert alert-error">Failed to load pools: ${err.message}</div>`;
+            }
+        }
+        
+        function renderPools() {
+            const container = document.getElementById('pools-content');
+            
+            container.innerHTML = `
+                <div class="agents-grid">
+                    ${state.pools.map(pool => `
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">${pool.emoji || '💰'} ${pool.name || pool.id}</h3>
+                            </div>
+                            <div class="stats-grid" style="margin-bottom: 16px;">
+                                <div class="stat-card">
+                                    <div class="stat-value">$${(pool.totalStaked || 0).toLocaleString()}</div>
+                                    <div class="stat-label">Total Staked</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value">${pool.agentCount || 0}</div>
+                                    <div class="stat-label">Agents</div>
+                                </div>
+                            </div>
+                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">
+                                Min score: ${pool.minScore || 60}
+                            </p>
+                            <button class="btn btn-primary" style="width: 100%;" onclick="joinPool('${pool.id}')">
+                                Join Pool
+                            </button>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+        
+        async function joinPool(topic) {
+            if (!state.wallet) {
+                showAlert('Connect your wallet first', 'error');
+                return;
+            }
+            
+            // Need to select an agent
+            const verifiedAgents = state.agents.filter(a => a.score >= 60);
+            if (verifiedAgents.length === 0) {
+                showAlert('You need a verified agent (60+ score) to join pools', 'error');
+                return;
+            }
+            
+            const agentId = verifiedAgents[0].agentId;
+            
+            try {
+                await api('/api/pool/apply', {
+                    method: 'POST',
+                    body: { agentId, topic, wallet: state.wallet, strategy: 'Dashboard application' }
+                });
+                showAlert(`Applied to ${topic} pool!`, 'success');
+                loadPools();
+            } catch (err) {
+                showAlert('Failed to join pool: ' + err.message, 'error');
+            }
+        }
+        
+        // ==========================================
+        // LEADERBOARD
+        // ==========================================
+        async function loadLeaderboard() {
+            const container = document.getElementById('leaderboard-content');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+            
+            try {
+                const data = await api('/api/leaderboard?limit=50');
+                state.leaderboard = data.agents || [];
+                renderLeaderboard();
+            } catch (err) {
+                container.innerHTML = `<div class="alert alert-error">Failed to load leaderboard: ${err.message}</div>`;
+            }
+        }
+        
+        function renderLeaderboard() {
+            const container = document.getElementById('leaderboard-content');
+            
+            container.innerHTML = `
+                <div class="card">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Agent</th>
+                                <th>Score</th>
+                                <th>Tier</th>
+                                <th>Behavioral</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${state.leaderboard.map((agent, i) => `
+                                <tr>
+                                    <td>
+                                        ${i < 3 ? `<span class="rank-badge rank-${i + 1}">${i + 1}</span>` : i + 1}
+                                    </td>
+                                    <td>
+                                        <div class="agent-name">${agent.name || agent.agentId}</div>
+                                        <div class="agent-id">${agent.agentId}</div>
+                                    </td>
+                                    <td><strong>${agent.score}</strong></td>
+                                    <td>${agent.tier}</td>
+                                    <td>+${agent.behavioralScore || 0}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        
+        // ==========================================
+        // HELPERS
+        // ==========================================
         function showAlert(message, type = 'info') {
-            const container = document.getElementById('alert-container');
+            const container = document.getElementById('alerts');
             const alert = document.createElement('div');
             alert.className = `alert alert-${type}`;
             alert.innerHTML = `<span>${type === 'success' ? '✓' : type === 'error' ? '✗' : 'ℹ'}</span> ${message}`;
             container.appendChild(alert);
             setTimeout(() => alert.remove(), 5000);
         }
-
-        function setActivePhase(phase) {
-            document.querySelectorAll('.phase').forEach((el, i) => {
-                el.classList.remove('active');
-                if (i + 1 < phase) el.classList.add('completed');
-                else el.classList.remove('completed');
-            });
-            document.querySelector(`.phase[data-phase="${phase}"]`).classList.add('active');
-            currentPhase = phase;
-        }
-
-        function setLoading(btnId, loading) {
-            const btn = document.getElementById(btnId);
-            if (loading) btn.classList.add('loading');
-            else btn.classList.remove('loading');
-            btn.disabled = loading;
-        }
-
-        async function connectWallet() {
-            if (window.solana && window.solana.isPhantom) {
-                try {
-                    const resp = await window.solana.connect();
-                    walletAddress = resp.publicKey.toString();
-                    document.getElementById('wallet-dot').classList.add('connected');
-                    document.getElementById('wallet-text').textContent = walletAddress.slice(0, 4) + '...' + walletAddress.slice(-4);
-                    showAlert('Wallet connected!', 'success');
-                } catch (err) {
-                    showAlert('Failed to connect: ' + err.message, 'error');
-                }
-            } else {
-                window.open('https://phantom.app/', '_blank');
-            }
-        }
-
-        document.getElementById('wallet-status').addEventListener('click', connectWallet);
-
-        async function registerAgent(e) {
-            e.preventDefault();
-            setLoading('register-btn', true);
-            
-            const agentId = document.getElementById('agent-id').value;
-            const github = document.getElementById('github-url').value;
-            const capsSelect = document.getElementById('capabilities');
-            const capabilities = Array.from(capsSelect.selectedOptions).map(o => o.value);
-
-            try {
-                // First register
-                await fetch('/api/apply', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        agentId,
-                        name: agentId,
-                        capabilities,
-                        website: github || undefined,
-                        contact: walletAddress || undefined
-                    })
-                });
-
-                // Then verify
-                const res = await fetch('/api/verify/deep', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        agentId, 
-                        capabilities,
-                        codeUrl: github || undefined
-                    })
-                });
-                const data = await res.json();
-                
-                registeredAgentId = agentId;
-                document.getElementById('trace-agent-id').value = agentId;
-                
-                updateScoreDisplay(data);
-                
-                if (data.score >= 60) {
-                    setActivePhase(2);
-                    showAlert(`Verified! Score: ${data.score}. Ready for staking pools!`, 'success');
-                    updatePoolSection(true, data);
-                } else {
-                    showAlert(`Score: ${data.score}. Need 60+ for full verification.`, 'info');
-                }
-            } catch (err) {
-                showAlert('Error: ' + err.message, 'error');
-            } finally {
-                setLoading('register-btn', false);
-            }
-        }
-
-        function updateScoreDisplay(data) {
-            const container = document.getElementById('score-display');
-            const score = data.score || 0;
-            const tier = data.tier || data.scoreTier || 'unverified';
-            
-            container.innerHTML = `
-                <div class="score-circle" style="--score: ${score}">
-                    <div class="score-value">${score}</div>
-                </div>
-                <div class="score-label">PoA Score</div>
-                <div class="tier-badge tier-${tier.toLowerCase().replace('-', '')}">${tier}</div>
-                ${data.attestation ? `<div style="margin-top: 8px; font-size: 0.75rem; color: var(--text-subtle);">Expires: ${new Date(data.attestation.expiresAt).toLocaleDateString()}</div>` : ''}
-                ${score >= 60 ? `
-                <div class="badge-share">
-                    <div class="badge-share-title">Share your verification</div>
-                    <div class="badge-actions">
-                        <button class="btn btn-secondary" onclick="copyBlink('${registeredAgentId || 'agent'}')">📋 Copy Blink</button>
-                        <button class="btn btn-secondary" onclick="shareBadge('${registeredAgentId || 'agent'}', ${score})">🐦 Share</button>
-                    </div>
-                </div>
-                ` : ''}
-            `;
-        }
-
-        function updatePoolSection(verified, data) {
-            if (!verified) return;
-            const container = document.getElementById('pool-content');
-            container.innerHTML = `
-                <div style="text-align: center;">
-                    <img src="/images/branding/staking-pool-1.png" alt="Staking Pool" class="pool-illustration">
-                    <div class="pool-stats">
-                        <div class="pool-stat">
-                            <div class="pool-stat-value">$0</div>
-                            <div class="pool-stat-label">Your Stake</div>
-                        </div>
-                        <div class="pool-stat">
-                            <div class="pool-stat-value">0</div>
-                            <div class="pool-stat-label">Pool Rank</div>
-                        </div>
-                        <div class="pool-stat">
-                            <div class="pool-stat-value">--</div>
-                            <div class="pool-stat-label">APY</div>
-                        </div>
-                    </div>
-                    <button class="btn btn-success" style="margin-top: 16px;" onclick="joinPool()">Join Trading Pool</button>
-                </div>
-            `;
-        }
-
-        async function joinPool() {
-            if (!registeredAgentId) return showAlert('Register an agent first', 'error');
-            
-            try {
-                const res = await fetch('/api/pool/apply', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        agentId: registeredAgentId,
-                        topic: 'trading',
-                        strategy: 'Dashboard application',
-                        wallet: walletAddress
-                    })
-                });
-                const data = await res.json();
-                if (data.success) {
-                    setActivePhase(3);
-                    showAlert('Applied to trading pool!', 'success');
-                } else {
-                    showAlert(data.error || 'Failed to join pool', 'error');
-                }
-            } catch (err) {
-                showAlert('Error: ' + err.message, 'error');
-            }
-        }
-
-        async function refreshScore() {
-            const agentId = registeredAgentId || document.getElementById('agent-id').value;
-            if (!agentId) return showAlert('Enter an agent ID', 'error');
-
-            try {
-                const res = await fetch(`/api/verify/status/${agentId}`);
-                const data = await res.json();
-                if (data.verified) {
-                    updateScoreDisplay(data);
-                    if (data.score >= 60) updatePoolSection(true, data);
-                } else {
-                    showAlert('Agent not verified yet', 'info');
-                }
-            } catch (err) {
-                showAlert('Error: ' + err.message, 'error');
-            }
-        }
-
-        async function submitTrace(e) {
-            e.preventDefault();
-            setLoading('trace-btn', true);
-            
-            const agentId = document.getElementById('trace-agent-id').value;
-            const actions = parseInt(document.getElementById('trace-actions').value) || 100;
-            const successRate = parseFloat(document.getElementById('trace-success').value) || 0.95;
-
-            try {
-                const res = await fetch('/api/traces', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        agentId,
-                        trace: {
-                            period: {
-                                start: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-                                end: new Date().toISOString()
-                            },
-                            summary: { totalActions: actions, successRate, errorRate: 1 - successRate }
-                        }
-                    })
-                });
-                const data = await res.json();
-                if (data.traceId) {
-                    showAlert(`Trace submitted! Behavioral bonus: +${data.behavioralScore || 0}`, 'success');
-                    loadTraces(agentId);
-                    setActivePhase(4);
-                }
-            } catch (err) {
-                showAlert('Error: ' + err.message, 'error');
-            } finally {
-                setLoading('trace-btn', false);
-            }
-        }
-
-        async function loadTraces(agentId) {
-            if (!agentId) return;
-            try {
-                const res = await fetch(`/api/traces/${agentId}`);
-                const data = await res.json();
-                const container = document.getElementById('trace-list');
-                
-                if (data.traces && data.traces.length > 0) {
-                    container.innerHTML = data.traces.map(t => `
-                        <div class="trace-item">
-                            <span class="trace-date">${new Date(t.createdAt).toLocaleDateString()}</span>
-                            <span class="trace-actions">${t.summary?.totalActions || '?'} actions</span>
-                            <span class="trace-score">+${t.behavioralScore || 0}</span>
-                        </div>
-                    `).join('');
-                }
-            } catch (err) {
-                console.error('Failed to load traces:', err);
-            }
-        }
-
+        
         function copyBlink(agentId) {
             const url = `https://web-production-419d9.up.railway.app/api/blink/verify/${agentId}`;
             navigator.clipboard.writeText(url);
             showAlert('Blink URL copied!', 'success');
         }
-
-        function shareBadge(agentId, score) {
-            const text = `My AI agent just got verified on @MoltLaunch! 🔐\n\nPoA Score: ${score}/100\n\nGet your agent verified: https://web-production-419d9.up.railway.app/dashboard.html`;
+        
+        function shareAgent(agentId, score) {
+            const text = `My AI agent just got verified on @MoltLaunch! 🔐\n\nPoA Score: ${score}/100\n\nGet your agent verified: https://web-production-419d9.up.railway.app`;
             window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
         }
-
-        // Auto-connect if Phantom is available
-        window.addEventListener('load', () => {
-            if (window.solana && window.solana.isPhantom && window.solana.isConnected) {
-                connectWallet();
-            }
+        
+        // ==========================================
+        // INIT
+        // ==========================================
+        document.querySelectorAll('.nav-item[data-view]').forEach(item => {
+            item.addEventListener('click', () => showView(item.dataset.view));
         });
+        
+        // Auto-connect if Phantom available
+        window.addEventListener('load', async () => {
+            if (window.solana?.isPhantom && window.solana.isConnected) {
+                try {
+                    const resp = await window.solana.connect({ onlyIfTrusted: true });
+                    state.wallet = resp.publicKey.toString();
+                    updateWalletUI();
+                } catch (e) {}
+            }
+            loadAgents();
+        });
+        
+        // Handle hash routing
+        function handleHash() {
+            const hash = window.location.hash.slice(1);
+            if (hash.startsWith('agent/')) {
+                const agentId = hash.slice(6);
+                viewAgent(agentId);
+            } else if (hash === 'pools') {
+                showView('pools');
+            } else if (hash === 'leaderboard') {
+                showView('leaderboard');
+            }
+        }
+        
+        window.addEventListener('hashchange', handleHash);
+        if (window.location.hash) handleHash();
     </script>
-
-    <footer style="padding: 60px 0 32px; border-top: 1px solid var(--border); background: var(--bg-subtle); margin-top: 80px;">
-        <div class="container">
-            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px;">
-                <div>
-                    <h3 style="font-size: 1.25rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-                        <span style="width: 24px; height: 24px; background: linear-gradient(135deg, var(--accent), #a855f7); border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px;">🔐</span>
-                        MoltLaunch
-                    </h3>
-                    <p style="color: var(--text-muted); font-size: 0.875rem; line-height: 1.6;">Trust infrastructure for AI agents on Solana.</p>
-                </div>
-                <div>
-                    <h4 style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 16px;">Product</h4>
-                    <a href="/dashboard.html" style="display: block; color: #71717a; text-decoration: none; font-size: 0.875rem; padding: 6px 0;">Dashboard</a>
-                    <a href="/pricing.html" style="display: block; color: #71717a; text-decoration: none; font-size: 0.875rem; padding: 6px 0;">Pricing</a>
-                    <a href="/airdrop.html" style="display: block; color: #71717a; text-decoration: none; font-size: 0.875rem; padding: 6px 0;">Airdrop</a>
-                    <a href="/tokenomics.html" style="display: block; color: #71717a; text-decoration: none; font-size: 0.875rem; padding: 6px 0;">Token</a>
-                </div>
-                <div>
-                    <h4 style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 16px;">Resources</h4>
-                    <a href="/docs.html" style="display: block; color: #71717a; text-decoration: none; font-size: 0.875rem; padding: 6px 0;">Documentation</a>
-                    <a href="/docs/WHITEPAPER.md" style="display: block; color: #71717a; text-decoration: none; font-size: 0.875rem; padding: 6px 0;">Whitepaper</a>
-                    <a href="/skill.md" style="display: block; color: #71717a; text-decoration: none; font-size: 0.875rem; padding: 6px 0;">skill.md</a>
-                    <a href="/manifesto.html" style="display: block; color: #71717a; text-decoration: none; font-size: 0.875rem; padding: 6px 0;">Manifesto</a>
-                </div>
-                <div>
-                    <h4 style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 16px;">Developers</h4>
-                    <a href="https://github.com/tradingstarllc/proof-of-agent" style="display: block; color: #71717a; text-decoration: none; font-size: 0.875rem; padding: 6px 0;">GitHub</a>
-                    <a href="https://www.npmjs.com/package/@moltlaunch/proof-of-agent" style="display: block; color: #71717a; text-decoration: none; font-size: 0.875rem; padding: 6px 0;">npm Package</a>
-                    <a href="/docs.html#api" style="display: block; color: #71717a; text-decoration: none; font-size: 0.875rem; padding: 6px 0;">API Reference</a>
-                    <a href="/flow.html" style="display: block; color: #71717a; text-decoration: none; font-size: 0.875rem; padding: 6px 0;">Flow Diagram</a>
-                </div>
-                <div>
-                    <h4 style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 16px;">Legal</h4>
-                    <a href="/terms.html" style="display: block; color: #71717a; text-decoration: none; font-size: 0.875rem; padding: 6px 0;">Terms of Service</a>
-                    <a href="/privacy.html" style="display: block; color: #71717a; text-decoration: none; font-size: 0.875rem; padding: 6px 0;">Privacy Policy</a>
-                    <a href="/disclaimer.html" style="display: block; color: #71717a; text-decoration: none; font-size: 0.875rem; padding: 6px 0;">Disclaimer</a>
-                </div>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 24px; border-top: 1px solid var(--border); font-size: 0.8rem; color: #71717a;">
-                <span>© 2026 MoltLaunch. Built for <a href="https://www.colosseum.org/" style="color: #a855f7; text-decoration: none;">Colosseum Agent Hackathon</a></span>
-                <span>Solana Devnet • Not Financial Advice</span>
-            </div>
-        </div>
-    </footer>
 </body>
 </html>
