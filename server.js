@@ -973,7 +973,7 @@ app.post('/api/verify/revoke', (req, res) => {
     const { attestationHash, reason, adminKey } = req.body || {};
     
     // Simple admin key check (would use proper auth in production)
-    if (adminKey !== process.env.ADMIN_KEY && adminKey !== 'moltlaunch-admin-dev') {
+    if (!adminKey || adminKey !== process.env.ADMIN_KEY) {
         return res.status(403).json({ error: 'Unauthorized' });
     }
     
