@@ -1,6 +1,24 @@
 {
   "name": "moltlaunch-api",
   "version": "3.2.0",
+  "description": "Trust infrastructure for AI agents — Proof-of-Agent verification, STARK proofs, staking pools, and on-chain behavioral scoring on Solana",
+  "keywords": [
+    "ai-agents",
+    "proof-of-agent",
+    "solana",
+    "stark-proofs",
+    "verification",
+    "trust-infrastructure",
+    "behavioral-scoring",
+    "cauldron",
+    "bonding-curves"
+  ],
+  "homepage": "https://web-production-419d9.up.railway.app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tradingstarllc/moltlaunch-site"
+  },
+  "license": "MIT",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
