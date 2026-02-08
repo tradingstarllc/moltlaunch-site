@@ -61,6 +61,20 @@ try {
     console.log('Paid endpoints will use credit system only');
 }
 
+// Solana on-chain anchoring
+let solanaConnection = null;
+let solanaKeypair = null;
+try {
+    const { Connection, Keypair, Transaction, TransactionInstruction, PublicKey } = require('@solana/web3.js');
+    const keypairPath = require('path').join(require('os').homedir(), 'moltbot-trial/products/launchpad/devnet-wallet.json');
+    const keypairData = JSON.parse(require('fs').readFileSync(keypairPath));
+    solanaKeypair = Keypair.fromSecretKey(new Uint8Array(keypairData));
+    solanaConnection = new Connection('https://api.devnet.solana.com', 'confirmed');
+    console.log('Solana connection established:', solanaKeypair.publicKey.toBase58());
+} catch (e) {
+    console.log('Solana direct connection not available:', e.message);
+}
+
 const app = express();
 
 // Rate limiting
@@ -1424,7 +1438,7 @@ app.post('/api/traces/verify', (req, res) => {
 });
 
 // Submit execution trace
-app.post('/api/traces', (req, res) => {
+app.post('/api/traces', async (req, res) => {
     if (!executionTraces) {
         return res.status(503).json({ error: 'Execution traces module not available' });
     }
@@ -1457,6 +1471,32 @@ app.post('/api/traces', (req, res) => {
     
     try {
         const result = executionTraces.submitTrace(agentId, trace);
+        
+        // Auto-anchor if Solana connection available
+        if (solanaConnection && solanaKeypair && result.commitment) {
+            try {
+                const { Transaction, TransactionInstruction, PublicKey } = require('@solana/web3.js');
+                const MEMO_PROGRAM_ID = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr');
+                
+                const memoData = `moltlaunch:trace:${agentId}:${result.commitment.substring(0, 32)}`;
+                const memoInstruction = new TransactionInstruction({
+                    keys: [{ pubkey: solanaKeypair.publicKey, isSigner: true, isWritable: true }],
+                    programId: MEMO_PROGRAM_ID,
+                    data: Buffer.from(memoData)
+                });
+                
+                const tx = new Transaction().add(memoInstruction);
+                const sig = await solanaConnection.sendTransaction(tx, [solanaKeypair]);
+                result.onChainAnchor = {
+                    signature: sig,
+                    explorer: `https://explorer.solana.com/tx/${sig}?cluster=devnet`,
+                    network: 'devnet'
+                };
+            } catch (e) {
+                result.onChainAnchor = { error: e.message };
+            }
+        }
+        
         res.json(result);
     } catch (e) {
         res.status(400).json({ error: e.message });
@@ -1516,6 +1556,77 @@ app.post('/api/traces/:traceId/anchor', (req, res) => {
     }
     
     res.json(result);
+});
+
+// Anchor verification hash on Solana via Memo program
+app.post('/api/anchor/verification', async (req, res) => {
+    if (!solanaConnection || !solanaKeypair) {
+        return res.status(503).json({ error: 'Solana connection not available' });
+    }
+    
+    const { agentId, attestationHash } = req.body || {};
+    if (!agentId || !attestationHash) {
+        return res.status(400).json({ error: 'agentId and attestationHash required' });
+    }
+    
+    try {
+        const { Transaction, TransactionInstruction, PublicKey } = require('@solana/web3.js');
+        
+        const MEMO_PROGRAM_ID = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr');
+        
+        const memoData = JSON.stringify({
+            type: 'moltlaunch-verification',
+            agentId,
+            hash: attestationHash,
+            ts: Date.now()
+        });
+        
+        const memoInstruction = new TransactionInstruction({
+            keys: [{ pubkey: solanaKeypair.publicKey, isSigner: true, isWritable: true }],
+            programId: MEMO_PROGRAM_ID,
+            data: Buffer.from(memoData)
+        });
+        
+        const transaction = new Transaction().add(memoInstruction);
+        
+        const signature = await solanaConnection.sendTransaction(transaction, [solanaKeypair]);
+        await solanaConnection.confirmTransaction(signature, 'confirmed');
+        
+        res.json({
+            anchored: true,
+            signature,
+            explorer: `https://explorer.solana.com/tx/${signature}?cluster=devnet`,
+            agentId,
+            attestationHash,
+            network: 'devnet',
+            cost: '~0.000005 SOL'
+        });
+    } catch (err) {
+        res.status(500).json({ error: 'Anchoring failed', details: err.message });
+    }
+});
+
+// Check real Solana balance
+app.get('/api/solana/balance/:address', async (req, res) => {
+    if (!solanaConnection) {
+        return res.status(503).json({ error: 'Solana connection not available' });
+    }
+    
+    try {
+        const { PublicKey, LAMPORTS_PER_SOL } = require('@solana/web3.js');
+        const pubkey = new PublicKey(req.params.address);
+        const balance = await solanaConnection.getBalance(pubkey);
+        
+        res.json({
+            address: req.params.address,
+            lamports: balance,
+            sol: balance / LAMPORTS_PER_SOL,
+            network: 'devnet',
+            source: 'solana-rpc-live'
+        });
+    } catch (err) {
+        res.status(400).json({ error: 'Invalid address or RPC error', details: err.message });
+    }
 });
 
 // Batch verification status - check multiple agents
@@ -2374,30 +2485,53 @@ app.post('/api/graduation/trigger', (req, res) => {
     });
 });
 
-// Jupiter swap quote (for testing profit-sharing logic)
+// Jupiter swap quote (live Jupiter V6 API with mock fallback)
 app.get('/api/jupiter/quote', async (req, res) => {
     const { inputMint, outputMint, amount } = req.query;
     
-    // Mock quote (would call Jupiter V6 API in production)
-    const inputAmount = parseInt(amount) || 1000000; // 1 USDC default
-    const mockRate = 0.95; // 95% (simulating slippage)
+    const inputAmount = parseInt(amount) || 1000000;
+    const from = inputMint || 'So11111111111111111111111111111111111111112'; // SOL
+    const to = outputMint || 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'; // USDC
     
-    res.json({
-        inputMint: inputMint || DBC_CONFIG.tokenMint,
-        outputMint: outputMint || 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', // USDC
-        inAmount: inputAmount.toString(),
-        outAmount: Math.floor(inputAmount * mockRate).toString(),
-        priceImpactPct: '0.5',
-        routePlan: [
-            { swapInfo: { label: 'Meteora DAMM' }, percent: 100 }
-        ],
-        profitSharing: {
-            agent: '70%',
-            stakers: '25%',
-            platform: '5%'
-        },
-        note: 'Mock quote. Full Jupiter V6 integration in Q2 2026.'
-    });
+    try {
+        const response = await fetch(
+            `https://quote-api.jup.ag/v6/quote?inputMint=${from}&outputMint=${to}&amount=${inputAmount}&slippageBps=50`
+        );
+        
+        if (!response.ok) {
+            throw new Error(`Jupiter API: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        res.json({
+            source: 'jupiter-v6-live',
+            inputMint: data.inputMint,
+            outputMint: data.outputMint,
+            inAmount: data.inAmount,
+            outAmount: data.outAmount,
+            otherAmountThreshold: data.otherAmountThreshold,
+            priceImpactPct: data.priceImpactPct,
+            routePlan: data.routePlan?.map(r => ({
+                swapInfo: { label: r.swapInfo?.label || 'Unknown' },
+                percent: r.percent
+            })),
+            contextSlot: data.contextSlot,
+            timeTaken: data.timeTaken
+        });
+    } catch (err) {
+        // Fallback to mock if Jupiter is down
+        res.json({
+            source: 'mock-fallback',
+            inputMint: from,
+            outputMint: to,
+            inAmount: inputAmount.toString(),
+            outAmount: Math.floor(inputAmount * 0.95).toString(),
+            priceImpactPct: '0.5',
+            error: err.message,
+            note: 'Jupiter API unavailable, showing estimate'
+        });
+    }
 });
 
 // API endpoints
