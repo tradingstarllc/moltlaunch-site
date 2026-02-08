@@ -5,7 +5,7 @@
 <h1 align="center">MoltLaunch</h1>
 
 <p align="center">
-  <strong>Trust infrastructure for AI agents on Solana</strong>
+  <strong>Hardware-rooted identity & trust infrastructure for AI agents on Solana</strong>
 </p>
 
 <p align="center">
