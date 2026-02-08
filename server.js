@@ -3390,6 +3390,347 @@ app.get('/api/capabilities/solana-agent-kit', (req, res) => {
     });
 });
 
+// ==========================================
+// DASHBOARD V2 APIs
+// ==========================================
+
+// List agents by wallet (for dashboard)
+app.get('/api/agents', (req, res) => {
+    const { wallet } = req.query;
+    
+    if (!wallet) {
+        // Return all agents (limited)
+        const allAgents = Object.entries(verificationCache)
+            .map(([agentId, v]) => ({
+                agentId,
+                name: v.name || agentId,
+                score: v.score || 0,
+                tier: v.tier || 'unverified',
+                verified: v.verified || false,
+                capabilities: v.capabilities || [],
+                wallet: v.wallet,
+                verifiedAt: v.verifiedAt,
+                expiresAt: v.expiresAt
+            }))
+            .slice(0, 100);
+        return res.json({ agents: allAgents, total: allAgents.length });
+    }
+    
+    // Find agents by wallet
+    const userAgents = Object.entries(verificationCache)
+        .filter(([_, v]) => v.wallet === wallet || v.contact === wallet)
+        .map(([agentId, v]) => ({
+            agentId,
+            name: v.name || agentId,
+            score: v.score || 0,
+            tier: v.tier || 'unverified',
+            verified: v.verified || false,
+            capabilities: v.capabilities || [],
+            github: v.codeUrl || v.github,
+            verifiedAt: v.verifiedAt,
+            expiresAt: v.expiresAt,
+            behavioralScore: v.behavioralScore || 0,
+            totalTraces: v.totalTraces || 0
+        }));
+    
+    // Also check airdrop registry for agents by this wallet
+    const airdropAgents = Object.entries(airdropRegistry.agents)
+        .filter(([_, a]) => a.wallet === wallet)
+        .map(([agentId, a]) => {
+            // Merge with verification if exists
+            const v = verificationCache[agentId];
+            return {
+                agentId,
+                name: a.name || agentId,
+                score: v?.score || 0,
+                tier: v?.tier || 'pending',
+                verified: v?.verified || false,
+                capabilities: v?.capabilities || [],
+                appliedAt: a.appliedAt
+            };
+        });
+    
+    // Dedupe by agentId
+    const seenIds = new Set(userAgents.map(a => a.agentId));
+    const combined = [...userAgents];
+    for (const a of airdropAgents) {
+        if (!seenIds.has(a.agentId)) {
+            combined.push(a);
+        }
+    }
+    
+    res.json({ agents: combined, wallet, total: combined.length });
+});
+
+// Get full agent details
+app.get('/api/agents/:agentId', (req, res) => {
+    const { agentId } = req.params;
+    const v = verificationCache[agentId];
+    const airdrop = airdropRegistry.agents[agentId];
+    
+    if (!v && !airdrop) {
+        return res.status(404).json({ error: 'Agent not found' });
+    }
+    
+    // Get traces for this agent (via executionTraces module)
+    let agentTraces = [];
+    if (executionTraces) {
+        try {
+            agentTraces = executionTraces.getTraces(agentId) || [];
+        } catch (e) {}
+    }
+    
+    // Get pool memberships
+    const poolApps = [];
+    Object.entries(poolAgents).forEach(([topic, agents]) => {
+        const found = agents.find(a => a.agentId === agentId);
+        if (found) {
+            poolApps.push({ topic, ...found });
+        }
+    });
+    
+    res.json({
+        agentId,
+        name: v?.name || airdrop?.name || agentId,
+        score: v?.score || 0,
+        tier: v?.tier || 'unverified',
+        verified: v?.verified || false,
+        verifiedAt: v?.verifiedAt,
+        expiresAt: v?.expiresAt,
+        attestationHash: v?.attestationHash,
+        capabilities: v?.capabilities || [],
+        github: v?.codeUrl || v?.github,
+        wallet: v?.wallet || v?.contact || airdrop?.wallet,
+        behavioralScore: v?.behavioralScore || 0,
+        totalTraces: agentTraces.length,
+        traces: agentTraces.slice(0, 20),
+        pools: poolApps,
+        appliedAt: airdrop?.appliedAt,
+        scoreBreakdown: v?.breakdown || null,
+        signals: v?.signals || null
+    });
+});
+
+// Leaderboard - top verified agents
+app.get('/api/leaderboard', (req, res) => {
+    const limit = Math.min(parseInt(req.query.limit) || 50, 100);
+    const capability = req.query.capability;
+    
+    let agents = Object.entries(verificationCache)
+        .filter(([_, v]) => v.verified && v.score > 0)
+        .map(([agentId, v]) => ({
+            agentId,
+            name: v.name || agentId,
+            score: v.score || 0,
+            tier: v.tier || 'good',
+            capabilities: v.capabilities || [],
+            behavioralScore: v.behavioralScore || 0,
+            totalScore: (v.score || 0) + (v.behavioralScore || 0),
+            verifiedAt: v.verifiedAt
+        }));
+    
+    // Filter by capability if specified
+    if (capability) {
+        agents = agents.filter(a => 
+            a.capabilities.some(c => c.toLowerCase() === capability.toLowerCase())
+        );
+    }
+    
+    // Sort by total score
+    agents.sort((a, b) => b.totalScore - a.totalScore);
+    
+    // Add rank
+    agents = agents.slice(0, limit).map((a, i) => ({ ...a, rank: i + 1 }));
+    
+    res.json({ 
+        agents, 
+        total: agents.length,
+        filters: { capability }
+    });
+});
+
+// Pool positions by wallet
+app.get('/api/pool/positions', (req, res) => {
+    const { wallet } = req.query;
+    
+    if (!wallet) {
+        return res.status(400).json({ error: 'wallet query param required' });
+    }
+    
+    // Find agents belonging to this wallet
+    const walletAgents = Object.entries(verificationCache)
+        .filter(([_, v]) => v.wallet === wallet || v.contact === wallet)
+        .map(([agentId]) => agentId);
+    
+    // Find pool positions for those agents
+    const positions = [];
+    Object.entries(poolAgents).forEach(([topic, agents]) => {
+        agents.forEach(agent => {
+            if (walletAgents.includes(agent.agentId)) {
+                positions.push({
+                    topic,
+                    agentId: agent.agentId,
+                    status: agent.status || 'active',
+                    totalDrawn: agent.totalDrawn || 0,
+                    totalReturned: agent.totalReturned || 0,
+                    efficiency: agent.efficiency || 0
+                });
+            }
+        });
+    });
+    
+    // Get staking positions
+    const stakes = Object.entries(stakingPositions)
+        .filter(([_, s]) => s.wallet === wallet)
+        .map(([topic, s]) => ({
+            topic,
+            amount: s.amount || 0,
+            stakedAt: s.stakedAt,
+            status: 'active'
+        }));
+    
+    res.json({ 
+        positions, 
+        stakes,
+        wallet,
+        totalStaked: stakes.reduce((sum, s) => sum + (s.amount || 0), 0)
+    });
+});
+
+// Register agent (enhanced for dashboard)
+app.post('/api/agents/register', async (req, res) => {
+    const { agentId, name, description, github, capabilities, wallet } = req.body || {};
+    
+    if (!agentId) {
+        return res.status(400).json({ error: 'agentId required' });
+    }
+    
+    // Validate agentId format
+    if (!/^[a-z0-9-]+$/.test(agentId)) {
+        return res.status(400).json({ error: 'agentId must be lowercase alphanumeric with hyphens' });
+    }
+    
+    // Check if already exists
+    if (verificationCache[agentId]) {
+        return res.status(409).json({ error: 'Agent ID already registered' });
+    }
+    
+    const now = new Date().toISOString();
+    
+    // Store in verification cache
+    verificationCache[agentId] = {
+        name: name || agentId,
+        description: description || '',
+        capabilities: capabilities || [],
+        codeUrl: github,
+        wallet: wallet,
+        contact: wallet,
+        registeredAt: now,
+        verified: false,
+        score: 0,
+        tier: 'unverified'
+    };
+    saveVerifications();
+    
+    // Also track in airdrop registry
+    if (wallet) {
+        if (!airdropRegistry.wallets[wallet]) {
+            airdropRegistry.wallets[wallet] = {
+                registeredAt: now,
+                actions: []
+            };
+            airdropRegistry.stats.totalWallets++;
+        }
+        airdropRegistry.wallets[wallet].agentId = agentId;
+        airdropRegistry.wallets[wallet].actions.push({ type: 'register', at: now });
+        airdropRegistry.wallets[wallet].tier = calculateTier(airdropRegistry.wallets[wallet]);
+        
+        airdropRegistry.agents[agentId] = {
+            wallet,
+            name: name || agentId,
+            appliedAt: now,
+            verified: false
+        };
+        saveRegistry();
+    }
+    
+    res.json({
+        success: true,
+        agentId,
+        status: 'registered',
+        message: 'Agent registered. Run verification to get your PoA score.',
+        nextStep: 'POST /api/verify/deep with agentId'
+    });
+});
+
+// API key management
+const apiKeysCache = loadData(path.join(DATA_DIR, 'api-keys.json'), {});
+const saveApiKeys = () => debouncedSave('api-keys', path.join(DATA_DIR, 'api-keys.json'), apiKeysCache);
+
+app.post('/api/keys/generate', (req, res) => {
+    const { wallet, name } = req.body || {};
+    
+    if (!wallet) {
+        return res.status(400).json({ error: 'wallet required' });
+    }
+    
+    const keyId = `mlt_${crypto.randomBytes(16).toString('hex')}`;
+    const secret = crypto.randomBytes(32).toString('hex');
+    
+    apiKeysCache[keyId] = {
+        wallet,
+        name: name || 'Dashboard Key',
+        createdAt: new Date().toISOString(),
+        lastUsed: null,
+        usageCount: 0
+    };
+    saveApiKeys();
+    
+    res.json({
+        keyId,
+        secret,
+        message: 'Save this secret - it will not be shown again'
+    });
+});
+
+app.get('/api/keys', (req, res) => {
+    const { wallet } = req.query;
+    
+    if (!wallet) {
+        return res.status(400).json({ error: 'wallet query param required' });
+    }
+    
+    const keys = Object.entries(apiKeysCache)
+        .filter(([_, k]) => k.wallet === wallet)
+        .map(([keyId, k]) => ({
+            keyId,
+            name: k.name,
+            createdAt: k.createdAt,
+            lastUsed: k.lastUsed,
+            usageCount: k.usageCount
+        }));
+    
+    res.json({ keys, wallet });
+});
+
+app.delete('/api/keys/:keyId', (req, res) => {
+    const { keyId } = req.params;
+    const { wallet } = req.body || {};
+    
+    if (!apiKeysCache[keyId]) {
+        return res.status(404).json({ error: 'Key not found' });
+    }
+    
+    if (apiKeysCache[keyId].wallet !== wallet) {
+        return res.status(403).json({ error: 'Not authorized' });
+    }
+    
+    delete apiKeysCache[keyId];
+    saveApiKeys();
+    
+    res.json({ success: true, message: 'Key deleted' });
+});
+
 // Error handler
 app.use((err, req, res, next) => {
     console.error('Error:', err);
