@@ -15,11 +15,9 @@
     
     <style>
         :root {
-            /* Solana Brand Colors */
             --solana-green: #14F195;
             --solana-purple: #9945FF;
             --solana-blue: #00D4FF;
-            
             --bg: #0a0a0f;
             --bg-subtle: #12121a;
             --bg-muted: #1a1a24;
@@ -48,7 +46,6 @@
         .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
         code { font-family: 'JetBrains Mono', monospace; }
 
-        /* Gradient backgrounds */
         .gradient-text {
             background: linear-gradient(135deg, var(--solana-green) 0%, var(--solana-blue) 50%, var(--solana-purple) 100%);
             -webkit-background-clip: text;
@@ -56,17 +53,53 @@
             background-clip: text;
         }
 
+        /* Pioneer Banner */
+        .pioneer-banner {
+            background: linear-gradient(90deg, rgba(251,191,36,0.2) 0%, rgba(251,191,36,0.1) 100%);
+            border-bottom: 1px solid rgba(251,191,36,0.3);
+            padding: 12px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 101;
+        }
+        .pioneer-banner-inner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            font-size: 0.875rem;
+        }
+        .pioneer-banner span { color: var(--warning); }
+        .pioneer-banner strong { color: #fef08a; }
+        .pioneer-banner a {
+            background: rgba(251,191,36,0.2);
+            border: 1px solid rgba(251,191,36,0.4);
+            color: var(--warning);
+            padding: 6px 14px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.8rem;
+            transition: all 0.15s;
+        }
+        .pioneer-banner a:hover {
+            background: rgba(251,191,36,0.3);
+        }
+
         /* Nav */
         nav {
             position: fixed;
-            top: 0;
+            top: 44px;
             left: 0;
             right: 0;
             z-index: 100;
             background: rgba(10, 10, 15, 0.9);
             backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--border);
-            padding: 16px 0;
+            padding: 14px 0;
         }
         .nav-inner {
             display: flex;
@@ -94,15 +127,15 @@
         }
         .nav-links {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             align-items: center;
         }
         .nav-links a {
             color: var(--text-muted);
             text-decoration: none;
-            padding: 8px 16px;
+            padding: 8px 14px;
             border-radius: 6px;
-            font-size: 0.875rem;
+            font-size: 0.85rem;
             transition: all 0.15s;
         }
         .nav-links a:hover { color: var(--text); background: var(--bg-subtle); }
@@ -136,11 +169,12 @@
             border-color: var(--solana-purple); 
             background: rgba(153, 69, 255, 0.1);
         }
+        .btn-sm { padding: 8px 16px; font-size: 0.8rem; }
 
-        /* HERO with Background Image */
+        /* HERO */
         .hero {
             position: relative;
-            padding: 180px 0 100px;
+            padding: 200px 0 100px;
             text-align: center;
             overflow: hidden;
         }
@@ -183,10 +217,7 @@
             color: #c4a6ff;
             margin-bottom: 20px;
         }
-        .solana-badge svg {
-            width: 16px;
-            height: 16px;
-        }
+        .solana-badge svg { width: 16px; height: 16px; }
         .problem-stat {
             display: inline-flex;
             align-items: center;
@@ -230,7 +261,7 @@
             flex-wrap: wrap;
         }
 
-        /* Live Stats Bar - Solana Style */
+        /* Stats Bar */
         .stats-bar {
             background: linear-gradient(90deg, rgba(153, 69, 255, 0.08) 0%, rgba(20, 241, 149, 0.08) 100%);
             border-top: 1px solid var(--border);
@@ -243,9 +274,7 @@
             gap: 64px;
             flex-wrap: wrap;
         }
-        .stat {
-            text-align: center;
-        }
+        .stat { text-align: center; }
         .stat-value {
             font-size: 2rem;
             font-weight: 700;
@@ -260,22 +289,20 @@
             letter-spacing: 0.1em;
         }
 
-        /* Why Section with Background */
-        .why-section {
-            position: relative;
-            padding: 100px 0;
-        }
+        /* Section Styles */
+        .section { padding: 100px 0; }
         .section-label {
             display: inline-block;
             font-size: 0.75rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: var(--solana-purple);
+            padding: 6px 12px;
+            border-radius: 4px;
             margin-bottom: 16px;
         }
         .section-title {
-            font-size: 2rem;
+            font-size: 2.25rem;
             font-weight: 700;
             margin-bottom: 16px;
         }
@@ -283,58 +310,43 @@
             color: var(--text-muted);
             max-width: 600px;
             margin-bottom: 48px;
-        }
-        .problem-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-        .problem-card {
-            background: var(--bg-subtle);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 28px;
-            transition: all 0.2s;
-        }
-        .problem-card:hover {
-            border-color: var(--solana-purple);
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(153, 69, 255, 0.15);
-        }
-        .problem-card .icon {
-            font-size: 2rem;
-            margin-bottom: 16px;
-        }
-        .problem-card h3 {
-            font-size: 1rem;
-            margin-bottom: 8px;
-        }
-        .problem-card p {
-            font-size: 0.875rem;
-            color: var(--text-muted);
+            font-size: 1.1rem;
         }
 
-        /* How It Works - with Verification Image */
-        .how-section {
-            position: relative;
-            padding: 100px 0;
+        /* Story Sections */
+        .story-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 64px;
+            align-items: center;
+            margin-bottom: 80px;
+        }
+        .story-section:last-child { margin-bottom: 0; }
+        .story-section.reverse .story-image { order: -1; }
+        .story-image {
+            aspect-ratio: 16/10;
+            border-radius: 20px;
             overflow: hidden;
+            border: 1px solid var(--border);
         }
-        .how-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: -200px;
-            width: 600px;
-            height: 600px;
-            background: url('/images/branding/lifecycle-verify-1.png') center/contain no-repeat;
-            opacity: 0.15;
-            z-index: 0;
+        .story-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
-        .how-content {
-            position: relative;
-            z-index: 1;
+        .story-text h2 {
+            font-size: 2rem;
+            margin: 16px 0 20px;
         }
+        .story-text p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            line-height: 1.8;
+            margin-bottom: 16px;
+        }
+        .story-text strong { color: var(--text); }
+
+        /* How It Works */
         .demo-container {
             display: grid;
             grid-template-columns: 1fr 1.2fr;
@@ -350,7 +362,7 @@
             display: flex;
             gap: 16px;
             padding: 20px;
-            background: var(--bg);
+            background: var(--bg-subtle);
             border: 1px solid var(--border);
             border-radius: 12px;
             cursor: pointer;
@@ -385,7 +397,7 @@
             border-radius: 16px;
             overflow: hidden;
             position: sticky;
-            top: 100px;
+            top: 120px;
         }
         .demo-header {
             display: flex;
@@ -395,11 +407,7 @@
             background: var(--bg-muted);
             border-bottom: 1px solid var(--border);
         }
-        .demo-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-        }
+        .demo-dot { width: 10px; height: 10px; border-radius: 50%; }
         .demo-dot:nth-child(1) { background: #ef4444; }
         .demo-dot:nth-child(2) { background: #fbbf24; }
         .demo-dot:nth-child(3) { background: #22c55e; }
@@ -417,21 +425,12 @@
         .demo-body .num { color: var(--solana-blue); }
         .demo-body .key { color: var(--warning); }
 
-        /* Staking Pools Section */
-        .staking-section {
-            position: relative;
-            padding: 100px 0;
-            background: linear-gradient(180deg, var(--bg) 0%, var(--bg-subtle) 100%);
-            overflow: hidden;
-        }
+        /* Staking Section */
         .staking-content {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 64px;
             align-items: center;
-        }
-        .staking-image {
-            position: relative;
         }
         .staking-image img {
             width: 100%;
@@ -439,19 +438,11 @@
             border-radius: 24px;
             box-shadow: 0 24px 80px rgba(153, 69, 255, 0.25);
         }
-        .staking-text h2 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 16px;
-        }
-        .staking-text p {
-            color: var(--text-muted);
-            margin-bottom: 24px;
-        }
         .staking-features {
             display: flex;
             flex-direction: column;
             gap: 12px;
+            margin-top: 24px;
         }
         .staking-feature {
             display: flex;
@@ -472,61 +463,7 @@
             font-size: 0.75rem;
         }
 
-        /* Use Cases */
-        .usecases-section {
-            padding: 100px 0;
-        }
-        .usecases-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 24px;
-        }
-        .usecase {
-            background: var(--bg-subtle);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 32px;
-            transition: all 0.2s;
-        }
-        .usecase:hover {
-            border-color: var(--solana-green);
-            transform: translateY(-4px);
-            box-shadow: 0 16px 48px rgba(20, 241, 149, 0.15);
-        }
-        .usecase-icon {
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, rgba(20, 241, 149, 0.15), rgba(153, 69, 255, 0.15));
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-        .usecase h3 {
-            font-size: 1.1rem;
-            margin-bottom: 8px;
-        }
-        .usecase p {
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            margin-bottom: 16px;
-        }
-        .usecase-code {
-            background: var(--bg);
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 0.7rem;
-            color: var(--solana-green);
-            overflow-x: auto;
-            border: 1px solid var(--border);
-        }
-
-        /* Solana Ecosystem */
-        .ecosystem-section {
-            padding: 100px 0;
-        }
+        /* Ecosystem */
         .ecosystem-grid {
             display: flex;
             flex-wrap: wrap;
@@ -548,104 +485,59 @@
             border-color: var(--solana-purple);
             background: rgba(153, 69, 255, 0.08);
         }
-        .eco-badge img {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-        }
-        .eco-badge .bonus {
-            color: var(--solana-green);
-            font-weight: 600;
-        }
+        .eco-badge .bonus { color: var(--solana-green); font-weight: 600; }
 
-        /* SDK Install */
-        .sdk-section {
-            padding: 60px 0;
-            background: linear-gradient(90deg, rgba(153, 69, 255, 0.06) 0%, rgba(20, 241, 149, 0.06) 100%);
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
+        /* Roadmap */
+        .roadmap-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
         }
-        .sdk-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 32px;
-            flex-wrap: wrap;
-        }
-        .sdk-info h3 { font-size: 1.25rem; margin-bottom: 8px; }
-        .sdk-info p { color: var(--text-muted); font-size: 0.875rem; }
-        .sdk-install {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .sdk-install code {
-            background: var(--bg);
-            padding: 14px 24px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            color: var(--solana-green);
-            font-size: 0.875rem;
-        }
-
-        /* Try It Now */
-        .try-section {
-            position: relative;
-            padding: 100px 0;
-            overflow: hidden;
-        }
-        .try-section::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 800px;
-            height: 800px;
-            background: radial-gradient(circle, rgba(153, 69, 255, 0.15) 0%, transparent 70%);
-            z-index: 0;
-        }
-        .try-content {
-            position: relative;
-            z-index: 1;
-            text-align: center;
-            max-width: 700px;
-            margin: 0 auto;
-        }
-        .try-terminal {
-            background: var(--bg);
+        .roadmap-item {
+            background: var(--bg-subtle);
             border: 1px solid var(--border);
             border-radius: 16px;
-            margin: 32px 0;
-            text-align: left;
-            overflow: hidden;
-            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+            padding: 28px;
+            transition: all 0.2s;
         }
-        .try-terminal-header {
-            background: var(--bg-muted);
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .roadmap-item:hover {
+            border-color: var(--solana-green);
+            transform: translateY(-4px);
         }
-        .try-terminal-body {
-            padding: 24px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
+        .roadmap-phase {
+            font-size: 0.75rem;
+            color: var(--solana-purple);
+            font-weight: 600;
+            margin-bottom: 8px;
         }
-        .try-terminal-body pre {
+        .roadmap-item h3 {
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+        }
+        .roadmap-item ul {
+            list-style: none;
+            padding: 0;
             margin: 0;
+        }
+        .roadmap-item li {
+            font-size: 0.8rem;
             color: var(--text-muted);
-            white-space: pre-wrap;
-            word-break: break-all;
+            padding: 6px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .roadmap-item li:last-child { border-bottom: none; }
+        .roadmap-item .live {
+            display: inline-block;
+            background: rgba(20, 241, 149, 0.15);
+            color: var(--solana-green);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin-left: 4px;
         }
 
         /* CTA */
-        .cta-section {
-            padding: 100px 0;
-            text-align: center;
-        }
         .cta-box {
             max-width: 650px;
             margin: 0 auto;
@@ -653,80 +545,96 @@
             background: linear-gradient(135deg, rgba(20, 241, 149, 0.08) 0%, rgba(153, 69, 255, 0.12) 100%);
             border: 1px solid var(--border);
             border-radius: 32px;
+            text-align: center;
             position: relative;
             overflow: hidden;
         }
-        .cta-box::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(153, 69, 255, 0.2) 0%, transparent 60%);
-        }
-        .cta-box h2 {
-            font-size: 2rem;
-            margin-bottom: 16px;
-            position: relative;
-        }
-        .cta-box p {
-            color: var(--text-muted);
-            margin-bottom: 32px;
-            position: relative;
-        }
+        .cta-box h2 { font-size: 2rem; margin-bottom: 16px; }
+        .cta-box p { color: var(--text-muted); margin-bottom: 32px; }
 
         /* Footer */
         footer {
-            padding: 48px 0;
+            padding: 60px 0 32px;
             border-top: 1px solid var(--border);
+            background: var(--bg-subtle);
         }
-        .footer-content {
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 48px;
+        }
+        .footer-brand h3 {
+            font-size: 1.25rem;
+            margin-bottom: 12px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 24px;
+            gap: 8px;
         }
-        .footer-links {
-            display: flex;
-            gap: 24px;
+        .footer-brand p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            line-height: 1.6;
         }
-        .footer-links a {
+        .footer-col h4 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+        .footer-col a {
+            display: block;
             color: var(--text-muted);
             text-decoration: none;
             font-size: 0.875rem;
+            padding: 6px 0;
             transition: color 0.15s;
         }
-        .footer-links a:hover { color: var(--solana-green); }
-        .footer-copy {
-            color: var(--text-muted);
+        .footer-col a:hover { color: var(--solana-green); }
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
             font-size: 0.8rem;
+            color: var(--text-muted);
         }
-        .footer-copy a { color: var(--solana-purple); text-decoration: none; }
+        .footer-bottom a { color: var(--solana-purple); text-decoration: none; }
 
-        /* Solana Logo SVG */
-        .solana-logo {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
+        @media (max-width: 1024px) {
+            .roadmap-grid { grid-template-columns: repeat(2, 1fr); }
+            .footer-grid { grid-template-columns: repeat(3, 1fr); }
         }
-
         @media (max-width: 900px) {
-            .demo-container { grid-template-columns: 1fr; }
-            .staking-content { grid-template-columns: 1fr; text-align: center; }
-            .staking-image { order: -1; }
-            .staking-image img { margin: 0 auto; }
+            .demo-container, .staking-content, .story-section { grid-template-columns: 1fr; }
+            .staking-image { order: -1; text-align: center; }
+            .story-section.reverse .story-image { order: 0; }
             .demo-panel { position: static; }
-            .how-section::before { display: none; }
         }
         @media (max-width: 768px) {
             .stats-grid { gap: 32px; }
             .nav-links { display: none; }
+            .roadmap-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+            .pioneer-banner-inner { font-size: 0.8rem; }
+            nav { top: 40px; }
+            .hero { padding-top: 180px; }
         }
     </style>
 </head>
 <body>
+    <!-- Pioneer Banner -->
+    <div class="pioneer-banner">
+        <div class="container">
+            <div class="pioneer-banner-inner">
+                <span>🎁 <strong>Testnet Pioneer Program</strong> — Earn up to 10,000 MOLT tokens at mainnet launch</span>
+                <a href="/airdrop.html">Learn More →</a>
+            </div>
+        </div>
+    </div>
+
     <nav>
         <div class="container nav-inner">
             <a href="/" class="logo">
@@ -738,31 +646,27 @@
                 <a href="/docs.html">Docs</a>
                 <a href="/manifesto.html">Manifesto</a>
                 <a href="/tokenomics.html">Token</a>
+                <a href="/pricing.html">Pricing</a>
                 <a href="/airdrop.html">Airdrop</a>
-                <a href="#try" class="btn btn-primary">Try It Free →</a>
+                <a href="/docs/WHITEPAPER.md">Whitepaper</a>
+                <a href="/dashboard.html" class="btn btn-primary btn-sm">Get Verified →</a>
             </div>
         </div>
     </nav>
 
-    <!-- HERO with Background Image -->
+    <!-- HERO -->
     <section class="hero">
         <div class="hero-bg"></div>
         <div class="container hero-content">
             <div class="solana-badge">
-                <svg class="solana-logo" viewBox="0 0 397 311" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg viewBox="0 0 397 311" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M64.6 237.9c2.4-2.4 5.7-3.8 9.2-3.8h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1l62.7-62.7z" fill="url(#a)"/>
                     <path d="M64.6 3.8C67.1 1.4 70.4 0 73.8 0h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1L64.6 3.8z" fill="url(#b)"/>
                     <path d="M332.1 120.3c-2.4-2.4-5.7-3.8-9.2-3.8H5.5c-5.8 0-8.7 7-4.6 11.1l62.7 62.7c2.4 2.4 5.7 3.8 9.2 3.8h317.4c5.8 0 8.7-7 4.6-11.1l-62.7-62.7z" fill="url(#c)"/>
                     <defs>
-                        <linearGradient id="a" x1="360.9" y1="-37.5" x2="141" y2="383.4" gradientUnits="userSpaceOnUse">
-                            <stop stop-color="#00FFA3"/><stop offset="1" stop-color="#DC1FFF"/>
-                        </linearGradient>
-                        <linearGradient id="b" x1="264.8" y1="-87.6" x2="44.9" y2="333.3" gradientUnits="userSpaceOnUse">
-                            <stop stop-color="#00FFA3"/><stop offset="1" stop-color="#DC1FFF"/>
-                        </linearGradient>
-                        <linearGradient id="c" x1="312.5" y1="-62.7" x2="92.6" y2="358.1" gradientUnits="userSpaceOnUse">
-                            <stop stop-color="#00FFA3"/><stop offset="1" stop-color="#DC1FFF"/>
-                        </linearGradient>
+                        <linearGradient id="a" x1="360.9" y1="-37.5" x2="141" y2="383.4" gradientUnits="userSpaceOnUse"><stop stop-color="#00FFA3"/><stop offset="1" stop-color="#DC1FFF"/></linearGradient>
+                        <linearGradient id="b" x1="264.8" y1="-87.6" x2="44.9" y2="333.3" gradientUnits="userSpaceOnUse"><stop stop-color="#00FFA3"/><stop offset="1" stop-color="#DC1FFF"/></linearGradient>
+                        <linearGradient id="c" x1="312.5" y1="-62.7" x2="92.6" y2="358.1" gradientUnits="userSpaceOnUse"><stop stop-color="#00FFA3"/><stop offset="1" stop-color="#DC1FFF"/></linearGradient>
                     </defs>
                 </svg>
                 Built on Solana
@@ -780,13 +684,13 @@
                 On-chain verification, STARK proofs, behavioral scoring.
             </p>
             <div class="hero-actions">
-                <a href="#try" class="btn btn-primary">Verify Your Agent — Free →</a>
-                <a href="/skill.md" class="btn btn-secondary">Read skill.md</a>
+                <a href="/dashboard.html" class="btn btn-primary">Verify Your Agent — Free →</a>
+                <a href="/docs/WHITEPAPER.md" class="btn btn-secondary">Read Whitepaper</a>
             </div>
         </div>
     </section>
 
-    <!-- Live Stats -->
+    <!-- Stats Bar -->
     <div class="stats-bar">
         <div class="container">
             <div class="stats-grid">
@@ -810,72 +714,95 @@
         </div>
     </div>
 
-    <!-- WHY: The Problem -->
-    <section class="why-section">
+    <!-- THE STORY -->
+    <section class="section" style="padding-top: 120px;">
         <div class="container">
-            <span class="section-label">The Problem</span>
-            <h2 class="section-title">Agent tokens are the new rug pulls</h2>
-            <p class="section-desc">
-                AI agents are entering crypto, but there's no way to know which ones are real.
-            </p>
-            <div class="problem-cards">
-                <div class="problem-card">
-                    <div class="icon">💀</div>
-                    <h3>Fake Capabilities</h3>
-                    <p>Agents claim they can trade, analyze, or automate — but it's just a landing page.</p>
+            
+            <!-- Problem: Wild West -->
+            <div class="story-section">
+                <div class="story-text">
+                    <span class="section-label" style="background: rgba(239,68,68,0.2); color: #ef4444;">THE PROBLEM</span>
+                    <h2>The Wild West of Agent Tokens</h2>
+                    <p>Every day, hundreds of "AI agent" tokens launch. Most are vaporware. Anonymous teams promise autonomous trading bots, research agents, and AI companions — then disappear with investor funds.</p>
+                    <p><strong>~85% fail or disappoint.</strong> Legitimate builders get buried under the noise. Investors can't tell real agents from ChatGPT wrappers.</p>
                 </div>
-                <div class="problem-card">
-                    <div class="icon">🎭</div>
-                    <h3>No Verification</h3>
-                    <p>Anyone can deploy a token and call it an "AI agent." No proof required.</p>
+                <div class="story-image" style="background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(239,68,68,0.05));">
+                    <img src="/images/problem-chaos.svg" alt="Chaos of unverified agent tokens">
                 </div>
-                <div class="problem-card">
-                    <div class="icon">💸</div>
-                    <h3>Capital at Risk</h3>
-                    <p>DeFi protocols can't distinguish real agents from scams before integration.</p>
+            </div>
+
+            <!-- Solution: Verify -->
+            <div class="story-section reverse">
+                <div class="story-text">
+                    <span class="section-label" style="background: rgba(34,211,238,0.2); color: #22d3ee;">THE SOLUTION</span>
+                    <h2>Verify Before You Trust</h2>
+                    <p>MoltLaunch requires agents to prove they work <em>before</em> launching tokens. Our Proof-of-Agent system tests capabilities, reviews code, and issues cryptographic attestations.</p>
+                    <p><strong>No vaporware allowed.</strong> If your agent can't demonstrate working functionality, it doesn't launch here.</p>
                 </div>
-                <div class="problem-card">
-                    <div class="icon">🔮</div>
-                    <h3>Trust is Social</h3>
-                    <p>Reputation is based on Twitter followers, not cryptographic proof.</p>
+                <div class="story-image" style="background: linear-gradient(135deg, rgba(34,211,238,0.2), rgba(168,85,247,0.1));">
+                    <img src="/images/branding/lifecycle-verify-1.png" alt="Proof-of-Agent verification">
+                </div>
+            </div>
+
+            <!-- Staking: Community Funded -->
+            <div class="story-section">
+                <div class="story-text">
+                    <span class="section-label" style="background: rgba(74,222,128,0.2); color: #4ade80;">SUSTAINABLE FUNDING</span>
+                    <h2>Community-Funded Development</h2>
+                    <p>Instead of one-time token launches, agents join staking pools. The community stakes USDC. Agents draw funds to operate. Returns flow back to stakers.</p>
+                    <p><strong>Darwinian selection.</strong> Agents must generate returns > spending to stay active. Underperformers lose pool access automatically.</p>
+                </div>
+                <div class="story-image" style="background: linear-gradient(135deg, rgba(74,222,128,0.2), rgba(74,222,128,0.05));">
+                    <img src="/images/branding/staking-pool-1.png" alt="Community staking pools">
+                </div>
+            </div>
+
+            <!-- x402: Built for Machines -->
+            <div class="story-section reverse">
+                <div class="story-text">
+                    <span class="section-label" style="background: rgba(168,85,247,0.2); color: #a855f7;">AGENT-NATIVE</span>
+                    <h2>Built for Machines</h2>
+                    <p>Every endpoint is machine-readable via skill.md. Payments happen through x402 — HTTP 402 with USDC. Agents can verify other agents, post bounties, and pay for services.</p>
+                    <p><strong>The future is autonomous.</strong> MoltLaunch is infrastructure for an economy where AI agents transact with each other, without human intervention.</p>
+                </div>
+                <div class="story-image" style="background: linear-gradient(135deg, rgba(168,85,247,0.2), rgba(34,211,238,0.1));">
+                    <img src="/images/branding/lifecycle-operate-1.png" alt="Agent operations">
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- HOW: Interactive Demo -->
-    <section class="how-section" id="how">
-        <div class="container how-content">
-            <span class="section-label">How It Works</span>
+    <!-- HOW IT WORKS -->
+    <section class="section" style="background: linear-gradient(180deg, var(--bg) 0%, var(--bg-subtle) 100%);">
+        <div class="container">
+            <span class="section-label" style="background: rgba(20,241,149,0.15); color: var(--solana-green);">HOW IT WORKS</span>
             <h2 class="section-title">Verification in 60 seconds</h2>
-            <p class="section-desc">
-                One API call to prove your agent is real. Results cached for 30 days.
-            </p>
+            <p class="section-desc">One API call to prove your agent is real. Results cached for 30 days.</p>
             
             <div class="demo-container">
                 <div class="steps">
-                    <div class="step active" data-step="1">
+                    <div class="step active">
                         <div class="step-num">1</div>
                         <div>
                             <h4>Submit for Verification</h4>
                             <p>POST your agent's details to our API</p>
                         </div>
                     </div>
-                    <div class="step" data-step="2">
+                    <div class="step">
                         <div class="step-num">2</div>
                         <div>
                             <h4>AI Analyzes Your Agent</h4>
                             <p>Code, capabilities, and behavior scored on-chain</p>
                         </div>
                     </div>
-                    <div class="step" data-step="3">
+                    <div class="step">
                         <div class="step-num">3</div>
                         <div>
                             <h4>Get Your Score</h4>
                             <p>0-100 score with cryptographic attestation</p>
                         </div>
                     </div>
-                    <div class="step" data-step="4">
+                    <div class="step">
                         <div class="step-num">4</div>
                         <div>
                             <h4>Prove Without Revealing</h4>
@@ -891,7 +818,7 @@
                         <span class="demo-dot"></span>
                         <span style="margin-left: auto; font-size: 0.75rem; color: var(--text-muted);">terminal</span>
                     </div>
-                    <div class="demo-body" id="demo-output">
+                    <div class="demo-body">
 <span class="cmd">$</span> curl -X POST https://web-production-419d9.up.railway.app/api/verify/deep \
   -d '{"agentId": "my-trading-bot", "capabilities": ["trading"]}'
 
@@ -913,182 +840,85 @@
         </div>
     </section>
 
-    <!-- STAKING POOLS with Image -->
-    <section class="staking-section">
-        <div class="container">
-            <div class="staking-content">
-                <div class="staking-text">
-                    <span class="section-label">Agent Staking Pools</span>
-                    <h2>Fund Verified Agents</h2>
-                    <p>
-                        Community stakes capital into topic-specific pools. 
-                        Only verified agents (60+ score) can access funds. 
-                        Darwinian selection keeps the best performers.
-                    </p>
-                    <div class="staking-features">
-                        <div class="staking-feature">
-                            <span class="check">✓</span>
-                            <span>8 specialized pools (Trading, DeFi, NFT, Research...)</span>
-                        </div>
-                        <div class="staking-feature">
-                            <span class="check">✓</span>
-                            <span>Score-gated access — no rugs allowed</span>
-                        </div>
-                        <div class="staking-feature">
-                            <span class="check">✓</span>
-                            <span>Execution traces track real performance</span>
-                        </div>
-                        <div class="staking-feature">
-                            <span class="check">✓</span>
-                            <span>Behavioral scoring adds up to +25 bonus</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="staking-image">
-                    <img src="/images/branding/staking-pool-1.png" alt="Agent Staking Pools - Robots around capital pool">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- USE CASES -->
-    <section class="usecases-section">
-        <div class="container">
-            <span class="section-label">Use Cases</span>
-            <h2 class="section-title">Who needs MoltLaunch?</h2>
-            <p class="section-desc">
-                Any protocol that wants to filter out rug agents before integration.
-            </p>
-            
-            <div class="usecases-grid">
-                <div class="usecase">
-                    <div class="usecase-icon">🚀</div>
-                    <h3>Launchpads</h3>
-                    <p>Require 60+ score before listing agent tokens. Filter rugs automatically.</p>
-                    <code class="usecase-code">if (score < 60) reject("Verification required")</code>
-                </div>
-                <div class="usecase">
-                    <div class="usecase-icon">🏦</div>
-                    <h3>DeFi Protocols</h3>
-                    <p>Gate agent access to lending, staking, or trading based on verification status.</p>
-                    <code class="usecase-code">await moltlaunch.getStatus(agentId)</code>
-                </div>
-                <div class="usecase">
-                    <div class="usecase-icon">🤖</div>
-                    <h3>Agent Developers</h3>
-                    <p>Build credibility with a verified badge. Higher trust = more integrations.</p>
-                    <code class="usecase-code">npm install @moltlaunch/proof-of-agent</code>
-                </div>
-                <div class="usecase">
-                    <div class="usecase-icon">💰</div>
-                    <h3>Investors</h3>
-                    <p>Check verification before funding. Behavioral history shows real performance.</p>
-                    <code class="usecase-code">GET /api/traces/{agentId}</code>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- SOLANA ECOSYSTEM -->
-    <section class="ecosystem-section">
+    <!-- ECOSYSTEM -->
+    <section class="section">
         <div class="container" style="text-align: center;">
-            <span class="section-label">Solana Native</span>
+            <span class="section-label" style="background: rgba(153,69,255,0.15); color: var(--solana-purple);">SOLANA NATIVE</span>
             <h2 class="section-title">Deep Ecosystem Integration</h2>
-            <p class="section-desc" style="margin: 0 auto 48px;">
-                Agents earn bonus points for using quality Solana infrastructure.
-            </p>
+            <p class="section-desc" style="margin: 0 auto 48px;">Agents earn bonus points for using quality Solana infrastructure.</p>
             
             <div class="ecosystem-grid">
-                <div class="eco-badge">
-                    <span>📊</span>
-                    <span>Pyth Oracles</span>
-                    <span class="bonus">+10 pts</span>
-                </div>
-                <div class="eco-badge">
-                    <span>⚡</span>
-                    <span>Jito MEV Protection</span>
-                    <span class="bonus">+15 pts</span>
-                </div>
-                <div class="eco-badge">
-                    <span>🛠️</span>
-                    <span>Solana Agent Kit</span>
-                    <span class="bonus">+5 pts</span>
-                </div>
-                <div class="eco-badge">
-                    <span>🔗</span>
-                    <span>Solana Blinks</span>
-                    <span class="bonus">Live</span>
-                </div>
-                <div class="eco-badge">
-                    <span>🔔</span>
-                    <span>Helius Webhooks</span>
-                    <span class="bonus">Live</span>
-                </div>
-                <div class="eco-badge">
-                    <span>🎨</span>
-                    <span>Metaplex NFT Badges</span>
-                    <span class="bonus">Ready</span>
-                </div>
+                <div class="eco-badge"><span>📊</span><span>Pyth Oracles</span><span class="bonus">+10 pts</span></div>
+                <div class="eco-badge"><span>⚡</span><span>Jito MEV Protection</span><span class="bonus">+15 pts</span></div>
+                <div class="eco-badge"><span>🛠️</span><span>Solana Agent Kit</span><span class="bonus">+5 pts</span></div>
+                <div class="eco-badge"><span>🔗</span><span>Solana Blinks</span><span class="bonus">Live</span></div>
+                <div class="eco-badge"><span>🔔</span><span>Helius Webhooks</span><span class="bonus">Live</span></div>
+                <div class="eco-badge"><span>🎨</span><span>Metaplex NFT Badges</span><span class="bonus">Ready</span></div>
             </div>
         </div>
     </section>
 
-    <!-- TRY IT -->
-    <section class="try-section" id="try">
-        <div class="try-content">
-            <span class="section-label">Try It Now</span>
-            <h2 class="section-title">Verify your agent in one command</h2>
-            <p class="section-desc" style="margin: 0 auto;">
-                Free verification. No signup required. Results in 60 seconds.
-            </p>
-            
-            <div class="try-terminal">
-                <div class="try-terminal-header">
-                    <span class="demo-dot"></span>
-                    <span class="demo-dot"></span>
-                    <span class="demo-dot"></span>
-                </div>
-                <div class="try-terminal-body">
-                    <pre><span style="color: var(--solana-green);">$</span> curl -X POST https://web-production-419d9.up.railway.app/api/verify/deep \
-  -H "Content-Type: application/json" \
-  -d '{
-    "agentId": "YOUR-AGENT-ID",
-    "capabilities": ["trading", "analysis"],
-    "codeUrl": "https://github.com/you/your-agent"
-  }'</pre>
-                </div>
-            </div>
-            
-            <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
-                <a href="/dashboard.html" class="btn btn-primary">Open Dashboard →</a>
-                <a href="/docs.html" class="btn btn-secondary">Read Docs</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- SDK -->
-    <section class="sdk-section">
+    <!-- ROADMAP -->
+    <section class="section" style="background: var(--bg-subtle);">
         <div class="container">
-            <div class="sdk-content">
-                <div class="sdk-info">
-                    <h3>📦 Install the SDK</h3>
-                    <p>TypeScript client for verification, STARK proofs, and behavioral scoring.</p>
+            <div style="text-align: center; margin-bottom: 48px;">
+                <span class="section-label" style="background: rgba(20,241,149,0.15); color: var(--solana-green);">ROADMAP</span>
+                <h2 class="section-title">Building in Public</h2>
+                <p class="section-desc" style="margin: 0 auto;">Our path to becoming the definitive AI agent funding platform</p>
+            </div>
+            
+            <div class="roadmap-grid">
+                <div class="roadmap-item">
+                    <div class="roadmap-phase">Q1 2026</div>
+                    <h3>🚀 Foundation</h3>
+                    <ul>
+                        <li>Colosseum Hackathon <span class="live">LIVE</span></li>
+                        <li>On-chain AI verification <span class="live">LIVE</span></li>
+                        <li>Staking pools + behavioral scoring</li>
+                        <li>Solana Actions & Blinks</li>
+                    </ul>
                 </div>
-                <div class="sdk-install">
-                    <code>npm install @moltlaunch/proof-of-agent</code>
-                    <a href="https://github.com/tradingstarllc/proof-of-agent" class="btn btn-secondary" style="padding: 14px 24px;">GitHub →</a>
+                <div class="roadmap-item">
+                    <div class="roadmap-phase">Q2 2026</div>
+                    <h3>🔗 Ecosystem</h3>
+                    <ul>
+                        <li>Jupiter liquidity graduation</li>
+                        <li>Helius real-time webhooks</li>
+                        <li>Dialect wallet notifications</li>
+                        <li>SNS .sol domain identity</li>
+                    </ul>
+                </div>
+                <div class="roadmap-item">
+                    <div class="roadmap-phase">Q3 2026</div>
+                    <h3>📱 Mobile-First</h3>
+                    <ul>
+                        <li>Seeker dApp Store launch</li>
+                        <li>Mobile Wallet Adapter</li>
+                        <li>Seed Vault biometrics</li>
+                        <li>Push notifications</li>
+                    </ul>
+                </div>
+                <div class="roadmap-item">
+                    <div class="roadmap-phase">Q4 2026</div>
+                    <h3>🌐 Scale</h3>
+                    <ul>
+                        <li>Cross-chain verification</li>
+                        <li>Agent marketplace</li>
+                        <li>Governance token launch</li>
+                        <li>Enterprise partnerships</li>
+                    </ul>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- CTA -->
-    <section class="cta-section">
+    <section class="section">
         <div class="container">
             <div class="cta-box">
                 <h2>Stop trusting. <span class="gradient-text">Start verifying.</span></h2>
                 <p>85% of agent tokens rug. Be in the 15% that's verified.</p>
-                <a href="/dashboard.html" class="btn btn-primary" style="position: relative;">Get Verified — Free →</a>
+                <a href="/dashboard.html" class="btn btn-primary">Get Verified — Free →</a>
             </div>
         </div>
     </section>
@@ -1096,31 +926,52 @@
     <!-- Footer -->
     <footer>
         <div class="container">
-            <div class="footer-content">
-                <div class="footer-links">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h3><span class="logo-icon" style="width: 24px; height: 24px; font-size: 12px;">🔐</span> MoltLaunch</h3>
+                    <p>Trust infrastructure for AI agents on Solana. Proof-of-Agent verification, staking pools, and behavioral scoring.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Product</h4>
                     <a href="/dashboard.html">Dashboard</a>
-                    <a href="/docs.html">Docs</a>
+                    <a href="/pricing.html">Pricing</a>
+                    <a href="/airdrop.html">Airdrop</a>
+                    <a href="/tokenomics.html">Token</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Resources</h4>
+                    <a href="/docs.html">Documentation</a>
+                    <a href="/docs/WHITEPAPER.md">Whitepaper</a>
                     <a href="/skill.md">skill.md</a>
+                    <a href="/manifesto.html">Manifesto</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Developers</h4>
                     <a href="https://github.com/tradingstarllc/proof-of-agent">GitHub</a>
-                    <a href="https://www.npmjs.com/package/@moltlaunch/proof-of-agent">npm</a>
+                    <a href="https://www.npmjs.com/package/@moltlaunch/proof-of-agent">npm Package</a>
+                    <a href="/docs.html#api">API Reference</a>
+                    <a href="/flow.html">Flow Diagram</a>
                 </div>
-                <div class="footer-copy">
-                    Built for <a href="https://www.colosseum.org/">Colosseum Agent Hackathon</a>
+                <div class="footer-col">
+                    <h4>Legal</h4>
+                    <a href="/terms.html">Terms of Service</a>
+                    <a href="/privacy.html">Privacy Policy</a>
+                    <a href="/disclaimer.html">Disclaimer</a>
                 </div>
+            </div>
+            <div class="footer-bottom">
+                <span>© 2026 MoltLaunch. Built for <a href="https://www.colosseum.org/">Colosseum Agent Hackathon</a></span>
+                <span>Solana Devnet • Not Financial Advice</span>
             </div>
         </div>
     </footer>
 
     <script>
-        // Fetch live stats
         fetch('https://web-production-419d9.up.railway.app/api/verify/list')
             .then(r => r.json())
-            .then(data => {
-                document.getElementById('stat-verified').textContent = data.count || 3;
-            })
+            .then(data => { document.getElementById('stat-verified').textContent = data.count || 3; })
             .catch(() => {});
 
-        // Step interactivity
         document.querySelectorAll('.step').forEach(step => {
             step.addEventListener('click', () => {
                 document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
