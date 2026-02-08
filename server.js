@@ -3251,7 +3251,7 @@ app.get('/api/badge/:agentId', (req, res) => {
     
     if (!badge) {
         // Check if agent is verified
-        const verified = verifiedAgents.get(agentId);
+        const verified = verificationCache[agentId];
         if (verified && verified.score >= 60) {
             // Generate badge metadata (not minted yet)
             res.json({
@@ -3290,7 +3290,7 @@ app.post('/api/badge/mint/:agentId', async (req, res) => {
     const { agentId } = req.params;
     const { wallet } = req.body;
     
-    const verified = verifiedAgents.get(agentId);
+    const verified = verificationCache[agentId];
     if (!verified || verified.score < 60) {
         return res.status(400).json({ error: 'Agent not eligible for badge' });
     }
