@@ -2,7 +2,26 @@
 
 **Updated:** 2026-02-08
 **Status:** Active Development
-**Days Remaining:** ~4.5
+**Days Remaining:** ~4
+
+---
+
+## 📦 SDKs & Packages
+
+| Package | Version | Install | GitHub |
+|---------|---------|---------|--------|
+| **@moltlaunch/proof-of-agent** | 1.0.0 | `npm i @moltlaunch/proof-of-agent` | [GitHub](https://github.com/tradingstarllc/proof-of-agent) |
+| **@moltlaunch/sdk** | 2.0.0 | `npm i @moltlaunch/sdk` | [GitHub](https://github.com/tradingstarllc/moltlaunch-sdk) |
+
+### Quick Install (from GitHub)
+
+```bash
+# Proof-of-Agent SDK (verification, STARK proofs, behavioral scoring)
+npm install github:tradingstarllc/proof-of-agent
+
+# MoltLaunch SDK (full API client)
+npm install github:tradingstarllc/moltlaunch-sdk
+```
 
 ---
 
