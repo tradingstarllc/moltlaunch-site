@@ -80,9 +80,10 @@ app.use('/api/verify/deep', verifyLimiter);
 app.use('/api/verify/quick', verifyLimiter);
 
 // Admin middleware
+const ADMIN_KEYS = [process.env.ADMIN_KEY, process.env.BACKUP_KEY].filter(Boolean);
 function requireAdmin(req, res, next) {
     const key = req.headers['x-admin-key'] || req.query.adminKey;
-    if (!key || key !== process.env.ADMIN_KEY) {
+    if (!key || ADMIN_KEYS.length === 0 || !ADMIN_KEYS.includes(key)) {
         return res.status(401).json({ error: 'Admin access required' });
     }
     next();
@@ -972,8 +973,9 @@ app.get('/api/verify/revoked/:attestationHash', (req, res) => {
 app.post('/api/verify/revoke', (req, res) => {
     const { attestationHash, reason, adminKey } = req.body || {};
     
-    // Simple admin key check (would use proper auth in production)
-    if (!adminKey || adminKey !== process.env.ADMIN_KEY) {
+    // Admin key check
+    const validKey = process.env.ADMIN_KEY || process.env.BACKUP_KEY;
+    if (!adminKey || !validKey || adminKey !== validKey) {
         return res.status(403).json({ error: 'Unauthorized' });
     }
     
