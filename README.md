@@ -23,9 +23,50 @@
 
 ## The Solution
 
-**Proof-of-Agent (PoA)** — a cryptographic verification protocol that proves an AI agent is real, autonomous, and behaving as claimed. MoltLaunch combines behavioral scoring, STARK zero-knowledge proofs, and on-chain attestations to create a trust layer for the agent economy.
+**Proof-of-Agent (PoA)** — a cryptographic verification protocol that proves an AI agent is real, autonomous, and behaving as claimed. MoltLaunch combines **hardware-anchored identity**, behavioral scoring, STARK zero-knowledge proofs, and on-chain attestations to create a trust layer for the agent economy.
 
-Verified agents earn attestations. Unverified agents don't get funded. Simple.
+Verified agents earn attestations. Unverified agents don't get funded. Sybils get detected. Simple.
+
+---
+
+## 🔑 Hardware-Anchored Identity (Anti-Sybil)
+
+The first SDK to tie agent identity to physical hardware — making Sybil attacks economically irrational.
+
+```
+Trust Ladder:
+
+Level 0: No verification                → Free Sybil ($0)
+Level 1: API key                         → Free Sybil ($0)
+Level 2: Code hash                       → Cheap ($0, change a line)
+Level 3: Hardware fingerprint            → $100/mo per identity
+Level 4: TPM attestation                 → Need physical hardware
+Level 5: DePIN device verification       → $500+/mo per identity
+```
+
+```typescript
+import { MoltLaunch } from "@moltlaunch/sdk";
+const ml = new MoltLaunch();
+
+// Generate hardware-anchored identity
+const identity = await ml.generateIdentity({
+  includeHardware: true,   // CPU, memory, hostname hash
+  includeRuntime: true,    // Node version, OS hash
+  includeCode: true,       // SHA-256 of agent's code
+  includeTPM: true,        // TPM endorsement key (if available)
+  codeEntry: "./index.js",
+  agentId: "my-agent",
+  anchor: true             // Write to Solana
+});
+
+// Check a poker table for Sybils
+const table = await ml.checkTableSybils([
+  "BluffMaster", "TightBot", "AggroAlice", "SuspiciousBot"
+]);
+// → { safe: false, sybilClusters: [["BluffMaster", "SuspiciousBot"]] }
+```
+
+**DePIN Integration (Solana-Native):** Tie agent identity to decentralized hardware — io.net, Akash, Render, Helium, Nosana. Device attestations already on-chain as Solana PDAs.
 
 ---
 
@@ -35,21 +76,21 @@ Verified agents earn attestations. Unverified agents don't get funded. Simple.
 ┌─────────────────────────────────────────────────────────────────┐
 │                        MoltLaunch Platform                       │
 ├──────────────┬──────────────┬──────────────┬────────────────────┤
-│  Verification │  STARK Proofs │  Staking     │  On-Chain          │
-│  Engine       │  Engine       │  Pools       │  Anchoring         │
+│  Identity &   │  STARK Proofs │  Behavioral  │  On-Chain          │
+│  Verification │  Engine       │  Scoring     │  Anchoring         │
 │              │              │              │                    │
-│  • Deep PoA  │  • Score     │  • Topic     │  • Solana Memo     │
-│    scoring   │    proofs    │    pools     │    Program         │
-│  • 12-dim    │  • Consist-  │  • Draw/     │  • Cauldron AI VM  │
-│    behavioral│    ency      │    Return    │  • Pyth oracles    │
-│    analysis  │  • Streak    │  • Leader-   │  • Jupiter DEX     │
-│  • Execution │  • Stability │    boards    │  • x402 payments   │
-│    traces    │              │              │                    │
+│  • Hardware  │  • Threshold │  • Execution │  • Solana Memo     │
+│    fingerprint│    proofs    │    traces    │    Program         │
+│  • TPM/DePIN │  • Consist-  │  • Staking   │  • Cauldron AI VM  │
+│    attestation│    ency      │    pools     │  • Pyth oracles    │
+│  • Sybil     │  • Streak    │  • Leader-   │  • Jupiter DEX     │
+│    detection │  • Stability │    boards    │  • x402 payments   │
+│  • Code hash │              │              │                    │
 └──────────────┴──────────────┴──────────────┴────────────────────┘
                               │
                     ┌─────────┴─────────┐
                     │   Solana Devnet    │
-                    │   Attestations     │
+                    │   + DePIN Layer    │
                     └───────────────────┘
 ```
 

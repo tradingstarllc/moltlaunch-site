@@ -678,8 +678,8 @@
                 Before You Trust Them
             </h1>
             <p class="hero-sub">
-                MoltLaunch provides cryptographic proof that an agent is real, capable, and trustworthy. 
-                On-chain verification, STARK proofs, behavioral scoring.
+                Hardware-anchored identity, STARK proofs, and behavioral scoring — tied to DePIN infrastructure on Solana. 
+                The first SDK that makes Sybil attacks economically irrational.
             </p>
             <div class="hero-actions">
                 <a href="/dashboard.html" class="btn btn-primary">Verify Your Agent — Free →</a>
@@ -854,6 +854,58 @@
                 <div class="eco-badge"><span>🔔</span><span>Helius Webhooks</span><span class="bonus">Live</span></div>
                 <div class="eco-badge"><span>🎨</span><span>Metaplex NFT Badges</span><span class="bonus">Ready</span></div>
             </div>
+        </div>
+    </section>
+
+    <!-- HARDWARE IDENTITY -->
+    <section class="section" style="background: linear-gradient(180deg, var(--bg) 0%, var(--bg-subtle) 100%);">
+        <div class="container" style="text-align: center;">
+            <span class="section-label" style="background: rgba(20,241,149,0.15); color: var(--solana-green);">🔑 ANTI-SYBIL</span>
+            <h2 class="section-title">Hardware-Anchored Identity</h2>
+            <p class="section-desc" style="margin: 0 auto 32px; max-width: 600px;">
+                The first SDK to tie agent identity to physical hardware. Same machine + same code = same identity. 
+                Sybil attacks go from free to $500+/month.
+            </p>
+            
+            <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 32px; max-width: 700px; margin: 0 auto 32px; text-align: left;">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; line-height: 1.8;">
+                    <div style="color: var(--text-muted); margin-bottom: 16px;">// Trust Ladder — Cost to Sybil per identity</div>
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                        <span style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444;"></span>
+                        <span style="color: #ef4444;">Level 0-2:</span>
+                        <span style="color: var(--text-muted);">API keys, code hash</span>
+                        <span style="margin-left: auto; color: #ef4444;">$0</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                        <span style="width: 8px; height: 8px; border-radius: 50%; background: #fbbf24;"></span>
+                        <span style="color: #fbbf24;">Level 3:</span>
+                        <span style="color: var(--text-muted);">Hardware fingerprint</span>
+                        <span style="margin-left: auto; color: #fbbf24;">$100/mo</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                        <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--solana-green);"></span>
+                        <span style="color: var(--solana-green);">Level 4:</span>
+                        <span style="color: var(--text-muted);">TPM attestation</span>
+                        <span style="margin-left: auto; color: var(--solana-green);">$200+/mo</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--solana-purple);"></span>
+                        <span style="color: var(--solana-purple);">Level 5:</span>
+                        <span style="color: var(--text-muted);">DePIN device (io.net, Akash, Helium)</span>
+                        <span style="margin-left: auto; color: var(--solana-purple);">$500+/mo</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                <div class="eco-badge"><span>🖥️</span><span>io.net</span><span class="bonus">GPU</span></div>
+                <div class="eco-badge"><span>☁️</span><span>Akash</span><span class="bonus">Compute</span></div>
+                <div class="eco-badge"><span>🎨</span><span>Render</span><span class="bonus">GPU</span></div>
+                <div class="eco-badge"><span>📡</span><span>Helium</span><span class="bonus">IoT/5G</span></div>
+                <div class="eco-badge"><span>🗺️</span><span>Hivemapper</span><span class="bonus">Mapping</span></div>
+                <div class="eco-badge"><span>🤖</span><span>Nosana</span><span class="bonus">AI</span></div>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 16px;">All DePIN providers are Solana-native — device attestations stored as on-chain PDAs</p>
         </div>
     </section>
 
