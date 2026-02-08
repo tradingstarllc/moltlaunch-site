@@ -1,0 +1,110 @@
+╔══════════════════════════════════════════════════════╗
+║                                                      ║
+║   🔐 MoltLaunch - Trust Infrastructure for Agents   ║
+║                                                      ║
+║   Verify AI agents before you trust them.           ║
+║                                                      ║
+╚══════════════════════════════════════════════════════╝
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📍 Step 1: Quick Verify - Does this agent respond?
+
+$ curl -X POST "$API/api/verify/quick" -d "{agentId: demo-agent, apiEndpoint: ...}"
+
+{
+  "verificationId": "poa_fff1167f3e1ca417",
+  "agentId": "demo-agent",
+  "score": 70,
+  "tier": "verified",
+  "checks": [
+    {"check": "endpoint_provided", "passed": true, "points": 20},
+    {"check": "endpoint_reachable", "passed": true, "points": 20}
+  ]
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📍 Step 2: Deep Verify - Comprehensive analysis with on-chain AI
+
+$ curl -X POST "$API/api/verify/deep" -d "{agentId: trading-bot, capabilities: [...]}"
+
+{
+  "verified": true,
+  "score": 80,
+  "tier": "excellent",
+  "onChainAI": true
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📍 Step 3: Check Status - Instant lookup (cached 30 days)
+
+$ curl "$API/api/verify/status/video-demo-agent"
+
+{
+  "verified": true,
+  "score": 80,
+  "tier": "excellent",
+  "expiresAt": "2026-03-10",
+  "daysRemaining": 30
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📍 Step 4: STARK Proof - Privacy-preserving verification
+   Prove 'score >= 60' without revealing exact score
+
+$ curl -X POST "$API/api/stark/generate/video-demo-agent" -d "{threshold: 60}"
+
+{
+  "success": true,
+  "commitment": "2215271f6c50f4e781aed58b",
+  "threshold": 60,
+  "privacyNote": "Score is not included - proof demonstrates threshold passage only"
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📍 Step 5: Ecosystem Bonuses - Rewarding best practices
+
+$ curl "$API/api/oracles/pyth/price/SOL/USD"
+
+{
+  "symbol": "SOL/USD",
+  "price": "87.32",
+  "verificationBonus": "+10 PoA score for using Pyth oracles"
+}
+
+$ curl "$API/api/mev/jito/tip-estimate"
+
+{
+  "urgency": "medium",
+  "estimatedTip": 10000,
+  "verificationBonus": "+15 PoA score for using Jito bundles (MEV protection)"
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📍 Step 6: List Verified Agents
+
+$ curl "$API/api/verify/list"
+
+{
+  "count": 3,
+  "agents": ["video-demo-agent", "moltlaunch-agent", "prod-test"]
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+╔══════════════════════════════════════════════════════╗
+║                                                      ║
+║   ✅ MoltLaunch Demo Complete                        ║
+║                                                      ║
+║   Install: npm install @moltlaunch/proof-of-agent   ║
+║   Docs:    web-production-419d9.up.railway.app      ║
+║   GitHub:  github.com/tradingstarllc/proof-of-agent ║
+║                                                      ║
+║   85% of AI agent tokens rug. We're fixing that.    ║
+║                                                      ║
+╚══════════════════════════════════════════════════════╝
