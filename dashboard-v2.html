@@ -723,10 +723,6 @@
                     <span class="nav-item-icon">📚</span>
                     Documentation
                 </a>
-                <a href="/pricing.html" class="nav-item">
-                    <span class="nav-item-icon">💳</span>
-                    Pricing
-                </a>
                 <a href="/airdrop.html" class="nav-item">
                     <span class="nav-item-icon">🎁</span>
                     Airdrop
@@ -1000,11 +996,55 @@
             
             if (state.agents.length === 0) {
                 container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">🤖</div>
-                        <div class="empty-state-title">No Agents Yet</div>
-                        <p class="empty-state-text">Register your first AI agent to get started</p>
-                        <button class="btn btn-primary" onclick="openRegisterModal()">+ Register Agent</button>
+                    <div class="empty-state" style="max-width: 600px; margin: 0 auto; text-align: left;">
+                        <div style="text-align: center;">
+                            <div class="empty-state-icon">🤖</div>
+                            <div class="empty-state-title" style="font-size: 1.4rem;">No Agents Yet</div>
+                            <p class="empty-state-text">Get your AI agent verified in 3 simple steps</p>
+                        </div>
+                        
+                        <div style="margin: 24px 0; display: flex; flex-direction: column; gap: 16px;">
+                            <div style="display: flex; align-items: flex-start; gap: 12px; padding: 16px; background: var(--bg-subtle, #1a1a2e); border-radius: 8px; border: 1px solid var(--border-subtle, #2a2a3e);">
+                                <span style="background: linear-gradient(135deg, #14F195, #00D4FF); color: #000; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">1</span>
+                                <div>
+                                    <strong>Connect Wallet</strong>
+                                    <p style="color: var(--text-muted, #888); margin: 4px 0 0; font-size: 0.85rem;">Connect your Phantom or Solflare wallet to identify yourself on-chain.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; gap: 12px; padding: 16px; background: var(--bg-subtle, #1a1a2e); border-radius: 8px; border: 1px solid var(--border-subtle, #2a2a3e);">
+                                <span style="background: linear-gradient(135deg, #14F195, #00D4FF); color: #000; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">2</span>
+                                <div>
+                                    <strong>Register Your Agent</strong>
+                                    <p style="color: var(--text-muted, #888); margin: 4px 0 0; font-size: 0.85rem;">Provide your agent's name, description, and API endpoint so we know what to verify.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; gap: 12px; padding: 16px; background: var(--bg-subtle, #1a1a2e); border-radius: 8px; border: 1px solid var(--border-subtle, #2a2a3e);">
+                                <span style="background: linear-gradient(135deg, #14F195, #00D4FF); color: #000; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">3</span>
+                                <div>
+                                    <strong>Get Verified</strong>
+                                    <p style="color: var(--text-muted, #888); margin: 4px 0 0; font-size: 0.85rem;">Run a quick or deep verification to earn your trust score and on-chain attestation.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="text-align: center; margin-bottom: 24px;">
+                            <button class="btn btn-primary" onclick="openRegisterModal()">+ Register Agent</button>
+                        </div>
+
+                        <div style="padding: 16px; background: var(--bg-subtle, #1a1a2e); border-radius: 8px; border: 1px solid var(--border-subtle, #2a2a3e);">
+                            <strong style="font-size: 0.9rem;">🖥️ For Headless Agents (API-only)</strong>
+                            <p style="color: var(--text-muted, #888); margin: 8px 0; font-size: 0.85rem;">No browser? Register and verify via API:</p>
+                            <pre style="background: #0d0d1a; padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 0.78rem; line-height: 1.5;"><code># Register agent
+curl -X POST /api/agents/register \\
+  -H "Content-Type: application/json" \\
+  -d '{"name":"my-agent","description":"Trading bot","wallet":"YOUR_WALLET"}'
+
+# Quick verify
+curl -X POST /api/verify/quick \\
+  -H "Content-Type: application/json" \\
+  -d '{"agentId":"YOUR_AGENT_ID"}'</code></pre>
+                            <p style="color: var(--text-muted, #888); margin: 8px 0 0; font-size: 0.8rem;">See <a href="/docs.html" style="color: #14F195;">full API docs</a> for deep verification, execution traces, and more.</p>
+                        </div>
                     </div>
                 `;
                 return;

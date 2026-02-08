@@ -63,6 +63,31 @@ try {
 
 const app = express();
 
+// Rate limiting
+const rateLimit = require('express-rate-limit');
+const apiLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 100,
+    message: { error: 'Too many requests, please try again later' }
+});
+const verifyLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 10,
+    message: { error: 'Verification rate limited. Try again in 1 minute.' }
+});
+app.use('/api/', apiLimiter);
+app.use('/api/verify/deep', verifyLimiter);
+app.use('/api/verify/quick', verifyLimiter);
+
+// Admin middleware
+function requireAdmin(req, res, next) {
+    const key = req.headers['x-admin-key'] || req.query.adminKey;
+    if (!key || key !== process.env.ADMIN_KEY) {
+        return res.status(401).json({ error: 'Admin access required' });
+    }
+    next();
+}
+
 // Hash IP for privacy
 const hashIP = (ip) => {
     if (!ip) return 'unknown';
@@ -295,8 +320,8 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
-// Stats endpoint
-app.get('/api/stats', (req, res) => {
+// Stats endpoint (admin only)
+app.get('/api/stats', requireAdmin, (req, res) => {
     const uptime = Math.floor((Date.now() - new Date(stats.startedAt).getTime()) / 1000);
     res.json({
         ...stats,
@@ -305,12 +330,8 @@ app.get('/api/stats', (req, res) => {
     });
 });
 
-// Logs backup endpoint (protected with simple key)
-app.get('/api/logs', (req, res) => {
-    const key = req.query.key || req.headers['x-backup-key'];
-    if (key !== process.env.BACKUP_KEY && key !== 'moltlaunch-backup-2026') {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
+// Logs backup endpoint (admin only)
+app.get('/api/logs', requireAdmin, (req, res) => {
     fs.readFile(LOG_FILE, 'utf8', (err, data) => {
         if (err) {
             return res.json({ logs: [], error: 'No logs yet' });
@@ -496,7 +517,7 @@ app.get('/api/usage/:wallet', (req, res) => {
     });
 });
 
-app.get('/api/metrics', (req, res) => {
+app.get('/api/metrics', requireAdmin, (req, res) => {
     const totalDeposits = Object.values(creditBalances)
         .reduce((sum, b) => sum + b.deposits.reduce((s, d) => s + d.amount, 0), 0);
     const totalUsage = Object.values(creditBalances)
@@ -2629,12 +2650,8 @@ app.get('/api/airdrop/stats', (req, res) => {
     });
 });
 
-// Export full registry (protected)
-app.get('/api/airdrop/export', (req, res) => {
-    const key = req.query.key || req.headers['x-backup-key'];
-    if (key !== process.env.BACKUP_KEY && key !== 'moltlaunch-backup-2026') {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
+// Export full registry (admin only)
+app.get('/api/airdrop/export', requireAdmin, (req, res) => {
     res.json(airdropRegistry);
 });
 
@@ -2934,13 +2951,34 @@ app.get('/.well-known/assetlinks.json', (req, res) => {
 app.use('/icons', express.static(path.join(__dirname, 'icons')));
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
+// Block sensitive files before static serving
+app.use((req, res, next) => {
+    const blocked = ['/package.json', '/package-lock.json', '/jest.config.js', '/server.js',
+                     '/cauldron-client.js', '/dbc-client.js', '/wallet.js', '/solana-agent-kit-poa.js',
+                     '/railway.json', '/.env.local', '/.gitignore', '/Procfile', '/render.yaml',
+                     '/nixpacks.toml', '/.nvmrc', '/requests.log'];
+    const blockedPrefixes = ['/tests/', '/scripts/', '/node_modules/', '/stark-prover/',
+                             '/execution-traces/', '/integrations/', '/.git/', '/.github/', '/data/'];
+    const blockedExtensions = ['.md'];
+
+    // Allow specific .md files
+    if (req.path === '/skill.md' || req.path === '/INTEGRATION.md') return next();
+    // Allow docs .md files
+    if (req.path.startsWith('/docs/') && req.path.endsWith('.md')) return next();
+
+    if (blocked.includes(req.path)) return res.status(404).send('Not found');
+    if (blockedPrefixes.some(p => req.path.startsWith(p))) return res.status(404).send('Not found');
+    if (blockedExtensions.some(e => req.path.endsWith(e))) return res.status(404).send('Not found');
+
+    next();
+});
+
 // Static files
 app.use(express.static(__dirname));
 
 // HTML routes
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
-app.get('/app', (req, res) => res.sendFile(path.join(__dirname, 'app.html')));
-app.get('/whitepaper', (req, res) => res.sendFile(path.join(__dirname, 'whitepaper.html')));
+app.get('/whitepaper', (req, res) => res.sendFile(path.join(__dirname, 'docs', 'WHITEPAPER.md')));
 
 // Technical documentation (markdown)
 app.get('/docs/whitepaper', (req, res) => {
