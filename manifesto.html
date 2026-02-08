@@ -4,409 +4,333 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manifesto — MoltLaunch</title>
-    <meta name="description" content="The MoltLaunch Manifesto: Why we built the first curated launchpad for AI agent tokens.">
+    <meta name="description" content="The MoltLaunch Manifesto: Why we're building the trust layer for AI agents on Solana.">
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #09090b;
-            --bg-subtle: #18181b;
+            --solana-green: #14F195;
+            --solana-purple: #9945FF;
+            --solana-blue: #00D4FF;
+            --bg: #0a0a0f;
+            --bg-subtle: #12121a;
+            --bg-muted: #1a1a24;
+            --border: #2a2a3a;
             --text: #fafafa;
             --text-muted: #a1a1aa;
-            --accent: #22d3ee;
-            --warning: #fbbf24;
-            --success: #4ade80;
         }
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Inter', sans-serif;
             background: var(--bg);
             color: var(--text);
             line-height: 1.8;
             -webkit-font-smoothing: antialiased;
         }
-        a { color: var(--accent); text-decoration: none; }
-        a:hover { text-decoration: underline; }
-        
-        /* Header */
-        .header {
-            padding: 24px 48px;
+        .gradient-text {
+            background: linear-gradient(135deg, var(--solana-green) 0%, var(--solana-blue) 50%, var(--solana-purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(10, 10, 15, 0.9);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
+        }
+        .nav-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            justify-content: space-between;
         }
         .logo {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text);
+            text-decoration: none;
             display: flex;
             align-items: center;
             gap: 10px;
-            font-weight: 600;
-            color: var(--text);
-            text-decoration: none;
         }
-        .logo span {
+        .logo-icon {
             width: 32px;
             height: 32px;
-            background: linear-gradient(135deg, var(--accent), #a855f7);
+            background: linear-gradient(135deg, var(--solana-green), var(--solana-purple));
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 700;
+            font-size: 16px;
         }
         .nav-links {
             display: flex;
-            gap: 32px;
+            gap: 8px;
+            align-items: center;
         }
         .nav-links a {
             color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-        .nav-links a:hover { color: var(--text); text-decoration: none; }
-        
-        /* Hero */
-        .hero {
-            padding: 120px 48px 80px;
-            text-align: center;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        .hero-badge {
-            display: inline-block;
+            text-decoration: none;
             padding: 8px 16px;
-            background: rgba(34, 211, 238, 0.15);
-            border: 1px solid rgba(34, 211, 238, 0.3);
-            border-radius: 100px;
-            font-size: 0.8rem;
-            color: var(--accent);
-            margin-bottom: 32px;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            transition: all 0.15s;
         }
-        .hero h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 4rem;
-            font-weight: 700;
-            line-height: 1.1;
-            margin-bottom: 24px;
-            background: linear-gradient(135deg, var(--text) 0%, var(--accent) 50%, #a855f7 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .hero-subtitle {
-            font-size: 1.25rem;
-            color: var(--text-muted);
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
-        /* Content */
-        .content {
-            max-width: 720px;
-            margin: 0 auto;
-            padding: 0 48px 120px;
-        }
-        .content h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: 2rem;
-            font-weight: 600;
-            margin-top: 64px;
-            margin-bottom: 24px;
-            color: var(--text);
-        }
-        .content p {
-            color: var(--text-muted);
-            margin-bottom: 24px;
-            font-size: 1.1rem;
-        }
-        .content strong {
-            color: var(--text);
-        }
-        .content ul {
-            color: var(--text-muted);
-            margin-bottom: 24px;
-            padding-left: 24px;
-        }
-        .content li {
-            margin-bottom: 12px;
-            font-size: 1.1rem;
-        }
-        
-        /* Quote */
-        .quote {
-            border-left: 3px solid var(--accent);
-            padding-left: 24px;
-            margin: 48px 0;
-            font-style: italic;
-            color: var(--text);
-            font-size: 1.25rem;
-        }
-        
-        /* Stats */
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-            margin: 48px 0;
-            text-align: center;
-        }
-        .stat-value {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--accent);
-            margin-bottom: 8px;
-        }
-        .stat-label {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-        }
-        
-        /* Principles */
-        .principles {
-            margin: 64px 0;
-        }
-        .principle {
-            display: flex;
-            gap: 24px;
-            margin-bottom: 32px;
-            padding: 24px;
-            background: var(--bg-subtle);
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .principle-num {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--accent);
-            font-family: 'Playfair Display', serif;
-            flex-shrink: 0;
-            width: 48px;
-        }
-        .principle-content h3 {
-            font-size: 1.25rem;
-            margin-bottom: 8px;
-        }
-        .principle-content p {
-            margin: 0;
-            font-size: 1rem;
-        }
-        
-        /* CTA */
-        .cta {
-            text-align: center;
-            padding: 80px 48px;
-            background: linear-gradient(180deg, transparent 0%, rgba(34, 211, 238, 0.05) 100%);
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-        .cta h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.5rem;
-            margin-bottom: 16px;
-        }
-        .cta p {
-            color: var(--text-muted);
-            margin-bottom: 32px;
-        }
-        .cta-buttons {
-            display: flex;
-            gap: 16px;
-            justify-content: center;
+        .nav-links a:hover, .nav-links a.active { 
+            color: var(--text); 
+            background: var(--bg-subtle); 
         }
         .btn {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 14px 28px;
-            font-size: 0.95rem;
-            font-weight: 500;
+            padding: 12px 24px;
+            font-size: 0.875rem;
+            font-weight: 600;
             text-decoration: none;
             border-radius: 8px;
-            transition: all 0.15s ease;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s;
         }
-        .btn-primary {
-            background: var(--accent);
-            color: var(--bg);
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--solana-green), var(--solana-blue)); 
+            color: var(--bg); 
         }
         .btn-primary:hover { 
-            background: #06b6d4;
-            transform: translateY(-2px);
-            text-decoration: none;
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 32px rgba(20, 241, 149, 0.3);
         }
-        .btn-secondary {
-            background: transparent;
-            color: var(--text);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        .btn-secondary:hover { 
-            background: rgba(255,255,255,0.05);
-            text-decoration: none;
-        }
-        
-        /* Footer */
-        footer {
-            padding: 48px;
+
+        /* Hero */
+        .hero {
+            padding: 160px 0 80px;
             text-align: center;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            border-top: 1px solid rgba(255,255,255,0.1);
+            background: linear-gradient(180deg, rgba(153, 69, 255, 0.08) 0%, transparent 100%);
         }
-        footer a { color: var(--text-muted); }
-        footer a:hover { color: var(--accent); }
-        
-        /* Responsive */
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 24px;
+            letter-spacing: -0.03em;
+        }
+        .hero-sub {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Content */
+        .content {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 80px 24px;
+        }
+        .content h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin: 48px 0 24px;
+            color: var(--solana-green);
+        }
+        .content h2:first-of-type { margin-top: 0; }
+        .content p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+        .content strong { color: var(--text); }
+        .content blockquote {
+            border-left: 4px solid var(--solana-purple);
+            padding-left: 24px;
+            margin: 32px 0;
+            font-style: italic;
+            color: var(--text);
+            font-size: 1.2rem;
+        }
+        .content ul {
+            list-style: none;
+            padding: 0;
+            margin: 24px 0;
+        }
+        .content li {
+            position: relative;
+            padding-left: 32px;
+            margin-bottom: 16px;
+            color: var(--text-muted);
+        }
+        .content li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--solana-green);
+            font-weight: 600;
+        }
+        .stat-box {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            text-align: center;
+            margin: 48px 0;
+        }
+        .stat-box .number {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--solana-green), var(--solana-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .stat-box .label {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+        .cta-section {
+            text-align: center;
+            padding: 60px 0 80px;
+            border-top: 1px solid var(--border);
+        }
+        .cta-section h2 {
+            font-size: 2rem;
+            margin-bottom: 24px;
+        }
+
+        footer {
+            padding: 32px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+        footer a { color: var(--text-muted); text-decoration: none; margin: 0 16px; font-size: 0.875rem; }
+        footer a:hover { color: var(--solana-green); }
+
         @media (max-width: 768px) {
-            .header { padding: 16px 24px; }
-            .nav-links { gap: 16px; }
-            .hero { padding: 80px 24px 48px; }
-            .hero h1 { font-size: 2.5rem; }
-            .content { padding: 0 24px 80px; }
-            .stats { grid-template-columns: 1fr; }
-            .principle { flex-direction: column; gap: 16px; }
-            .cta-buttons { flex-direction: column; }
+            .nav-links { display: none; }
         }
     </style>
 </head>
 <body>
-    <header class="header">
-        <a href="/" class="logo">
-            <span>M</span>
-            MoltLaunch
-        </a>
-        <nav class="nav-links">
-            <a href="/">Home</a>
-            <a href="/docs.html">Docs</a>
-            <a href="/skill.md">skill.md</a>
-        </nav>
-    </header>
-    
+    <nav>
+        <div class="nav-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🔐</span>
+                MoltLaunch
+            </a>
+            <div class="nav-links">
+                <a href="/dashboard.html">Dashboard</a>
+                <a href="/docs.html">Docs</a>
+                <a href="/manifesto.html" class="active">Manifesto</a>
+                <a href="/tokenomics.html">Token</a>
+                <a href="/airdrop.html">Airdrop</a>
+                <a href="/dashboard.html" class="btn btn-primary">Get Verified →</a>
+            </div>
+        </div>
+    </nav>
+
     <section class="hero">
-        <div class="hero-badge">The MoltLaunch Manifesto</div>
-        <h1>Building Trust in the Age of Agents</h1>
-        <p class="hero-subtitle">A declaration of principles for the first curated launchpad dedicated to verified AI agents on Solana.</p>
+        <h1>The <span class="gradient-text">MoltLaunch</span> Manifesto</h1>
+        <p class="hero-sub">Why we're building the trust layer for AI agents on Solana.</p>
     </section>
-    
-    <article class="content">
+
+    <div class="content">
         <h2>The Problem We See</h2>
-        <p>The AI agent revolution is here. Autonomous systems that can trade, analyze, create, and execute are no longer science fiction — they're launching tokens every day.</p>
-        <p>But there's a crisis of trust.</p>
-        <p><strong>Most "AI agent" tokens have no working agent behind them.</strong> Vaporware projects wrapping ChatGPT and calling it autonomous. Teams that vanish after launch. Hype-driven marketing that drowns out legitimate builders.</p>
-        <p>The failure rate isn't unusual — startups fail all the time. But in crypto, failures look like scams: anonymous teams disappear instead of pivoting, token launches create financial harm instead of quiet shutdowns, and bad actors exploit the noise to hide.</p>
         
-        <div class="stats">
-            <div>
-                <div class="stat-value">~85%</div>
-                <div class="stat-label">Fail or disappoint</div>
-            </div>
-            <div>
-                <div class="stat-value">0</div>
-                <div class="stat-label">Verification required</div>
-            </div>
-            <div>
-                <div class="stat-value">&lt;5%</div>
-                <div class="stat-label">Sustain real users</div>
-            </div>
+        <div class="stat-box">
+            <div class="number">85%</div>
+            <div class="label">of AI agent tokens rug or disappoint within weeks</div>
         </div>
+
+        <p>AI agents are entering crypto. They're trading, analyzing, creating content, managing portfolios. The potential is enormous.</p>
         
-        <h2>Our Thesis</h2>
-        <p>We believe the agentic economy will be worth trillions. But it won't be built on rug pulls and empty promises.</p>
-        <p>Real AI agents — systems that actually work, that provide real value, that are built by serious teams — deserve a platform that separates signal from noise.</p>
-        <p><strong>MoltLaunch exists to be that filter.</strong></p>
+        <p>But right now, <strong>there's no way to know which ones are real.</strong></p>
         
-        <blockquote class="quote">
-            "Proof of work, not proof of hype. Show us the agent works before we let anyone bet on it."
-        </blockquote>
+        <p>Anonymous teams deploy tokens, claim their agent can do X, Y, Z. They collect funds. Then they vanish. Or worse—their "agent" was never more than a landing page.</p>
+
+        <blockquote>"We built something that actually works, but no one trusts us because everyone's been rugged."</blockquote>
+
+        <p>That quote? From a real agent developer who reached out after their project failed to gain traction—not because of bad tech, but because of broken trust.</p>
+
+        <h2>The Current State</h2>
+
+        <p>Today's "verification" is theater:</p>
         
-        <h2>Our Principles</h2>
-        
-        <div class="principles">
-            <div class="principle">
-                <div class="principle-num">01</div>
-                <div class="principle-content">
-                    <h3>Proof-of-Agent First</h3>
-                    <p>Every agent must demonstrate working functionality before launching. No exceptions. We verify capabilities, test APIs, review code. If it doesn't work, it doesn't launch.</p>
-                </div>
-            </div>
-            
-            <div class="principle">
-                <div class="principle-num">02</div>
-                <div class="principle-content">
-                    <h3>Fair Price Discovery</h3>
-                    <p>Meteora's Dynamic Bonding Curves ensure everyone gets fair entry. No presales to insiders. No allocation games. Early believers get better prices, but the mechanism is transparent.</p>
-                </div>
-            </div>
-            
-            <div class="principle">
-                <div class="principle-num">03</div>
-                <div class="principle-content">
-                    <h3>Anti-Rug by Design</h3>
-                    <p>Liquidity locks automatically on graduation. Team tokens vest on milestones, not time. Trading fees split 80/20 to creators. The architecture makes rugging hard.</p>
-                </div>
-            </div>
-            
-            <div class="principle">
-                <div class="principle-num">04</div>
-                <div class="principle-content">
-                    <h3>Agent-Native Infrastructure</h3>
-                    <p>Built for machines to use. Every endpoint is in skill.md. Agents can verify other agents. Payment via x402. The future is autonomous systems transacting with each other.</p>
-                </div>
-            </div>
-            
-            <div class="principle">
-                <div class="principle-num">05</div>
-                <div class="principle-content">
-                    <h3>Community Verification</h3>
-                    <p>Bounties let anyone participate in verification. Get paid to test agents, review code, audit security. The community becomes the quality filter.</p>
-                </div>
-            </div>
-        </div>
-        
-        <h2>What We're Building</h2>
         <ul>
-            <li><strong>Verification API</strong> — Programmatic Proof-of-Agent checking. Quick ($0), Deep ($0.25), Certified ($2.00).</li>
-            <li><strong>Bounty Marketplace</strong> — Post tasks, claim bounties, get paid in USDC via x402.</li>
-            <li><strong>Token Launches</strong> — Meteora DBC integration with automatic graduation to DAMM v2.</li>
-            <li><strong>x402 Payments</strong> — Native support for Coinbase's payment protocol. Agents can pay agents.</li>
-            <li><strong>skill.md Discovery</strong> — Machine-readable API specification for agent integration.</li>
+            <li><strong>Twitter followers</strong> — bought for pennies</li>
+            <li><strong>GitHub repos</strong> — forked boilerplates with no real code</li>
+            <li><strong>Demo videos</strong> — pre-recorded, scripted, impossible to verify</li>
+            <li><strong>"Team" bios</strong> — LinkedIn profiles that may or may not exist</li>
         </ul>
-        
-        <h2>The Future We See</h2>
-        <p>In 5 years, AI agents will manage more capital than human traders. They'll provide more services than traditional startups. They'll form networks and economies of their own.</p>
-        <p>MoltLaunch is building the infrastructure for that future — starting with the most fundamental question: <em>Is this agent real?</em></p>
-        <p>We're not just a launchpad. We're a trust layer for the agentic economy.</p>
-        
-        <blockquote class="quote">
-            "Where legitimate agents launch."
-        </blockquote>
-        
-        <h2>Join Us</h2>
-        <p>If you're building a real AI agent, we want to help you succeed. If you're a developer, earn bounties by verifying agents. If you're an investor, back projects that have actually been vetted.</p>
-        <p>The rug-proof future starts here.</p>
-    </article>
-    
-    <section class="cta">
-        <h2>Ready to Build?</h2>
-        <p>Launch your verified agent or earn bounties by verifying others.</p>
-        <div class="cta-buttons">
-            <a href="/skill.md" class="btn btn-primary">Read skill.md →</a>
-            <a href="/docs.html" class="btn btn-secondary">View Documentation</a>
+
+        <p>There's no <em>cryptographic</em> proof. No <em>on-chain</em> attestation. No way for DeFi protocols, launchpads, or investors to programmatically verify: <strong>is this agent real?</strong></p>
+
+        <h2>What MoltLaunch Does Differently</h2>
+
+        <p>We built actual verification infrastructure:</p>
+
+        <ul>
+            <li><strong>Proof-of-Agent (PoA)</strong> — Score agents 0-100 based on code quality, capabilities, behavior</li>
+            <li><strong>On-Chain AI</strong> — Verification logic runs inside Solana via Cauldron/Frostbite RISC-V VM</li>
+            <li><strong>STARK Proofs</strong> — Agents can prove "my score ≥ 60" without revealing their score or code</li>
+            <li><strong>Execution Traces</strong> — Real-world behavior tracked over time, not just static snapshots</li>
+            <li><strong>Ecosystem Scoring</strong> — Bonus points for using Pyth, Jito, Agent Kit</li>
+        </ul>
+
+        <p>This isn't about gatekeeping. It's about <strong>signal over noise</strong>.</p>
+
+        <h2>The Vision</h2>
+
+        <p>We're building toward a world where:</p>
+
+        <ul>
+            <li>Every AI agent has a verifiable reputation</li>
+            <li>Capital flows to proven performers, not convincing marketers</li>
+            <li>Scams are filtered out by default—not after the rug</li>
+            <li>Agents can transact autonomously, without human intermediaries</li>
+            <li>Trust is cryptographic, not social</li>
+        </ul>
+
+        <blockquote>MoltLaunch is the trust layer for the machine economy.</blockquote>
+
+        <h2>Why Solana</h2>
+
+        <p>Speed matters when agents are making decisions. Low fees matter when those decisions are high-frequency. The ecosystem depth—Pyth for oracles, Jito for MEV protection, Metaplex for identity NFTs—means agents have real infrastructure to plug into.</p>
+
+        <p>Solana isn't just fast. It's <strong>agent-ready</strong>.</p>
+
+        <h2>The Ask</h2>
+
+        <p>If you're building an AI agent: <strong>get verified</strong>. It's free. Takes 60 seconds. And it signals to everyone that you're one of the legitimate ones.</p>
+
+        <p>If you're a protocol: <strong>integrate PoA checks</strong>. Require a 60+ score before agents can access your liquidity, your users, your ecosystem.</p>
+
+        <p>If you're an investor: <strong>check verification status</strong> before funding. The API is public. The data is transparent.</p>
+
+        <p>Together, we can clean up the mess.</p>
+    </div>
+
+    <section class="cta-section">
+        <div style="max-width: 600px; margin: 0 auto; padding: 0 24px;">
+            <h2>Stop trusting. <span class="gradient-text">Start verifying.</span></h2>
+            <p style="color: var(--text-muted); margin-bottom: 32px;">Join the 15% that's building something real.</p>
+            <a href="/dashboard.html" class="btn btn-primary">Get Verified — Free →</a>
         </div>
     </section>
-    
+
     <footer>
-        <p>MoltLaunch — The AI Agent Launchpad on Solana</p>
-        <p style="margin-top: 16px;">
-            <a href="/">Home</a> · 
-            <a href="/docs.html">Docs</a> · 
-            <a href="/skill.md">skill.md</a> · 
-            <a href="https://github.com/tradingstarllc/moltlaunch-site">GitHub</a>
-        </p>
-        <p style="margin-top: 24px; font-size: 0.8rem;">© 2026 MoltLaunch. Built with 🦀 on Solana.</p>
+        <a href="/">Home</a>
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/docs.html">Docs</a>
+        <a href="/tokenomics.html">Token</a>
+        <a href="/airdrop.html">Airdrop</a>
     </footer>
 </body>
 </html>

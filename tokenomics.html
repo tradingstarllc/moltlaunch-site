@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Token & Tokenomics — MoltLaunch</title>
+    <meta name="description" content="MOLT token information, distribution, and deployment details on Solana devnet.">
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --solana-green: #14F195;
+            --solana-purple: #9945FF;
+            --solana-blue: #00D4FF;
+            --bg: #0a0a0f;
+            --bg-subtle: #12121a;
+            --bg-muted: #1a1a24;
+            --border: #2a2a3a;
+            --text: #fafafa;
+            --text-muted: #a1a1aa;
+            --warning: #fbbf24;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+        code { font-family: 'JetBrains Mono', monospace; }
+        .gradient-text {
+            background: linear-gradient(135deg, var(--solana-green) 0%, var(--solana-blue) 50%, var(--solana-purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(10, 10, 15, 0.9);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
+        }
+        .nav-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--solana-green), var(--solana-purple));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            transition: all 0.15s;
+        }
+        .nav-links a:hover, .nav-links a.active { 
+            color: var(--text); 
+            background: var(--bg-subtle); 
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.15s;
+        }
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--solana-green), var(--solana-blue)); 
+            color: var(--bg); 
+        }
+        .btn-primary:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 32px rgba(20, 241, 149, 0.3);
+        }
+        .btn-secondary { 
+            background: transparent; 
+            color: var(--text); 
+            border: 1px solid var(--border); 
+        }
+        .btn-secondary:hover { 
+            border-color: var(--solana-purple); 
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+        /* Hero */
+        .hero {
+            padding: 160px 0 60px;
+            text-align: center;
+        }
+        .devnet-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(251, 191, 36, 0.15);
+            border: 1px solid rgba(251, 191, 36, 0.4);
+            padding: 8px 16px;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            color: var(--warning);
+            margin-bottom: 24px;
+        }
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 24px;
+            letter-spacing: -0.03em;
+        }
+        .hero-sub {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Token Info Card */
+        .token-card {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 48px;
+            margin: 60px auto;
+            max-width: 700px;
+        }
+        .token-header {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        .token-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--solana-green), var(--solana-purple));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+        }
+        .token-name h2 {
+            font-size: 1.75rem;
+            margin-bottom: 4px;
+        }
+        .token-name p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        .token-address {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+        }
+        .token-address label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
+        }
+        .token-address code {
+            font-size: 0.8rem;
+            color: var(--solana-green);
+            word-break: break-all;
+        }
+        .token-address a {
+            display: inline-block;
+            margin-top: 8px;
+            color: var(--solana-purple);
+            font-size: 0.8rem;
+            text-decoration: none;
+        }
+        .token-address a:hover { text-decoration: underline; }
+        .token-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        .token-stat {
+            text-align: center;
+            padding: 16px;
+            background: var(--bg);
+            border-radius: 12px;
+        }
+        .token-stat .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--solana-green);
+        }
+        .token-stat .label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Distribution */
+        .section {
+            padding: 80px 0;
+        }
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 48px;
+        }
+        .distribution-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .dist-card {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            transition: all 0.2s;
+        }
+        .dist-card:hover {
+            border-color: var(--solana-green);
+            transform: translateY(-4px);
+        }
+        .dist-percent {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--solana-green), var(--solana-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+        .dist-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .dist-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Bonding Curve */
+        .curve-section {
+            background: linear-gradient(180deg, var(--bg) 0%, var(--bg-subtle) 100%);
+            padding: 80px 0;
+        }
+        .curve-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .curve-box {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 40px;
+        }
+        .curve-box h3 {
+            font-size: 1.25rem;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .curve-box h3 span {
+            font-size: 1.5rem;
+        }
+        .curve-features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+        .curve-feature {
+            display: flex;
+            align-items: start;
+            gap: 12px;
+        }
+        .curve-feature .icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(20, 241, 149, 0.15);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .curve-feature h4 {
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+        .curve-feature p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Pool Info */
+        .pool-card {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 32px;
+        }
+        .pool-card label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
+        }
+        .pool-card code {
+            font-size: 0.75rem;
+            color: var(--solana-purple);
+            word-break: break-all;
+        }
+
+        /* Roadmap */
+        .roadmap-list {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .roadmap-item {
+            display: flex;
+            gap: 20px;
+            padding: 24px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .roadmap-item:last-child { border-bottom: none; }
+        .roadmap-phase {
+            width: 100px;
+            flex-shrink: 0;
+            color: var(--solana-purple);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .roadmap-content h4 {
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+        .roadmap-content p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+        .roadmap-content .live {
+            display: inline-block;
+            background: rgba(20, 241, 149, 0.15);
+            color: var(--solana-green);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        footer {
+            padding: 32px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+        footer a { color: var(--text-muted); text-decoration: none; margin: 0 16px; font-size: 0.875rem; }
+        footer a:hover { color: var(--solana-green); }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .token-stats { grid-template-columns: 1fr; }
+            .curve-features { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🔐</span>
+                MoltLaunch
+            </a>
+            <div class="nav-links">
+                <a href="/dashboard.html">Dashboard</a>
+                <a href="/docs.html">Docs</a>
+                <a href="/manifesto.html">Manifesto</a>
+                <a href="/tokenomics.html" class="active">Token</a>
+                <a href="/airdrop.html">Airdrop</a>
+                <a href="/dashboard.html" class="btn btn-primary">Get Verified →</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container">
+            <div class="devnet-badge">
+                ⚠️ DEVNET — Not real money
+            </div>
+            <h1><span class="gradient-text">MOLTEST</span> Token</h1>
+            <p class="hero-sub">The test token for MoltLaunch on Solana Devnet. Mainnet deployment pending funding.</p>
+        </div>
+    </section>
+
+    <!-- Token Card -->
+    <div class="container">
+        <div class="token-card">
+            <div class="token-header">
+                <div class="token-icon">🦀</div>
+                <div class="token-name">
+                    <h2>MOLTEST</h2>
+                    <p>MoltLaunch Testnet Token</p>
+                </div>
+            </div>
+            
+            <div class="token-address">
+                <label>Token Mint Address (Devnet)</label>
+                <code>ATFtoArfzAF6Vi6XUeCr64ffD1SAN6HvwePkPmkkQ6en</code>
+                <a href="https://explorer.solana.com/address/ATFtoArfzAF6Vi6XUeCr64ffD1SAN6HvwePkPmkkQ6en?cluster=devnet" target="_blank">View on Solana Explorer →</a>
+            </div>
+            
+            <div class="token-stats">
+                <div class="token-stat">
+                    <div class="value">1B</div>
+                    <div class="label">Total Supply</div>
+                </div>
+                <div class="token-stat">
+                    <div class="value">9</div>
+                    <div class="label">Decimals</div>
+                </div>
+                <div class="token-stat">
+                    <div class="value">Devnet</div>
+                    <div class="label">Network</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Distribution -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Token Distribution</h2>
+            <div class="distribution-grid">
+                <div class="dist-card">
+                    <div class="dist-percent">40%</div>
+                    <div class="dist-title">Bonding Curve</div>
+                    <div class="dist-desc">Fair launch via Meteora Dynamic Bonding Curve. No presale, no VCs.</div>
+                </div>
+                <div class="dist-card">
+                    <div class="dist-percent">25%</div>
+                    <div class="dist-title">Agent Rewards</div>
+                    <div class="dist-desc">Distributed to verified agents based on performance and score.</div>
+                </div>
+                <div class="dist-card">
+                    <div class="dist-percent">20%</div>
+                    <div class="dist-title">Staking Pools</div>
+                    <div class="dist-desc">Incentives for stakers who fund agent operations.</div>
+                </div>
+                <div class="dist-card">
+                    <div class="dist-percent">10%</div>
+                    <div class="dist-title">Liquidity</div>
+                    <div class="dist-desc">Permanently locked liquidity on launch.</div>
+                </div>
+                <div class="dist-card">
+                    <div class="dist-percent">3%</div>
+                    <div class="dist-title">Team</div>
+                    <div class="dist-desc">12-month linear vesting. No cliff.</div>
+                </div>
+                <div class="dist-card">
+                    <div class="dist-percent">2%</div>
+                    <div class="dist-title">Testnet Pioneers</div>
+                    <div class="dist-desc">Early adopters from devnet. Join via /airdrop.html</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bonding Curve -->
+    <section class="curve-section">
+        <div class="container curve-content">
+            <h2 class="section-title">Meteora Dynamic Bonding Curve</h2>
+            <div class="curve-box">
+                <h3><span>📈</span> Fair Launch Mechanism</h3>
+                <div class="curve-features">
+                    <div class="curve-feature">
+                        <div class="icon">🚫</div>
+                        <div>
+                            <h4>No Presale</h4>
+                            <p>Everyone buys from the same curve at the same price.</p>
+                        </div>
+                    </div>
+                    <div class="curve-feature">
+                        <div class="icon">📊</div>
+                        <div>
+                            <h4>Price Discovery</h4>
+                            <p>Price increases as supply is purchased. Early buyers pay less.</p>
+                        </div>
+                    </div>
+                    <div class="curve-feature">
+                        <div class="icon">🔒</div>
+                        <div>
+                            <h4>Instant Liquidity</h4>
+                            <p>No waiting for DEX listing. Buy and sell immediately.</p>
+                        </div>
+                    </div>
+                    <div class="curve-feature">
+                        <div class="icon">💎</div>
+                        <div>
+                            <h4>80% to Creator</h4>
+                            <p>Industry-leading creator share. Only 20% fees.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pool-card">
+                    <label>Bonding Curve Pool (Devnet)</label>
+                    <code>33XbvmoL1A9CYVa5ibgFrRgRqBgh13B6Zot1pwxTwERw</code>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Roadmap -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Token Roadmap</h2>
+            <div class="roadmap-list">
+                <div class="roadmap-item">
+                    <div class="roadmap-phase">Phase 1</div>
+                    <div class="roadmap-content">
+                        <h4>Devnet Launch <span class="live">LIVE</span></h4>
+                        <p>MOLTEST token deployed. Bonding curve active. Testnet Pioneer Program open for early adopters.</p>
+                    </div>
+                </div>
+                <div class="roadmap-item">
+                    <div class="roadmap-phase">Phase 2</div>
+                    <div class="roadmap-content">
+                        <h4>Mainnet Deployment</h4>
+                        <p>Real MOLT token launch on Solana mainnet. Migrate testnet allocations. Enable x402 payments.</p>
+                    </div>
+                </div>
+                <div class="roadmap-item">
+                    <div class="roadmap-phase">Phase 3</div>
+                    <div class="roadmap-content">
+                        <h4>Staking Pools</h4>
+                        <p>Real staking contracts go live. Community funds verified agents. Revenue sharing begins.</p>
+                    </div>
+                </div>
+                <div class="roadmap-item">
+                    <div class="roadmap-phase">Phase 4</div>
+                    <div class="roadmap-content">
+                        <h4>Governance</h4>
+                        <p>Token holders vote on verification criteria, pool allocations, and protocol upgrades.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="section" style="text-align: center; padding-bottom: 100px;">
+        <h2 style="margin-bottom: 16px;">Join the Testnet Pioneer Program</h2>
+        <p style="color: var(--text-muted); margin-bottom: 32px;">Earn MOLT allocation by participating in devnet.</p>
+        <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+            <a href="/airdrop.html" class="btn btn-primary">View Airdrop →</a>
+            <a href="/dashboard.html" class="btn btn-secondary">Get Verified</a>
+        </div>
+    </section>
+
+    <footer>
+        <a href="/">Home</a>
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/docs.html">Docs</a>
+        <a href="/manifesto.html">Manifesto</a>
+        <a href="/airdrop.html">Airdrop</a>
+    </footer>
+</body>
+</html>
