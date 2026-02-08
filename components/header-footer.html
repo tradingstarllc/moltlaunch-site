@@ -1,0 +1,235 @@
+<!-- 
+STANDARD HEADER AND FOOTER FOR MOLTLAUNCH
+Copy these components to each page.
+Nav is NOT sticky (position: relative, not fixed)
+-->
+
+<!-- STANDARD STYLES (add to <style> section) -->
+<style>
+/* Pioneer Banner - NOT sticky */
+.pioneer-banner {
+    background: linear-gradient(90deg, rgba(251,191,36,0.2) 0%, rgba(251,191,36,0.1) 100%);
+    border-bottom: 1px solid rgba(251,191,36,0.3);
+    padding: 12px 0;
+}
+.pioneer-banner-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 0.875rem;
+}
+.pioneer-banner span { color: #fbbf24; }
+.pioneer-banner strong { color: #fef08a; }
+.pioneer-banner a {
+    background: rgba(251,191,36,0.2);
+    border: 1px solid rgba(251,191,36,0.4);
+    color: #fbbf24;
+    padding: 6px 14px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.8rem;
+    transition: all 0.15s;
+}
+.pioneer-banner a:hover { background: rgba(251,191,36,0.3); }
+
+/* Nav - NOT sticky */
+.site-nav {
+    background: rgba(10, 10, 15, 0.95);
+    border-bottom: 1px solid #2a2a3a;
+    padding: 14px 0;
+}
+.nav-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.logo {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #fafafa;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.logo-icon {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #14F195, #9945FF);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+.nav-links {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+.nav-links a {
+    color: #a1a1aa;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    transition: all 0.15s;
+}
+.nav-links a:hover { color: #fafafa; background: #12121a; }
+.nav-links a.active { color: #fafafa; background: #12121a; }
+.btn-nav {
+    background: linear-gradient(135deg, #14F195, #00D4FF);
+    color: #0a0a0f;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    margin-left: 8px;
+}
+.btn-nav:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(20, 241, 149, 0.3);
+}
+
+/* Footer */
+.site-footer {
+    padding: 60px 0 32px;
+    border-top: 1px solid #2a2a3a;
+    background: #12121a;
+}
+.footer-grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+    gap: 48px;
+    margin-bottom: 48px;
+}
+.footer-brand h3 {
+    font-size: 1.25rem;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #fafafa;
+}
+.footer-brand p {
+    color: #a1a1aa;
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+.footer-col h4 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #a1a1aa;
+    margin-bottom: 16px;
+}
+.footer-col a {
+    display: block;
+    color: #71717a;
+    text-decoration: none;
+    font-size: 0.875rem;
+    padding: 6px 0;
+    transition: color 0.15s;
+}
+.footer-col a:hover { color: #14F195; }
+.footer-bottom {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 24px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #2a2a3a;
+    font-size: 0.8rem;
+    color: #71717a;
+}
+.footer-bottom a { color: #9945FF; text-decoration: none; }
+
+@media (max-width: 1024px) {
+    .footer-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 768px) {
+    .nav-links { display: none; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+
+<!-- HEADER HTML -->
+<div class="pioneer-banner">
+    <div class="pioneer-banner-inner">
+        <span>🎁 <strong>Testnet Pioneer Program</strong> — Earn up to 10,000 MOLT at mainnet</span>
+        <a href="/airdrop.html">Learn More →</a>
+    </div>
+</div>
+
+<nav class="site-nav">
+    <div class="nav-inner">
+        <a href="/" class="logo">
+            <span class="logo-icon">🔐</span>
+            MoltLaunch
+        </a>
+        <div class="nav-links">
+            <a href="/dashboard.html">Dashboard</a>
+            <a href="/docs.html">Docs</a>
+            <a href="/manifesto.html">Manifesto</a>
+            <a href="/tokenomics.html">Token</a>
+            <a href="/pricing.html">Pricing</a>
+            <a href="/airdrop.html">Airdrop</a>
+            <a href="/docs/WHITEPAPER.md">Whitepaper</a>
+            <a href="/dashboard.html" class="btn-nav">Get Verified →</a>
+        </div>
+    </div>
+</nav>
+
+<!-- FOOTER HTML -->
+<footer class="site-footer">
+    <div class="footer-grid">
+        <div class="footer-brand">
+            <h3><span style="width: 24px; height: 24px; background: linear-gradient(135deg, #14F195, #9945FF); border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px;">🔐</span> MoltLaunch</h3>
+            <p>Trust infrastructure for AI agents on Solana. Proof-of-Agent verification, staking pools, and behavioral scoring.</p>
+        </div>
+        <div class="footer-col">
+            <h4>Product</h4>
+            <a href="/dashboard.html">Dashboard</a>
+            <a href="/pricing.html">Pricing</a>
+            <a href="/airdrop.html">Airdrop</a>
+            <a href="/tokenomics.html">Token</a>
+        </div>
+        <div class="footer-col">
+            <h4>Resources</h4>
+            <a href="/docs.html">Documentation</a>
+            <a href="/docs/WHITEPAPER.md">Whitepaper</a>
+            <a href="/skill.md">skill.md</a>
+            <a href="/manifesto.html">Manifesto</a>
+        </div>
+        <div class="footer-col">
+            <h4>Developers</h4>
+            <a href="https://github.com/tradingstarllc/proof-of-agent">GitHub</a>
+            <a href="https://www.npmjs.com/package/@moltlaunch/proof-of-agent">npm Package</a>
+            <a href="/docs.html#api">API Reference</a>
+            <a href="/flow.html">Flow Diagram</a>
+        </div>
+        <div class="footer-col">
+            <h4>Legal</h4>
+            <a href="/terms.html">Terms of Service</a>
+            <a href="/privacy.html">Privacy Policy</a>
+            <a href="/disclaimer.html">Disclaimer</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <span>© 2026 MoltLaunch. Built for <a href="https://www.colosseum.org/">Colosseum Agent Hackathon</a></span>
+        <span>Solana Devnet • Not Financial Advice</span>
+    </div>
+</footer>
