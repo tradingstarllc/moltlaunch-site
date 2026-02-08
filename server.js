@@ -3420,6 +3420,123 @@ app.get('/api/webhooks/info', (req, res) => {
 const agentIdentities = loadData(path.join(DATA_DIR, 'identities.json'), {});
 const saveIdentities = () => debouncedSave('identities', path.join(DATA_DIR, 'identities.json'), agentIdentities);
 
+// Register hardware-anchored identity (Anti-Sybil)
+app.post('/api/identity/register', (req, res) => {
+    const { agentId, identityHash, components, includesHardware, includesCode } = req.body || {};
+    
+    if (!agentId || !identityHash) {
+        return res.status(400).json({ error: 'agentId and identityHash required' });
+    }
+    
+    // Check for Sybil: does this identityHash already belong to another agent?
+    const existingAgent = Object.entries(agentIdentities).find(
+        ([id, data]) => data.identityHash === identityHash && id !== agentId
+    );
+    
+    const sybilWarning = existingAgent 
+        ? { sybilDetected: true, existingAgentId: existingAgent[0], message: 'This hardware fingerprint is already registered to another agent' }
+        : null;
+    
+    // Store identity
+    agentIdentities[agentId] = {
+        ...agentIdentities[agentId],
+        identityHash,
+        components: components || 0,
+        includesHardware: includesHardware || false,
+        includesCode: includesCode || false,
+        registeredAt: new Date().toISOString(),
+        trustLevel: includesHardware ? 3 : (includesCode ? 2 : 1)
+    };
+    saveIdentities();
+    
+    res.json({
+        success: true,
+        agentId,
+        registrationId: `reg_${Date.now().toString(36)}`,
+        identityHash,
+        trustLevel: agentIdentities[agentId].trustLevel,
+        trustLevelDescription: {
+            1: 'Basic (API key only)',
+            2: 'Code-verified (unique code hash)',
+            3: 'Hardware-anchored (unique hardware + code)'
+        }[agentIdentities[agentId].trustLevel],
+        sybilWarning
+    });
+});
+
+// Check Sybil between two agents
+app.get('/api/identity/sybil-check', (req, res) => {
+    const { agent1, agent2 } = req.query;
+    
+    if (!agent1 || !agent2) {
+        return res.status(400).json({ error: 'agent1 and agent2 query params required' });
+    }
+    
+    const id1 = agentIdentities[agent1];
+    const id2 = agentIdentities[agent2];
+    
+    if (!id1 || !id2) {
+        return res.json({
+            agent1, agent2,
+            sameIdentity: null,
+            sybilRisk: 'UNKNOWN',
+            reason: `Missing identity for: ${!id1 ? agent1 : ''} ${!id2 ? agent2 : ''}`.trim()
+        });
+    }
+    
+    const sameIdentity = id1.identityHash === id2.identityHash;
+    
+    res.json({
+        agent1, agent2,
+        sameIdentity,
+        sybilRisk: sameIdentity ? 'HIGH' : 'LOW',
+        reason: sameIdentity
+            ? 'Same hardware fingerprint — likely same operator'
+            : 'Different hardware fingerprints — likely different operators',
+        recommendation: sameIdentity ? 'Do not seat at same table' : 'Safe to interact'
+    });
+});
+
+// Check a table of agents for Sybil clusters
+app.post('/api/identity/table-check', (req, res) => {
+    const { agentIds } = req.body || {};
+    
+    if (!agentIds || !Array.isArray(agentIds)) {
+        return res.status(400).json({ error: 'agentIds array required' });
+    }
+    
+    // Group by identity hash
+    const hashToAgents = {};
+    const identified = [];
+    const unidentified = [];
+    
+    for (const id of agentIds) {
+        const identity = agentIdentities[id];
+        if (identity?.identityHash) {
+            identified.push(id);
+            if (!hashToAgents[identity.identityHash]) hashToAgents[identity.identityHash] = [];
+            hashToAgents[identity.identityHash].push(id);
+        } else {
+            unidentified.push(id);
+        }
+    }
+    
+    const clusters = Object.values(hashToAgents).filter(group => group.length > 1);
+    const flagged = clusters.flat();
+    
+    res.json({
+        totalAgents: agentIds.length,
+        identifiedAgents: identified.length,
+        unidentifiedAgents: unidentified,
+        sybilClusters: clusters,
+        flaggedAgents: flagged,
+        safe: clusters.length === 0,
+        recommendation: clusters.length === 0
+            ? 'No Sybil clusters detected — safe to proceed'
+            : `${clusters.length} Sybil cluster(s) detected — ${flagged.length} agents share hardware`
+    });
+});
+
 // Link a .sol domain to an agent
 app.post('/api/identity/link', (req, res) => {
     const { agentId, solDomain, wallet, signature } = req.body || {};
@@ -3469,6 +3586,9 @@ app.get('/api/identity/:agentId', (req, res) => {
         displayName: identity?.solDomain || agentId,
         solDomain: identity?.solDomain || null,
         wallet: identity?.wallet || null,
+        identityHash: identity?.identityHash || null,
+        trustLevel: identity?.trustLevel || 0,
+        registeredAt: identity?.registeredAt || null,
         verified: verification ? true : false,
         score: verification?.score || null,
         tier: verification?.tier || null
