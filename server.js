@@ -2437,10 +2437,12 @@ app.get('/api/airdrop/leaderboard', (req, res) => {
 // QUICK VERIFY - Demo endpoint for agents to test verification
 // ===========================================
 app.post('/api/verify/quick', async (req, res) => {
-    const { agentName, endpoint, capabilities } = req.body || {};
+    const { agentName, agentId, endpoint, apiEndpoint, capabilities } = req.body || {};
+    const name = agentName || agentId; // Accept both for SDK compatibility
+    const ep = endpoint || apiEndpoint; // Accept both
     
-    if (!agentName) {
-        return res.status(400).json({ error: 'agentName required' });
+    if (!name) {
+        return res.status(400).json({ error: 'agentName or agentId required' });
     }
     
     // Quick capability check
@@ -2448,7 +2450,7 @@ app.post('/api/verify/quick', async (req, res) => {
     const checks = [];
     
     // Check 1: Has endpoint?
-    if (endpoint) {
+    if (ep) {
         score += 20;
         checks.push({ check: 'endpoint_provided', passed: true, points: 20 });
         
@@ -2456,7 +2458,7 @@ app.post('/api/verify/quick', async (req, res) => {
         try {
             const controller = new AbortController();
             const timeout = setTimeout(() => controller.abort(), 5000);
-            const resp = await fetch(endpoint, { 
+            const resp = await fetch(ep, { 
                 signal: controller.signal,
                 headers: { 'User-Agent': 'MoltLaunch-PoA-Verifier/1.0' }
             });
@@ -2488,7 +2490,8 @@ app.post('/api/verify/quick', async (req, res) => {
     
     res.json({
         verificationId,
-        agentName,
+        agentId: name,
+        agentName: name,
         score,
         maxScore: 100,
         tier: score >= 70 ? 'verified' : score >= 50 ? 'builder' : 'pioneer',
