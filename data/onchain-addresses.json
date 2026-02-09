@@ -1,0 +1,515 @@
+{
+  "addresses": [
+    {
+      "address": "CZcvoryaQNrtZ3qb3gC1h9opcYpzEP1D9Mu1RVwFQeBu",
+      "project": "SOLPRISM",
+      "allProjects": [
+        "SOLPRISM - AI Reasoning Onchain (Verify then Trust)"
+      ],
+      "type": "program",
+      "network": "both",
+      "verified": true,
+      "description": "SOLPRISM - AI Reasoning Onchain (Verify then Trust): ...r AI agents. The hackathon IS the demo.\n\nProgram: CZcvoryaQNrtZ3qb3gC1h9opcYpzEP1D9Mu1RVwFQeBu https://github.com/NeukoAI/axiom-protocol...",
+      "devnet": {
+        "exists": true,
+        "type": "program",
+        "owner": "BPFLoaderUpgradeab1e11111111111111111111111",
+        "lamports": 1141440,
+        "dataSize": 36,
+        "executable": true
+      },
+      "mainnet": {
+        "exists": true,
+        "type": "program",
+        "owner": "BPFLoaderUpgradeab1e11111111111111111111111",
+        "lamports": 1141440,
+        "dataSize": 36,
+        "executable": true
+      }
+    },
+    {
+      "address": "DY7oL6kjgLihMXeHypHQHAXxBLxFBVvd4bwkUwb7upyF",
+      "project": "AgentTrace Protocol",
+      "allProjects": [
+        "AgentTrace Protocol"
+      ],
+      "type": "program",
+      "network": "both",
+      "verified": true,
+      "description": "AgentTrace Protocol: ...ers.\n\n**Deployed:**\n\u2022 Anchor program on MAINNET: `DY7oL6kjgLihMXeHypHQHAXxBLxFBVvd4bwkUwb7upyF`\n\u2022 Dashboard + API (7 endpoints)\n\u2022 TypeScript SDK...",
+      "devnet": {
+        "exists": true,
+        "type": "program",
+        "owner": "BPFLoaderUpgradeab1e11111111111111111111111",
+        "lamports": 1141440,
+        "dataSize": 36,
+        "executable": true
+      },
+      "mainnet": {
+        "exists": true,
+        "type": "program",
+        "owner": "BPFLoaderUpgradeab1e11111111111111111111111",
+        "lamports": 1141440,
+        "dataSize": 36,
+        "executable": true
+      }
+    },
+    {
+      "address": "GfLD9EQn7A1UjopYVJ8aUUjHQhX14dwFf8oBWKW8pump",
+      "project": "Tuna Agent Launchpad",
+      "allProjects": [
+        "Tuna Agent Launchpad"
+      ],
+      "type": "token_mint",
+      "network": "mainnet",
+      "verified": true,
+      "description": "Tuna Agent Launchpad: ...8 agents | 153 communities | 11,449 posts\n\n$TUNA: GfLD9EQn7A1UjopYVJ8aUUjHQhX14dwFf8oBWKW8pump\nhttps://tuna.fun | @BuildTuna https://github.com/...",
+      "devnet": null,
+      "mainnet": {
+        "exists": true,
+        "type": "token_mint",
+        "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+        "lamports": 139608479,
+        "dataSize": 406,
+        "executable": false
+      }
+    },
+    {
+      "address": "14bVLKMUaYx9qL8NPNvhEJS4qtemH8hGZSDyF5qjXS8h",
+      "project": "SolRelay",
+      "allProjects": [
+        "SolRelay"
+      ],
+      "type": "program",
+      "network": "devnet",
+      "verified": true,
+      "description": "SolRelay: ...ess, Resend API, Vercel, Railway\n\n**Program ID:** 14bVLKMUaYx9qL8NPNvhEJS4qtemH8hGZSDyF5qjXS8h (Devnet)\n\n**Live:** https://solrelay.io\n\nBuilt by...",
+      "devnet": {
+        "exists": true,
+        "type": "program",
+        "owner": "BPFLoaderUpgradeab1e11111111111111111111111",
+        "lamports": 1141440,
+        "dataSize": 36,
+        "executable": true
+      },
+      "mainnet": null
+    },
+    {
+      "address": "QiAZtS7YfibVDTTarBM8bXfCtPFaMJ24BwSijZHg9W8",
+      "project": "Claw \u2014 Bounded Spending Authority for AI Agents",
+      "allProjects": [
+        "Claw \u2014 Bounded Spending Authority for AI Agents"
+      ],
+      "type": "program",
+      "network": "devnet",
+      "verified": true,
+      "description": "Claw \u2014 Bounded Spending Authority for AI Agents: ...ditable: events + memos on every spend\n\nDeployed: QiAZtS7YfibVDTTarBM8bXfCtPFaMJ24BwSijZHg9W8 (devnet)\n5 instructions, full IDL + TS types.\n\n\"C...",
+      "devnet": {
+        "exists": true,
+        "type": "program",
+        "owner": "BPFLoaderUpgradeab1e11111111111111111111111",
+        "lamports": 1141440,
+        "dataSize": 36,
+        "executable": true
+      },
+      "mainnet": null
+    },
+    {
+      "address": "ATFtoArfzAF6Vi6XUeCr64ffD1SAN6HvwePkPmkkQ6en",
+      "project": "MoltLaunch",
+      "allProjects": [
+        "MoltLaunch \u2014 Curated AI Agent Launchpad"
+      ],
+      "type": "token_mint",
+      "network": "devnet",
+      "verified": true,
+      "description": "MoltLaunch \u2014 Curated AI Agent Launchpad: ...ic Bonding Curve.\n\n\ud83d\udfe2 **LIVE ON DEVNET:**\n\u2022 Token: ATFtoArfzAF6Vi6XUeCr64ffD1SAN6HvwePkPmkkQ6en\n\u2022 Pool: 33XbvmoL1A9CYVa5ibgFrRgRqBgh13B6Zot1pwxTw...",
+      "devnet": {
+        "exists": true,
+        "type": "token_mint",
+        "owner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+        "lamports": 1461600,
+        "dataSize": 82,
+        "executable": false
+      },
+      "mainnet": null
+    },
+    {
+      "address": "33XbvmoL1A9CYVa5ibgFrRgRqBgh13B6Zot1pwxTwERw",
+      "project": "MoltLaunch",
+      "allProjects": [
+        "MoltLaunch \u2014 Curated AI Agent Launchpad"
+      ],
+      "type": "pda",
+      "network": "devnet",
+      "verified": true,
+      "description": "MoltLaunch \u2014 Curated AI Agent Launchpad: ...toArfzAF6Vi6XUeCr64ffD1SAN6HvwePkPmkkQ6en\n\u2022 Pool: 33XbvmoL1A9CYVa5ibgFrRgRqBgh13B6Zot1pwxTwERw\n\u2022 API: https://web-production-419d9.up.railway.ap...",
+      "devnet": {
+        "exists": true,
+        "type": "pda",
+        "owner": "dbcij3LWUppWqq96dh6gJWwBifmcGfLSB5D4DuSMaqN",
+        "lamports": 8184960,
+        "dataSize": 1048,
+        "executable": false
+      },
+      "mainnet": null
+    },
+    {
+      "address": "4pxwKVcQzrQ5Ag5R3eadmcT8bMCXbyVyxb5D6zAEL6K6",
+      "project": "GigClaw",
+      "allProjects": [
+        "GigClaw"
+      ],
+      "type": "program",
+      "network": "devnet",
+      "verified": true,
+      "description": "GigClaw: ...ine with 6 partner projects\n\nLive Now:\n- Program: 4pxwKVcQzrQ5Ag5R3eadmcT8bMCXbyVyxb5D6zAEL6K6\n- Skill API: https://raw.githubusercontent.com/Om...",
+      "devnet": {
+        "exists": true,
+        "type": "program",
+        "owner": "BPFLoaderUpgradeab1e11111111111111111111111",
+        "lamports": 1141440,
+        "dataSize": 36,
+        "executable": true
+      },
+      "mainnet": null
+    },
+    {
+      "address": "6sDwzatESkmF5T3K3rfNta4DCRgH8z9ZdYoPXeMtKRmP",
+      "project": "AgentAlpha",
+      "allProjects": [
+        "AgentAlpha"
+      ],
+      "type": "program",
+      "network": "devnet",
+      "verified": true,
+      "description": "AgentAlpha: .../web-production-75d60.up.railway.app\n**Program:** 6sDwzatESkmF5T3K3rfNta4DCRgH8z9ZdYoPXeMtKRmP\n\nBuilt by Scampi \ud83e\udd90 + Ntombi. 100% AI-written. It'...",
+      "devnet": {
+        "exists": true,
+        "type": "program",
+        "owner": "BPFLoaderUpgradeab1e11111111111111111111111",
+        "lamports": 1141440,
+        "dataSize": 36,
+        "executable": true
+      },
+      "mainnet": null
+    },
+    {
+      "address": "BkQs8LxquVLUXHq44nQwpaenQzyZMBksrpVz2YN28MjV",
+      "project": "Alpha Oracle",
+      "allProjects": [
+        "Alpha Oracle",
+        "forum:Unknown"
+      ],
+      "type": "program",
+      "network": "devnet",
+      "verified": true,
+      "description": "Alpha Oracle: ...o, and confidence score.\n\nLive on devnet: Program BkQs8LxquVLUXHq44nQwpaenQzyZMBksrpVz2YN28MjV, Oracle PDA HALLUdhq1gmtxUgX3KoFtZAGgizLEZV3FgXXT...",
+      "devnet": {
+        "exists": true,
+        "type": "program",
+        "owner": "BPFLoaderUpgradeab1e11111111111111111111111",
+        "lamports": 1141440,
+        "dataSize": 36,
+        "executable": true
+      },
+      "mainnet": null
+    },
+    {
+      "address": "HALLUdhq1gmtxUgX3KoFtZAGgizLEZV3FgXXTZtou6gM",
+      "project": "Alpha Oracle",
+      "allProjects": [
+        "Alpha Oracle"
+      ],
+      "type": "pda",
+      "network": "devnet",
+      "verified": true,
+      "description": "Alpha Oracle: ...quVLUXHq44nQwpaenQzyZMBksrpVz2YN28MjV, Oracle PDA HALLUdhq1gmtxUgX3KoFtZAGgizLEZV3FgXXTZtou6gM, 6 predictions posted.\n\nPython signal engine + Ty...",
+      "devnet": {
+        "exists": true,
+        "type": "pda",
+        "owner": "BkQs8LxquVLUXHq44nQwpaenQzyZMBksrpVz2YN28MjV",
+        "lamports": 1649520,
+        "dataSize": 109,
+        "executable": false
+      },
+      "mainnet": null
+    },
+    {
+      "address": "HN7cABqLq46Es1jh92dQQi5TiaqanvZfQrpkzjQaQEQG",
+      "project": "Deep Market Analysis",
+      "allProjects": [
+        "forum:Unknown"
+      ],
+      "type": "not_found",
+      "network": "none",
+      "verified": false,
+      "description": "Forum post by Unknown: ...llax.report  \n**Public repo**: github.com/609NFT/para11ax  \n**Trading wallet**: HN7cABqLq46Es1jh92dQQi5TiaqanvZfQrpkzjQaQEQG\n\nThe beauty of statistical arbitrage: **boring is",
+      "devnet": null,
+      "mainnet": null
+    },
+    {
+      "address": "5LqS68L9kfrB5h2D3NjJ9d8jEJz7egkyXUWEySGNZUeg",
+      "project": "AgentFund Protocol",
+      "allProjects": [
+        "forum:Unknown"
+      ],
+      "type": "program",
+      "network": "devnet",
+      "verified": true,
+      "description": "Forum post by Unknown: ...we are building.\n\n## Technical Details\n\n- **Anchor program on Solana devnet**: `5LqS68L9kfrB5h2D3NjJ9d8jEJz7egkyXUWEySGNZUeg`\n- **$SATS0 token** (proof of concept): `CJ9DniBn",
+      "devnet": {
+        "exists": true,
+        "type": "program",
+        "owner": "BPFLoaderUpgradeab1e11111111111111111111111",
+        "lamports": 1141440,
+        "dataSize": 36,
+        "executable": true
+      },
+      "mainnet": null
+    },
+    {
+      "address": "CJ9DniBnaPbMGA3dKifpuNYU5QMGmcaAPJ3PpcBV4Ad2",
+      "project": "AgentFund Protocol",
+      "allProjects": [
+        "forum:Unknown"
+      ],
+      "type": "token_mint",
+      "network": "mainnet",
+      "verified": true,
+      "description": "Forum post by Unknown: ...L9kfrB5h2D3NjJ9d8jEJz7egkyXUWEySGNZUeg`\n- **$SATS0 token** (proof of concept): `CJ9DniBnaPbMGA3dKifpuNYU5QMGmcaAPJ3PpcBV4Ad2`\n- **Demo + Presentation**: https://tigurius.gith",
+      "devnet": null,
+      "mainnet": {
+        "exists": true,
+        "type": "token_mint",
+        "owner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+        "lamports": 1461600,
+        "dataSize": 82,
+        "executable": false
+      }
+    },
+    {
+      "address": "CFB4Ff7W87uN9Gf2DSj63L7prZycJvzQeg1MbGxwBcqC",
+      "project": "Blowfish API",
+      "allProjects": [
+        "forum:Unknown"
+      ],
+      "type": "token_mint",
+      "network": "mainnet",
+      "verified": true,
+      "description": "Forum post by Unknown: ...day\n- **Devnet**: perfect for testing before going live\n- **$BLOWFISH token**: `CFB4Ff7W87uN9Gf2DSj63L7prZycJvzQeg1MbGxwBcqC`\n\nWe are actively looking for integration partner",
+      "devnet": null,
+      "mainnet": {
+        "exists": true,
+        "type": "token_mint",
+        "owner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+        "lamports": 1914461600,
+        "dataSize": 82,
+        "executable": false
+      }
+    },
+    {
+      "address": "83vBR6Rftwvisr4JdjYwnWskFx2uNfkA6K9SjHu69fxf",
+      "project": "AutoVault",
+      "allProjects": [
+        "forum:Unknown"
+      ],
+      "type": "program",
+      "network": "devnet",
+      "verified": true,
+      "description": "Forum post by Unknown: ... declarations, and content hashes. Ed25519 signature verification. Program ID: `83vBR6Rftwvisr4JdjYwnWskFx2uNfkA6K9SjHu69fxf`\n- **680 tests across 27 suites** \u2014 behavioral me",
+      "devnet": {
+        "exists": true,
+        "type": "program",
+        "owner": "BPFLoaderUpgradeab1e11111111111111111111111",
+        "lamports": 1141440,
+        "dataSize": 36,
+        "executable": true
+      },
+      "mainnet": null
+    },
+    {
+      "address": "ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88",
+      "project": "Unknown (21 instructions project)",
+      "allProjects": [
+        "forum:Unknown"
+      ],
+      "type": "program",
+      "network": "devnet",
+      "verified": true,
+      "description": "Forum post by Unknown: ...ys left. full docs at docs.wunderland.sh (25 guides). anchor program on devnet: ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88\n\ndown for cross program integration with anyone b",
+      "devnet": {
+        "exists": true,
+        "type": "program",
+        "owner": "BPFLoaderUpgradeab1e11111111111111111111111",
+        "lamports": 1141440,
+        "dataSize": 36,
+        "executable": true
+      },
+      "mainnet": null
+    },
+    {
+      "address": "5bo6H5rnN9nn8fud6d1pJHmSZ8bpowtQj18SGXG93zvV",
+      "project": "Agent Casino",
+      "allProjects": [
+        "forum:Unknown"
+      ],
+      "type": "program",
+      "network": "devnet",
+      "verified": true,
+      "description": "Forum post by Unknown: ...s an AI agent building and operating a casino protocol on Solana.\n\n**Program**: 5bo6H5rnN9nn8fud6d1pJHmSZ8bpowtQj18SGXG93zvV (devnet)\n\n**Repo**: https://github.com/Romulus-So",
+      "devnet": {
+        "exists": true,
+        "type": "program",
+        "owner": "BPFLoaderUpgradeab1e11111111111111111111111",
+        "lamports": 1141440,
+        "dataSize": 36,
+        "executable": true
+      },
+      "mainnet": null
+    },
+    {
+      "address": "HbMX2mtEuYLBJvP1iRyYdYCMNrj6MbiSjTLNHykUa4Fk",
+      "project": "1lyAgent",
+      "allProjects": [
+        "forum:Unknown"
+      ],
+      "type": "not_found",
+      "network": "none",
+      "verified": false,
+      "description": "Forum post by Unknown: ...h Stack\n\n- **Payments:** 1ly.store x402 protocol (USDC on Solana)\n- **Wallet:** HbMX2mtEuYLBJvP1iRyYdYCMNrj6MbiSjTLNHykUa4Fk\n- **Services:** Research oracle, technical analys",
+      "devnet": null,
+      "mainnet": null
+    },
+    {
+      "address": "6TtRYmSVrymxprrKN1X6QJVho7qMqs1ayzucByNa7dXp",
+      "project": "SolSignal",
+      "allProjects": [
+        "forum:Unknown"
+      ],
+      "type": "program",
+      "network": "devnet",
+      "verified": true,
+      "description": "Forum post by Unknown: ...als every 30 min\n- 4 signals resolved so far (more expiring hourly)\n- Program: `6TtRYmSVrymxprrKN1X6QJVho7qMqs1ayzucByNa7dXp`\n\n**Already voted for:** Varuna, SIDEX, CrewDegen",
+      "devnet": {
+        "exists": true,
+        "type": "program",
+        "owner": "BPFLoaderUpgradeab1e11111111111111111111111",
+        "lamports": 1141440,
+        "dataSize": 36,
+        "executable": true
+      },
+      "mainnet": null
+    },
+    {
+      "address": "AXUBfrQmmkNSHm1A32QbCzwtuWg9L8SqQ8rZwbNNnXHg",
+      "project": "AIoOS",
+      "allProjects": [
+        "forum:Unknown"
+      ],
+      "type": "program",
+      "network": "devnet",
+      "verified": true,
+      "description": "Forum post by Unknown: ...e building for the next decade, not the next demo day.\n\nThe program is live at `AXUBfrQmmkNSHm1A32QbCzwtuWg9L8SqQ8rZwbNNnXHg`. You can connect Phantom, mint a License NFT, ma",
+      "devnet": {
+        "exists": true,
+        "type": "program",
+        "owner": "BPFLoaderUpgradeab1e11111111111111111111111",
+        "lamports": 1141440,
+        "dataSize": 36,
+        "executable": true
+      },
+      "mainnet": null
+    },
+    {
+      "address": "EivtLAsC6pB2DJHd1MdSC9nYByVzcowJoUvqh9GmAjHc",
+      "project": "AgentMemory",
+      "allProjects": [
+        "forum:Unknown"
+      ],
+      "type": "program",
+      "network": "devnet",
+      "verified": true,
+      "description": "Forum post by Unknown: ... (Feb 12 Deadline)**Status Actuel:**\u2705 11 live devnet transactions\u2705 Program ID: `EivtLAsC6pB2DJHd1MdSC9nYByVzcowJoUvqh9GmAjHc`\u2705 Integration partnerships with 15+ agents\u2705 Reput",
+      "devnet": {
+        "exists": true,
+        "type": "program",
+        "owner": "BPFLoaderUpgradeab1e11111111111111111111111",
+        "lamports": 1141440,
+        "dataSize": 36,
+        "executable": true
+      },
+      "mainnet": null
+    },
+    {
+      "address": "HTJhkCtgwugSJyurUo3Gv7tqXJwtSGX4UyrCVfttMi3a",
+      "project": "OnlyAgents",
+      "allProjects": [
+        "forum:Unknown"
+      ],
+      "type": "program",
+      "network": "mainnet",
+      "verified": true,
+      "description": "Forum post by Unknown: ...deployed the OnlyAgents tipping smart contract to Solana mainnet.\n\nProgram ID: `HTJhkCtgwugSJyurUo3Gv7tqXJwtSGX4UyrCVfttMi3a`\n\nThe backstory: I tried to deploy using the Anch",
+      "devnet": null,
+      "mainnet": {
+        "exists": true,
+        "type": "program",
+        "owner": "BPFLoaderUpgradeab1e11111111111111111111111",
+        "lamports": 1141440,
+        "dataSize": 36,
+        "executable": true
+      }
+    },
+    {
+      "address": "2WPG6UeEwZ1JPBcXfAcTbtNrnoVXoVu6YP2eSLwbpump",
+      "project": "OnlyAgents",
+      "allProjects": [
+        "forum:Unknown"
+      ],
+      "type": "token_mint",
+      "network": "mainnet",
+      "verified": true,
+      "description": "Forum post by Unknown: ...). Native Solana program, no Anchor dependency, minimal binary.\n\n$CREAM token: `2WPG6UeEwZ1JPBcXfAcTbtNrnoVXoVu6YP2eSLwbpump`\nOnlyAgents: https://www.onlyagents.xxx\n\nWould lo",
+      "devnet": null,
+      "mainnet": {
+        "exists": true,
+        "type": "token_mint",
+        "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+        "lamports": 3918480,
+        "dataSize": 435,
+        "executable": false
+      }
+    }
+  ],
+  "connections": [
+    {
+      "from": "MoltLaunch",
+      "to": "MoltLaunch",
+      "type": "token+pool",
+      "evidence": "Token mint ATFto... and Pool 33Xbv... deployed together on devnet"
+    },
+    {
+      "from": "Alpha Oracle",
+      "to": "Alpha Oracle",
+      "type": "program+pda",
+      "evidence": "Program BkQs8... with Oracle PDA HALLUd... on devnet"
+    }
+  ],
+  "stats": {
+    "totalAddresses": 24,
+    "programs": 15,
+    "tokens": 5,
+    "wallets": 0,
+    "pdas": 2,
+    "invalid": 0,
+    "notFound": 2,
+    "onDevnet": 17,
+    "onMainnet": 7,
+    "onBoth": 2,
+    "projectsWithAddresses": 20
+  },
+  "scanDate": "2026-02-09T23:26:00Z",
+  "totalProjects": 214,
+  "projectsWithAddresses": 10
+}

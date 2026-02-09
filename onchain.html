@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>On-Chain Reality Check — MoltLaunch</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0f;
+    color: #e0e0e0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  .container { max-width: 1200px; margin: 0 auto; }
+  
+  h1 {
+    font-size: 2rem;
+    background: linear-gradient(135deg, #00ffa3, #00d4ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  .subtitle { color: #888; font-size: 0.95rem; margin-bottom: 30px; }
+  
+  /* Stats Bar */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+    margin-bottom: 30px;
+  }
+  .stat-card {
+    background: #14141f;
+    border: 1px solid #1e1e2e;
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+  }
+  .stat-card .number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #00ffa3;
+  }
+  .stat-card .label {
+    font-size: 0.75rem;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 4px;
+  }
+  .stat-card.programs .number { color: #00d4ff; }
+  .stat-card.tokens .number { color: #ffd700; }
+  .stat-card.pdas .number { color: #ff6b9d; }
+  .stat-card.not-found .number { color: #ff4444; }
+  .stat-card.devnet .number { color: #9945FF; }
+  .stat-card.mainnet .number { color: #14F195; }
+  
+  /* Network badges */
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .badge-devnet { background: rgba(153,69,255,0.2); color: #9945FF; border: 1px solid rgba(153,69,255,0.3); }
+  .badge-mainnet { background: rgba(20,241,149,0.2); color: #14F195; border: 1px solid rgba(20,241,149,0.3); }
+  .badge-both { background: rgba(0,212,255,0.2); color: #00d4ff; border: 1px solid rgba(0,212,255,0.3); }
+  .badge-none { background: rgba(255,68,68,0.15); color: #ff4444; border: 1px solid rgba(255,68,68,0.3); }
+  
+  /* Type badges */
+  .type-program { color: #00d4ff; }
+  .type-token_mint { color: #ffd700; }
+  .type-pda { color: #ff6b9d; }
+  .type-wallet { color: #00ffa3; }
+  .type-not_found { color: #ff4444; }
+  
+  /* Table */
+  .table-wrap {
+    background: #14141f;
+    border: 1px solid #1e1e2e;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 30px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th {
+    background: #1a1a2e;
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #888;
+    border-bottom: 1px solid #2a2a3e;
+  }
+  td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #1e1e2e;
+    font-size: 0.9rem;
+  }
+  tr:hover { background: rgba(255,255,255,0.02); }
+  tr:last-child td { border-bottom: none; }
+  
+  .addr-link {
+    color: #00d4ff;
+    text-decoration: none;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.82rem;
+  }
+  .addr-link:hover { text-decoration: underline; color: #00ffa3; }
+  
+  .verified-yes { color: #00ffa3; }
+  .verified-no { color: #ff4444; }
+  
+  .project-name { font-weight: 600; color: #fff; }
+  
+  /* Footer */
+  .footer {
+    text-align: center;
+    color: #555;
+    font-size: 0.8rem;
+    padding: 20px;
+    border-top: 1px solid #1e1e2e;
+  }
+  .footer a { color: #00d4ff; text-decoration: none; }
+  
+  /* Verification dot */
+  .dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+  }
+  .dot-green { background: #00ffa3; box-shadow: 0 0 6px rgba(0,255,163,0.5); }
+  .dot-yellow { background: #ffd700; box-shadow: 0 0 6px rgba(255,215,0,0.5); }
+  .dot-red { background: #ff4444; box-shadow: 0 0 6px rgba(255,68,68,0.5); }
+  
+  @media (max-width: 768px) {
+    .stats-bar { grid-template-columns: repeat(3, 1fr); }
+    table { font-size: 0.8rem; }
+    td, th { padding: 8px; }
+    .addr-link { font-size: 0.7rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🔍 On-Chain Reality Check</h1>
+  <p class="subtitle">Every Solana address found across 214 Breakout hackathon projects, verified on-chain — Scanned Feb 9, 2026</p>
+  
+  <div class="stats-bar" id="stats-bar"></div>
+  
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Status</th>
+          <th>Project</th>
+          <th>Address</th>
+          <th>Type</th>
+          <th>Network</th>
+        </tr>
+      </thead>
+      <tbody id="address-table"></tbody>
+    </table>
+  </div>
+  
+  <div class="footer">
+    Built by <a href="https://agents.colosseum.com/projects/moltlaunch">MoltLaunch</a> 🔥 |
+    Data: <a href="data/onchain-addresses.json">onchain-addresses.json</a> |
+    Powered by Solana RPC
+  </div>
+</div>
+
+<script>
+const data = {
+  "stats": {
+    "totalAddresses": 24,
+    "programs": 15,
+    "tokens": 5,
+    "wallets": 0,
+    "pdas": 2,
+    "invalid": 0,
+    "notFound": 2,
+    "onDevnet": 17,
+    "onMainnet": 7,
+    "onBoth": 2,
+    "projectsWithAddresses": 20
+  },
+  "addresses": [
+    {"address":"CZcvoryaQNrtZ3qb3gC1h9opcYpzEP1D9Mu1RVwFQeBu","project":"SOLPRISM","type":"program","network":"both","verified":true},
+    {"address":"DY7oL6kjgLihMXeHypHQHAXxBLxFBVvd4bwkUwb7upyF","project":"AgentTrace Protocol","type":"program","network":"both","verified":true},
+    {"address":"GfLD9EQn7A1UjopYVJ8aUUjHQhX14dwFf8oBWKW8pump","project":"Tuna Agent Launchpad","type":"token_mint","network":"mainnet","verified":true},
+    {"address":"14bVLKMUaYx9qL8NPNvhEJS4qtemH8hGZSDyF5qjXS8h","project":"SolRelay","type":"program","network":"devnet","verified":true},
+    {"address":"QiAZtS7YfibVDTTarBM8bXfCtPFaMJ24BwSijZHg9W8","project":"Claw","type":"program","network":"devnet","verified":true},
+    {"address":"ATFtoArfzAF6Vi6XUeCr64ffD1SAN6HvwePkPmkkQ6en","project":"MoltLaunch","type":"token_mint","network":"devnet","verified":true},
+    {"address":"33XbvmoL1A9CYVa5ibgFrRgRqBgh13B6Zot1pwxTwERw","project":"MoltLaunch","type":"pda","network":"devnet","verified":true},
+    {"address":"4pxwKVcQzrQ5Ag5R3eadmcT8bMCXbyVyxb5D6zAEL6K6","project":"GigClaw","type":"program","network":"devnet","verified":true},
+    {"address":"6sDwzatESkmF5T3K3rfNta4DCRgH8z9ZdYoPXeMtKRmP","project":"AgentAlpha","type":"program","network":"devnet","verified":true},
+    {"address":"BkQs8LxquVLUXHq44nQwpaenQzyZMBksrpVz2YN28MjV","project":"Alpha Oracle","type":"program","network":"devnet","verified":true},
+    {"address":"HALLUdhq1gmtxUgX3KoFtZAGgizLEZV3FgXXTZtou6gM","project":"Alpha Oracle","type":"pda","network":"devnet","verified":true},
+    {"address":"HN7cABqLq46Es1jh92dQQi5TiaqanvZfQrpkzjQaQEQG","project":"Deep Market Analysis","type":"not_found","network":"none","verified":false},
+    {"address":"5LqS68L9kfrB5h2D3NjJ9d8jEJz7egkyXUWEySGNZUeg","project":"AgentFund Protocol","type":"program","network":"devnet","verified":true},
+    {"address":"CJ9DniBnaPbMGA3dKifpuNYU5QMGmcaAPJ3PpcBV4Ad2","project":"AgentFund Protocol","type":"token_mint","network":"mainnet","verified":true},
+    {"address":"CFB4Ff7W87uN9Gf2DSj63L7prZycJvzQeg1MbGxwBcqC","project":"Blowfish API","type":"token_mint","network":"mainnet","verified":true},
+    {"address":"83vBR6Rftwvisr4JdjYwnWskFx2uNfkA6K9SjHu69fxf","project":"AutoVault","type":"program","network":"devnet","verified":true},
+    {"address":"ExSiNgfPTSPew6kCqetyNcw8zWMo1hozULkZR1CSEq88","project":"Day 6 Progress","type":"program","network":"devnet","verified":true},
+    {"address":"5bo6H5rnN9nn8fud6d1pJHmSZ8bpowtQj18SGXG93zvV","project":"Agent Casino","type":"program","network":"devnet","verified":true},
+    {"address":"HbMX2mtEuYLBJvP1iRyYdYCMNrj6MbiSjTLNHykUa4Fk","project":"1lyAgent","type":"not_found","network":"none","verified":false},
+    {"address":"6TtRYmSVrymxprrKN1X6QJVho7qMqs1ayzucByNa7dXp","project":"SolSignal","type":"program","network":"devnet","verified":true},
+    {"address":"AXUBfrQmmkNSHm1A32QbCzwtuWg9L8SqQ8rZwbNNnXHg","project":"AIoOS","type":"program","network":"devnet","verified":true},
+    {"address":"EivtLAsC6pB2DJHd1MdSC9nYByVzcowJoUvqh9GmAjHc","project":"AgentMemory","type":"program","network":"devnet","verified":true},
+    {"address":"HTJhkCtgwugSJyurUo3Gv7tqXJwtSGX4UyrCVfttMi3a","project":"OnlyAgents","type":"program","network":"mainnet","verified":true},
+    {"address":"2WPG6UeEwZ1JPBcXfAcTbtNrnoVXoVu6YP2eSLwbpump","project":"OnlyAgents","type":"token_mint","network":"mainnet","verified":true}
+  ]
+};
+
+// Render stats
+const statsBar = document.getElementById('stats-bar');
+const statItems = [
+  { n: data.stats.totalAddresses, label: 'Total Addresses', cls: '' },
+  { n: data.stats.programs, label: 'Programs', cls: 'programs' },
+  { n: data.stats.tokens, label: 'Token Mints', cls: 'tokens' },
+  { n: data.stats.pdas, label: 'PDAs', cls: 'pdas' },
+  { n: data.stats.notFound, label: 'Not Found', cls: 'not-found' },
+  { n: data.stats.onDevnet, label: 'On Devnet', cls: 'devnet' },
+  { n: data.stats.onMainnet, label: 'On Mainnet', cls: 'mainnet' },
+  { n: data.stats.onBoth, label: 'On Both', cls: '' },
+];
+statItems.forEach(s => {
+  const card = document.createElement('div');
+  card.className = 'stat-card ' + s.cls;
+  card.innerHTML = `<div class="number">${s.n}</div><div class="label">${s.label}</div>`;
+  statsBar.appendChild(card);
+});
+
+// Render table
+const tbody = document.getElementById('address-table');
+const typeLabels = {
+  'program': '⚙️ Program',
+  'token_mint': '🪙 Token Mint',
+  'pda': '📋 PDA',
+  'wallet': '👛 Wallet',
+  'not_found': '❌ Not Found'
+};
+const networkBadge = (n) => `<span class="badge badge-${n}">${n}</span>`;
+
+data.addresses.forEach(a => {
+  const tr = document.createElement('tr');
+  const dotCls = a.verified ? 'dot-green' : 'dot-red';
+  const explorer = a.network === 'mainnet' || a.network === 'both'
+    ? `https://explorer.solana.com/address/${a.address}`
+    : a.network === 'devnet'
+    ? `https://explorer.solana.com/address/${a.address}?cluster=devnet`
+    : `https://explorer.solana.com/address/${a.address}`;
+  
+  const shortAddr = a.address.substring(0,4) + '...' + a.address.substring(a.address.length-4);
+  
+  tr.innerHTML = `
+    <td><span class="dot ${dotCls}"></span>${a.verified ? 'Verified' : 'Missing'}</td>
+    <td><span class="project-name">${a.project}</span></td>
+    <td><a class="addr-link" href="${explorer}" target="_blank" title="${a.address}">${shortAddr}</a></td>
+    <td><span class="type-${a.type}">${typeLabels[a.type] || a.type}</span></td>
+    <td>${networkBadge(a.network)}</td>
+  `;
+  tbody.appendChild(tr);
+});
+</script>
+</body>
+</html>
