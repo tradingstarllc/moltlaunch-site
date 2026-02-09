@@ -3650,6 +3650,143 @@ app.get('/api/identity/depin/providers', (req, res) => {
     });
 });
 
+// ===========================================
+// UNIFIED VALIDATION ENDPOINT (SAP-0001)
+// ===========================================
+
+app.post('/api/validate', async (req, res) => {
+    const { agentId, validationType = ['identity', 'scoring'], trustRequired = 1, threshold = 60 } = req.body || {};
+    
+    if (!agentId) {
+        return res.status(400).json({ error: 'agentId required' });
+    }
+    
+    const result = {
+        agentId,
+        requestedTypes: validationType,
+        trustRequired,
+        validatedAt: new Date().toISOString()
+    };
+    
+    // Identity check
+    if (validationType.includes('identity')) {
+        const identity = agentIdentities[agentId];
+        result.identity = {
+            registered: !!identity,
+            hash: identity?.identityHash || null,
+            trustLevel: identity?.trustLevel || 0,
+            depinProvider: identity?.depinProvider || null,
+            meetsRequired: (identity?.trustLevel || 0) >= trustRequired
+        };
+    }
+    
+    // Scoring (verification)
+    if (validationType.includes('scoring')) {
+        const verification = verificationCache[agentId];
+        result.scoring = {
+            verified: verification ? true : false,
+            score: verification?.score || null,
+            tier: verification?.tier || null,
+            passed: (verification?.score || 0) >= threshold
+        };
+    }
+    
+    // Behavioral scoring
+    if (validationType.includes('behavioral') && executionTraces) {
+        const score = executionTraces.getAgentBehavioralScore(agentId);
+        result.behavioral = {
+            score: score.total || 0,
+            traceCount: score.traceCount || 0,
+            breakdown: score.breakdown || {}
+        };
+    }
+    
+    // Sybil check
+    if (validationType.includes('sybil')) {
+        const identity = agentIdentities[agentId];
+        if (identity?.identityHash) {
+            const duplicates = Object.entries(agentIdentities)
+                .filter(([id, data]) => data.identityHash === identity.identityHash && id !== agentId)
+                .map(([id]) => id);
+            
+            result.sybil = {
+                status: duplicates.length === 0 ? 'clean' : 'flagged',
+                duplicateIdentities: duplicates,
+                risk: duplicates.length === 0 ? 'LOW' : 'HIGH'
+            };
+        } else {
+            result.sybil = { status: 'unknown', reason: 'No identity registered' };
+        }
+    }
+    
+    // STARK proof
+    if (validationType.includes('proof')) {
+        if (starkProver && verificationCache[agentId]) {
+            try {
+                const proofResult = starkProver.generateProof(
+                    verificationCache[agentId].score,
+                    threshold,
+                    agentId
+                );
+                result.proof = {
+                    type: 'stark-threshold',
+                    valid: proofResult.valid,
+                    claim: `score >= ${threshold}`,
+                    commitment: proofResult.commitment,
+                    privacyNote: 'Exact score not revealed'
+                };
+            } catch (e) {
+                result.proof = { error: e.message };
+            }
+        } else {
+            result.proof = { available: false, reason: 'No verification data or prover unavailable' };
+        }
+    }
+    
+    // Overall pass/fail
+    const checks = [];
+    if (result.identity) checks.push(result.identity.meetsRequired);
+    if (result.scoring) checks.push(result.scoring.passed);
+    if (result.sybil) checks.push(result.sybil.status !== 'flagged');
+    
+    result.passed = checks.length > 0 && checks.every(Boolean);
+    
+    // ERC-8004 compatible response
+    result.erc8004Compatible = {
+        response: result.scoring?.score || 0,
+        tag: 'moltlaunch-sap-v1',
+        responseURI: `${req.protocol}://${req.get('host')}/api/identity/${agentId}/report`
+    };
+    
+    // Anchor on Solana if all checks passed
+    if (result.passed && solanaConnection && solanaKeypair) {
+        try {
+            const { Transaction, TransactionInstruction, PublicKey } = require('@solana/web3.js');
+            const MEMO_PROGRAM_ID = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr');
+            
+            const memoData = `sap:validate:${agentId}:${result.scoring?.score || 0}:${result.identity?.trustLevel || 0}`;
+            const memoIx = new TransactionInstruction({
+                keys: [{ pubkey: solanaKeypair.publicKey, isSigner: true, isWritable: true }],
+                programId: MEMO_PROGRAM_ID,
+                data: Buffer.from(memoData)
+            });
+            
+            const tx = new Transaction().add(memoIx);
+            const sig = await solanaConnection.sendTransaction(tx, [solanaKeypair]);
+            
+            result.anchor = {
+                chain: 'solana-devnet',
+                signature: sig,
+                explorer: `https://explorer.solana.com/tx/${sig}?cluster=devnet`
+            };
+        } catch (e) {
+            result.anchor = { error: e.message };
+        }
+    }
+    
+    res.json(result);
+});
+
 // Link a .sol domain to an agent
 app.post('/api/identity/link', (req, res) => {
     const { agentId, solDomain, wallet, signature } = req.body || {};
