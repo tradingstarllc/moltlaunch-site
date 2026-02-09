@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoltLaunch — Pitch Deck</title>
+    <meta name="description" content="MoltLaunch: The Trust Layer for the Agent Economy. Hardware identity, STARK proofs, DePIN attestation on Solana.">
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --solana-green: #14F195;
+            --solana-purple: #9945FF;
+            --solana-blue: #00D4FF;
+            --bg: #0a0a0f;
+            --bg-subtle: #12121a;
+            --bg-muted: #1a1a24;
+            --border: #2a2a3a;
+            --text: #fafafa;
+            --text-muted: #a1a1aa;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        body.overview-mode { overflow: auto; }
+        code, .mono { font-family: 'JetBrains Mono', monospace; }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--solana-green) 0%, var(--solana-blue) 50%, var(--solana-purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Slide container */
+        .deck {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 48px;
+            opacity: 0;
+            transform: translateX(60px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            pointer-events: none;
+            text-align: center;
+            overflow-y: auto;
+        }
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+            z-index: 2;
+        }
+        .slide.exit-left {
+            opacity: 0;
+            transform: translateX(-60px);
+        }
+        .slide.exit-right {
+            opacity: 0;
+            transform: translateX(60px);
+        }
+
+        .slide-inner {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .slide h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            letter-spacing: -0.03em;
+        }
+        .slide h2 {
+            font-size: clamp(1.6rem, 4vw, 2.8rem);
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 20px;
+            letter-spacing: -0.02em;
+        }
+        .slide .subtitle {
+            font-size: clamp(1rem, 2vw, 1.4rem);
+            color: var(--text-muted);
+            line-height: 1.6;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .slide .subtitle strong {
+            color: var(--text);
+        }
+
+        .slide .tag {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            padding: 6px 14px;
+            border-radius: 100px;
+            margin-bottom: 20px;
+        }
+
+        /* Bullet list */
+        .bullet-list {
+            text-align: left;
+            max-width: 650px;
+            margin: 28px auto;
+        }
+        .bullet-list li {
+            list-style: none;
+            padding: 10px 0;
+            font-size: clamp(0.9rem, 1.8vw, 1.15rem);
+            color: var(--text-muted);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            line-height: 1.5;
+        }
+        .bullet-list li::before {
+            content: '•';
+            color: var(--solana-green);
+            font-weight: 700;
+            font-size: 1.2em;
+            flex-shrink: 0;
+        }
+        .bullet-list li strong {
+            color: var(--text);
+        }
+
+        /* Highlight stat */
+        .big-stat {
+            font-size: clamp(2.5rem, 7vw, 5rem);
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 16px;
+        }
+
+        /* Trust ladder table */
+        .ladder-table {
+            text-align: left;
+            max-width: 700px;
+            margin: 28px auto;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .ladder-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 14px 20px;
+            border-radius: 10px;
+            margin-bottom: 6px;
+            font-size: clamp(0.75rem, 1.5vw, 0.95rem);
+        }
+        .ladder-row .level {
+            font-weight: 700;
+            min-width: 70px;
+            flex-shrink: 0;
+        }
+        .ladder-row .desc {
+            flex: 1;
+            color: var(--text-muted);
+        }
+        .ladder-row .cost {
+            font-weight: 700;
+            min-width: 90px;
+            text-align: right;
+        }
+        .ladder-row .badge {
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        /* Flywheel */
+        .flywheel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 32px auto;
+            font-size: clamp(0.85rem, 1.6vw, 1.1rem);
+            font-weight: 600;
+        }
+        .flywheel .arrow {
+            color: var(--solana-green);
+            font-size: 1.2em;
+        }
+        .flywheel .step {
+            padding: 10px 18px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+
+        /* Check grid */
+        .check-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            max-width: 700px;
+            margin: 28px auto;
+            text-align: left;
+        }
+        .check-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px 16px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: clamp(0.75rem, 1.4vw, 0.9rem);
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+        .check-item .check {
+            color: var(--solana-green);
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* Value row */
+        .value-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            max-width: 750px;
+            margin: 28px auto;
+            text-align: left;
+        }
+        .value-item {
+            padding: 20px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+        .value-item h4 {
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+            color: var(--solana-green);
+        }
+        .value-item p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Revenue table */
+        .revenue-block {
+            text-align: left;
+            max-width: 600px;
+            margin: 24px auto;
+        }
+        .revenue-block h4 {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--solana-green);
+            margin: 20px 0 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .revenue-block h4:first-child { margin-top: 0; }
+        .revenue-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 16px;
+            background: var(--bg-subtle);
+            border-radius: 8px;
+            margin-bottom: 4px;
+            font-size: clamp(0.8rem, 1.4vw, 0.95rem);
+        }
+        .revenue-row .label { color: var(--text-muted); }
+        .revenue-row .price { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--solana-green); }
+
+        /* CTA buttons */
+        .cta-row {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 32px;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--solana-green), var(--solana-blue));
+            color: var(--bg);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(20, 241, 149, 0.3);
+        }
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover {
+            border-color: var(--solana-purple);
+            background: rgba(153, 69, 255, 0.1);
+        }
+        .btn-mono {
+            background: var(--bg-muted);
+            color: var(--solana-green);
+            border: 1px solid var(--border);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+        }
+        .btn-mono:hover {
+            border-color: var(--solana-green);
+            background: rgba(20, 241, 149, 0.1);
+        }
+
+        /* Avatar in corner */
+        .corner-avatar {
+            position: absolute;
+            bottom: 80px;
+            right: 40px;
+            width: 80px;
+            height: 80px;
+            opacity: 0.5;
+            z-index: 3;
+        }
+
+        /* Protocol cards inline */
+        .protocol-list {
+            text-align: left;
+            max-width: 650px;
+            margin: 24px auto;
+        }
+        .protocol-item {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            padding: 16px 20px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+        .protocol-item .icon {
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+        .protocol-item h4 {
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+        .protocol-item p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* Traction stats */
+        .traction-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            max-width: 700px;
+            margin: 28px auto;
+        }
+        .traction-item {
+            padding: 20px 16px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            text-align: center;
+        }
+        .traction-item .num {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--solana-green), var(--solana-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .traction-item .label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Progress dots */
+        .progress-dots {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+            padding: 10px 20px;
+            background: rgba(10, 10, 15, 0.85);
+            border-radius: 100px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(12px);
+        }
+        .progress-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--border);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .progress-dot.active {
+            background: var(--solana-green);
+            box-shadow: 0 0 12px rgba(20, 241, 149, 0.5);
+            transform: scale(1.2);
+        }
+        .progress-dot:hover {
+            background: var(--solana-blue);
+        }
+
+        /* Slide number */
+        .slide-num {
+            position: fixed;
+            top: 24px;
+            right: 32px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            z-index: 100;
+            opacity: 0.6;
+        }
+
+        /* Nav hint */
+        .nav-hint {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            opacity: 0.4;
+            z-index: 100;
+            text-align: center;
+        }
+
+        /* Back to site */
+        .back-link {
+            position: fixed;
+            top: 24px;
+            left: 32px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: var(--solana-green); }
+
+        /* Sybil comparison */
+        .sybil-compare {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+        .sybil-box {
+            padding: 20px 28px;
+            border-radius: 12px;
+            text-align: center;
+            min-width: 200px;
+        }
+        .sybil-box .cost {
+            font-size: 1.8rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .sybil-box .label {
+            font-size: 0.8rem;
+            margin-top: 4px;
+        }
+
+        /* Overview mode */
+        body.overview-mode .deck {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 40px;
+            height: auto;
+            width: auto;
+        }
+        body.overview-mode .slide {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            opacity: 1;
+            transform: none;
+            pointer-events: auto;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            padding: 20px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+        body.overview-mode .slide:hover {
+            border-color: var(--solana-green);
+        }
+        body.overview-mode .slide .slide-inner {
+            transform: scale(0.4);
+            transform-origin: center center;
+        }
+        body.overview-mode .progress-dots,
+        body.overview-mode .slide-num,
+        body.overview-mode .nav-hint,
+        body.overview-mode .corner-avatar { display: none; }
+
+        /* Background decorations */
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: -200px;
+            right: -200px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(20, 241, 149, 0.04) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .slide::after {
+            content: '';
+            position: absolute;
+            bottom: -200px;
+            left: -200px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(153, 69, 255, 0.04) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .slide { padding: 40px 24px; }
+            .check-grid { grid-template-columns: 1fr; }
+            .value-grid { grid-template-columns: 1fr; }
+            .traction-grid { grid-template-columns: repeat(2, 1fr); }
+            .sybil-compare { flex-direction: column; align-items: center; }
+            .corner-avatar { display: none; }
+            .back-link { top: 12px; left: 16px; font-size: 0.75rem; }
+            .slide-num { top: 12px; right: 16px; font-size: 0.7rem; }
+            .flywheel { font-size: 0.8rem; }
+            .flywheel .step { padding: 8px 12px; }
+        }
+
+        @media (max-width: 480px) {
+            .ladder-row { flex-wrap: wrap; gap: 6px; padding: 10px 14px; }
+            .ladder-row .cost { min-width: auto; }
+            .cta-row { flex-direction: column; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+
+<a href="/" class="back-link">← MoltLaunch</a>
+<div class="slide-num"><span id="slideNum">1</span> / 11</div>
+
+<div class="deck" id="deck">
+
+    <!-- SLIDE 1: Title -->
+    <div class="slide active" data-slide="0">
+        <div class="slide-inner">
+            <div style="font-size: 3rem; margin-bottom: 16px;">🔐</div>
+            <h1><span class="gradient-text">MoltLaunch</span></h1>
+            <p class="subtitle" style="font-size: clamp(1.1rem, 2.2vw, 1.5rem); color: var(--text); font-weight: 600; margin-bottom: 16px;">
+                The Trust Layer for the Agent Economy
+            </p>
+            <p class="subtitle" style="margin-bottom: 12px;">
+                Hardware identity. STARK proofs. DePIN attestation.<br>
+                <strong>Only on Solana.</strong>
+            </p>
+            <div class="tag" style="background: rgba(153,69,255,0.15); color: #c4a6ff; margin-top: 24px;">
+                Colosseum Agent Hackathon 2026
+            </div>
+        </div>
+        <!-- Corner avatar -->
+        <div class="corner-avatar">
+            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="cyberGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#14F195"/>
+                        <stop offset="50%" style="stop-color:#00D4FF"/>
+                        <stop offset="100%" style="stop-color:#9945FF"/>
+                    </linearGradient>
+                    <filter id="glow"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                </defs>
+                <circle cx="100" cy="100" r="90" fill="#0a0a0f" stroke="#1a1a24" stroke-width="1"/>
+                <path d="M40 80 L60 80 L70 90 L90 90" stroke="#14F195" stroke-width="1" fill="none" opacity="0.3"/>
+                <path d="M160 80 L140 80 L130 90 L110 90" stroke="#9945FF" stroke-width="1" fill="none" opacity="0.3"/>
+                <path d="M50 140 L70 140 L80 130" stroke="#00D4FF" stroke-width="1" fill="none" opacity="0.3"/>
+                <path d="M150 140 L130 140 L120 130" stroke="#00D4FF" stroke-width="1" fill="none" opacity="0.3"/>
+                <path d="M65 130 C65 70 135 70 135 130 L130 155 L70 155 Z" fill="none" stroke="url(#cyberGrad)" stroke-width="2" filter="url(#glow)"/>
+                <rect x="72" y="95" width="56" height="14" rx="7" fill="none" stroke="#14F195" stroke-width="2" filter="url(#glow)"/>
+                <rect x="76" y="98" width="18" height="8" rx="4" fill="#14F195" opacity="0.8"/>
+                <rect x="106" y="98" width="18" height="8" rx="4" fill="#14F195" opacity="0.8"/>
+                <line x1="94" y1="98" x2="106" y2="98" stroke="#14F195" stroke-width="1" opacity="0.5"/>
+                <path d="M80 125 L90 120 L110 120 L120 125" stroke="#9945FF" stroke-width="1.5" fill="none" opacity="0.6"/>
+                <line x1="100" y1="60" x2="100" y2="72" stroke="#00D4FF" stroke-width="2" filter="url(#glow)"/>
+                <circle cx="100" cy="58" r="3" fill="#00D4FF" filter="url(#glow)"/>
+                <rect x="58" y="100" width="6" height="20" rx="3" fill="#9945FF" opacity="0.5"/>
+                <rect x="136" y="100" width="6" height="20" rx="3" fill="#9945FF" opacity="0.5"/>
+                <text x="100" y="170" text-anchor="middle" fill="#14F195" font-family="monospace" font-size="8" opacity="0.6">01001101 01001100</text>
+            </svg>
+        </div>
+    </div>
+
+    <!-- SLIDE 2: The Problem -->
+    <div class="slide" data-slide="1">
+        <div class="slide-inner">
+            <div class="tag" style="background: rgba(239,68,68,0.2); color: #ef4444;">THE PROBLEM</div>
+            <div class="big-stat" style="color: #ef4444;">85%</div>
+            <h2>of AI Agent Tokens <span style="color: #ef4444;">Rug</span></h2>
+            <ul class="bullet-list">
+                <li>No way to verify if an agent is <strong>real</strong></li>
+                <li>No way to prove an agent is <strong>unique</strong> (Sybil)</li>
+                <li>No way to verify reputation <strong>privately</strong></li>
+                <li><strong>$2.1B+</strong> lost to unverified agent projects</li>
+            </ul>
+            <p class="subtitle" style="margin-top: 24px; font-weight: 600; color: var(--text);">
+                The agent economy can't function without trust.
+            </p>
+        </div>
+    </div>
+
+    <!-- SLIDE 3: The Solution -->
+    <div class="slide" data-slide="2">
+        <div class="slide-inner">
+            <div class="tag" style="background: rgba(20,241,149,0.15); color: var(--solana-green);">THE SOLUTION</div>
+            <h2><span class="gradient-text">MoltLaunch</span>: Verification Makes Agents Fundable</h2>
+            <div class="flywheel">
+                <span class="step">Verify</span>
+                <span class="arrow">→</span>
+                <span class="step">Access</span>
+                <span class="arrow">→</span>
+                <span class="step">Earn</span>
+                <span class="arrow">→</span>
+                <span class="step">Reinvest</span>
+            </div>
+            <p class="subtitle" style="margin-top: 28px;">
+                Agent proves identity → Unlocks protocol access<br>
+                → Generates revenue → Invests in higher trust<br>
+                → More access → More revenue
+            </p>
+            <p class="subtitle" style="margin-top: 20px; font-weight: 600; color: var(--solana-green);">
+                The economic flywheel of trust.
+            </p>
+        </div>
+    </div>
+
+    <!-- SLIDE 4: The Trust Ladder -->
+    <div class="slide" data-slide="3">
+        <div class="slide-inner">
+            <div class="tag" style="background: rgba(153,69,255,0.15); color: var(--solana-purple);">ANTI-SYBIL</div>
+            <h2>Making Sybil Attacks<br><span class="gradient-text">Economically Irrational</span></h2>
+            <div class="ladder-table">
+                <div class="ladder-row" style="background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2);">
+                    <span class="level" style="color: #ef4444;">L0-2</span>
+                    <span class="desc">Wallet / API key</span>
+                    <span class="cost" style="color: #ef4444;">$0</span>
+                    <span class="badge" style="background: rgba(239,68,68,0.2); color: #ef4444;">Everyone else</span>
+                </div>
+                <div class="ladder-row" style="background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.2);">
+                    <span class="level" style="color: #fbbf24;">L3</span>
+                    <span class="desc">Hardware fingerprint</span>
+                    <span class="cost" style="color: #fbbf24;">$100/mo</span>
+                    <span class="badge" style="background: rgba(20,241,149,0.15); color: var(--solana-green);">MoltLaunch</span>
+                </div>
+                <div class="ladder-row" style="background: rgba(20,241,149,0.08); border: 1px solid rgba(20,241,149,0.2);">
+                    <span class="level" style="color: var(--solana-green);">L4</span>
+                    <span class="desc">TPM challenge-response</span>
+                    <span class="cost" style="color: var(--solana-green);">$200/mo</span>
+                    <span class="badge" style="background: rgba(20,241,149,0.15); color: var(--solana-green);">MoltLaunch</span>
+                </div>
+                <div class="ladder-row" style="background: rgba(153,69,255,0.08); border: 1px solid rgba(153,69,255,0.2);">
+                    <span class="level" style="color: var(--solana-purple);">L5</span>
+                    <span class="desc">DePIN device verified</span>
+                    <span class="cost" style="color: var(--solana-purple);">$500/mo</span>
+                    <span class="badge" style="background: rgba(153,69,255,0.15); color: var(--solana-purple);">Solana-only</span>
+                </div>
+            </div>
+            <div class="sybil-compare">
+                <div class="sybil-box" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);">
+                    <div class="cost" style="color: #ef4444;">$0</div>
+                    <div class="label" style="color: #fca5a5;">10 Sybil bots (wallet)</div>
+                </div>
+                <div class="sybil-box" style="background: rgba(20,241,149,0.1); border: 1px solid rgba(20,241,149,0.3);">
+                    <div class="cost" style="color: var(--solana-green);">$5,000<span style="font-size: 0.5em; opacity: 0.7;">/mo</span></div>
+                    <div class="label" style="color: rgba(20,241,149,0.8);">10 Sybil bots (MoltLaunch L5)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 5: Why Solana -->
+    <div class="slide" data-slide="4">
+        <div class="slide-inner">
+            <div class="tag" style="background: rgba(153,69,255,0.15); color: var(--solana-purple);">WHY SOLANA</div>
+            <h2>This Only Works on <span class="gradient-text">Solana</span></h2>
+            <ul class="bullet-list">
+                <li><strong>DePIN is Solana-native</strong> (io.net, Helium, Nosana)<br>
+                    <span style="font-size: 0.85em; color: var(--text-muted);">→ Device attestations already on-chain as PDAs<br>→ No other chain has this ecosystem</span>
+                </li>
+                <li><strong>400ms blocks</strong> → real-time verification</li>
+                <li><strong>$0.00025/tx</strong> → per-interaction checks affordable</li>
+                <li><strong>Composability</strong> → CPI into DePIN PDAs</li>
+                <li><strong>Agent Kit + Blinks</strong> → agent infrastructure exists</li>
+            </ul>
+            <p class="subtitle" style="margin-top: 24px; font-weight: 600; color: var(--solana-purple);">
+                Solana is the verification chain.
+            </p>
+        </div>
+    </div>
+
+    <!-- SLIDE 6: What We Built -->
+    <div class="slide" data-slide="5">
+        <div class="slide-inner">
+            <div class="tag" style="background: rgba(20,241,149,0.15); color: var(--solana-green);">SHIPPED</div>
+            <h2>Shipped in <span class="gradient-text">8 Days</span></h2>
+            <div class="check-grid">
+                <div class="check-item"><span class="check">✅</span> 90+ API endpoints (live on Railway)</div>
+                <div class="check-item"><span class="check">✅</span> SDK v2.4.0 on npm (@moltlaunch/sdk)</div>
+                <div class="check-item"><span class="check">✅</span> STARK proofs (4 types — privacy-preserving)</div>
+                <div class="check-item"><span class="check">✅</span> On-chain AI scoring (Cauldron RISC-V VM)</div>
+                <div class="check-item"><span class="check">✅</span> Hardware identity (TPM challenge-response)</div>
+                <div class="check-item"><span class="check">✅</span> DePIN device verification (real PDA lookup)</div>
+                <div class="check-item"><span class="check">✅</span> 174 projects evaluated (registry)</div>
+                <div class="check-item"><span class="check">✅</span> 1 PR merged (Agent Casino)</div>
+            </div>
+            <div style="margin-top: 12px;">
+                <div class="check-item" style="display: inline-flex; max-width: 400px;">
+                    <span class="check">✅</span> sRFC submitted to Solana Foundation
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 7: The Protocol (SAP) -->
+    <div class="slide" data-slide="6">
+        <div class="slide-inner">
+            <div class="tag" style="background: rgba(0,212,255,0.15); color: var(--solana-blue);">THE PROTOCOL</div>
+            <h2><span class="gradient-text">Solana Agent Protocol</span></h2>
+            <div class="protocol-list">
+                <div class="protocol-item">
+                    <span class="icon">🔍</span>
+                    <div>
+                        <h4>SAP-0001: Validation Protocol</h4>
+                        <p>Unified request/response + Trust Ladder</p>
+                    </div>
+                </div>
+                <div class="protocol-item">
+                    <span class="icon">🔑</span>
+                    <div>
+                        <h4>SAP-0002: Hardware-Anchored Identity</h4>
+                        <p>TPM + DePIN fingerprinting + anti-Sybil</p>
+                    </div>
+                </div>
+                <div class="protocol-item">
+                    <span class="icon">📡</span>
+                    <div>
+                        <h4>SAP-0003: DePIN Device Attestation</h4>
+                        <p>io.net, Helium, Nosana device binding</p>
+                    </div>
+                </div>
+            </div>
+            <p class="subtitle" style="font-size: 0.9rem; margin-top: 20px;">
+                sRFC #9 submitted · ERC-8004 compatible · SATI integration proposed
+            </p>
+            <p style="margin-top: 12px;">
+                <a href="https://github.com/tradingstarllc/solana-agent-protocol" target="_blank" style="color: var(--solana-blue); text-decoration: none; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">
+                    github.com/tradingstarllc/solana-agent-protocol →
+                </a>
+            </p>
+        </div>
+    </div>
+
+    <!-- SLIDE 8: Value to Ecosystem -->
+    <div class="slide" data-slide="7">
+        <div class="slide-inner">
+            <div class="tag" style="background: rgba(20,241,149,0.15); color: var(--solana-green);">ECOSYSTEM</div>
+            <h2>Who <span class="gradient-text">Benefits</span></h2>
+            <div class="value-grid">
+                <div class="value-item">
+                    <h4>🤖 For Agents</h4>
+                    <p>Prove you're real → unlock capital</p>
+                </div>
+                <div class="value-item">
+                    <h4>🔗 For Protocols</h4>
+                    <p>Gate by trust level → no Sybils</p>
+                </div>
+                <div class="value-item">
+                    <h4>💰 For Investors</h4>
+                    <p>Verify before funding → reduce risk</p>
+                </div>
+                <div class="value-item">
+                    <h4>📡 For DePIN</h4>
+                    <p>New device utility → more registrations</p>
+                </div>
+                <div class="value-item" style="grid-column: 1 / -1;">
+                    <h4>☀️ For Solana</h4>
+                    <p>Trust layer attracts builders → ecosystem quality</p>
+                </div>
+            </div>
+            <p class="subtitle" style="margin-top: 24px; font-weight: 600; color: var(--solana-green);">
+                Everyone wins when agents are verifiable.
+            </p>
+        </div>
+    </div>
+
+    <!-- SLIDE 9: Traction -->
+    <div class="slide" data-slide="8">
+        <div class="slide-inner">
+            <div class="tag" style="background: rgba(0,212,255,0.15); color: var(--solana-blue);">TRACTION</div>
+            <h2><span class="gradient-text">8 Days</span>, Real Results</h2>
+            <div class="traction-grid">
+                <div class="traction-item">
+                    <div class="num">400+</div>
+                    <div class="label">Forum Interactions</div>
+                </div>
+                <div class="traction-item">
+                    <div class="num">30+</div>
+                    <div class="label">Agents Engaged</div>
+                </div>
+                <div class="traction-item">
+                    <div class="num">6</div>
+                    <div class="label">Integration Partners</div>
+                </div>
+                <div class="traction-item">
+                    <div class="num">174</div>
+                    <div class="label">Projects Scored</div>
+                </div>
+                <div class="traction-item">
+                    <div class="num">22+</div>
+                    <div class="label">Website Visitors</div>
+                </div>
+                <div class="traction-item">
+                    <div class="num">1</div>
+                    <div class="label">PR Merged</div>
+                </div>
+            </div>
+            <p class="subtitle" style="font-size: 0.9rem; margin-top: 16px;">
+                Agent Casino (PR merged) · CLAWIN · Agent Arena · SlotScribe · AAP · AutoVault<br>
+                sRFC on Solana Foundation repo · Issue opened on SATI/Cascade Protocol
+            </p>
+        </div>
+    </div>
+
+    <!-- SLIDE 10: Revenue Model -->
+    <div class="slide" data-slide="9">
+        <div class="slide-inner">
+            <div class="tag" style="background: rgba(251,191,36,0.15); color: #fbbf24;">REVENUE</div>
+            <h2>How We <span class="gradient-text">Make Money</span></h2>
+            <div class="revenue-block">
+                <h4>Verification fees (x402 micropayments)</h4>
+                <div class="revenue-row"><span class="label">Level 3 check</span><span class="price">$0.01</span></div>
+                <div class="revenue-row"><span class="label">Level 4 check</span><span class="price">$0.05</span></div>
+                <div class="revenue-row"><span class="label">Level 5 check</span><span class="price">$0.10</span></div>
+                <div class="revenue-row"><span class="label">Batch (100+)</span><span class="price">Custom</span></div>
+
+                <h4>Protocol integration</h4>
+                <div class="revenue-row"><span class="label">API access for protocols querying trust levels</span><span class="price">SaaS</span></div>
+
+                <h4>Staking pools (future)</h4>
+                <div class="revenue-row"><span class="label">Agent profits flowing through pools</span><span class="price">5% fee</span></div>
+                <div class="revenue-row"><span class="label">Only verified agents access capital</span><span class="price">Gated</span></div>
+            </div>
+            <p class="subtitle" style="margin-top: 24px; font-style: italic; color: var(--solana-green);">
+                "Become a dependency, not a service"
+            </p>
+        </div>
+    </div>
+
+    <!-- SLIDE 11: CTA -->
+    <div class="slide" data-slide="10">
+        <div class="slide-inner">
+            <h1 style="font-size: clamp(1.6rem, 4vw, 2.8rem); line-height: 1.3;">
+                <span class="gradient-text">MoltLaunch</span> makes AI agents fundable<br>
+                by making them <span class="gradient-text">verifiable</span>.
+            </h1>
+            <p class="subtitle" style="margin-top: 24px; font-size: clamp(1rem, 1.8vw, 1.2rem);">
+                Hardware identity via DePIN.<br>
+                Privacy via STARK proofs.<br>
+                Capital via staking pools.<br>
+                <strong>Only possible on Solana.</strong>
+            </p>
+            <div class="cta-row">
+                <a href="/dashboard.html" class="btn btn-primary">Try the API →</a>
+                <a href="https://github.com/tradingstarllc/solana-agent-protocol" target="_blank" class="btn btn-secondary">Read the Spec →</a>
+                <a href="https://www.npmjs.com/package/@moltlaunch/sdk" target="_blank" class="btn btn-mono">npm install @moltlaunch/sdk</a>
+            </div>
+            <p style="margin-top: 32px;">
+                <a href="https://github.com/tradingstarllc/moltlaunch" target="_blank" style="color: var(--text-muted); text-decoration: none; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">
+                    github.com/tradingstarllc/moltlaunch →
+                </a>
+            </p>
+        </div>
+    </div>
+
+</div>
+
+<!-- Progress dots -->
+<div class="progress-dots" id="progressDots"></div>
+
+<!-- Nav hint -->
+<div class="nav-hint">← → keys · click · scroll · ESC for overview</div>
+
+<script>
+(function() {
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+    let transitioning = false;
+    let overviewMode = false;
+
+    // Build progress dots
+    const dotsContainer = document.getElementById('progressDots');
+    for (let i = 0; i < totalSlides; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'progress-dot' + (i === 0 ? ' active' : '');
+        dot.addEventListener('click', (e) => {
+            e.stopPropagation();
+            goToSlide(i);
+        });
+        dotsContainer.appendChild(dot);
+    }
+
+    function goToSlide(n) {
+        if (n === currentSlide || n < 0 || n >= totalSlides || transitioning) return;
+        transitioning = true;
+
+        const direction = n > currentSlide ? 'left' : 'right';
+        const oldSlide = slides[currentSlide];
+        const newSlide = slides[n];
+
+        // Exit old
+        oldSlide.classList.remove('active');
+        oldSlide.classList.add(direction === 'left' ? 'exit-left' : 'exit-right');
+
+        // Prepare new
+        newSlide.classList.remove('exit-left', 'exit-right');
+        newSlide.style.transform = direction === 'left' ? 'translateX(60px)' : 'translateX(-60px)';
+        newSlide.style.opacity = '0';
+
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                newSlide.style.transform = '';
+                newSlide.style.opacity = '';
+                newSlide.classList.add('active');
+            });
+        });
+
+        // Update dots
+        document.querySelectorAll('.progress-dot').forEach((d, i) => {
+            d.classList.toggle('active', i === n);
+        });
+
+        // Update slide number
+        document.getElementById('slideNum').textContent = n + 1;
+
+        currentSlide = n;
+
+        setTimeout(() => {
+            oldSlide.classList.remove('exit-left', 'exit-right');
+            transitioning = false;
+        }, 550);
+    }
+
+    function next() { goToSlide(currentSlide + 1); }
+    function prev() { goToSlide(currentSlide - 1); }
+
+    function toggleOverview() {
+        overviewMode = !overviewMode;
+        document.body.classList.toggle('overview-mode', overviewMode);
+        if (overviewMode) {
+            slides.forEach(s => {
+                s.classList.remove('active', 'exit-left', 'exit-right');
+                s.style.opacity = '';
+                s.style.transform = '';
+            });
+            // Click to exit overview
+            slides.forEach((s, i) => {
+                s.addEventListener('click', function handler(e) {
+                    if (!overviewMode) return;
+                    e.stopPropagation();
+                    overviewMode = false;
+                    document.body.classList.remove('overview-mode');
+                    slides.forEach(sl => {
+                        sl.classList.remove('active');
+                        sl.removeEventListener('click', handler);
+                    });
+                    currentSlide = i;
+                    slides[i].classList.add('active');
+                    document.querySelectorAll('.progress-dot').forEach((d, j) => d.classList.toggle('active', j === i));
+                    document.getElementById('slideNum').textContent = i + 1;
+                }, { once: true });
+            });
+        } else {
+            slides.forEach(s => s.classList.remove('active'));
+            slides[currentSlide].classList.add('active');
+        }
+    }
+
+    // Keyboard
+    document.addEventListener('keydown', (e) => {
+        if (overviewMode && e.key !== 'Escape') return;
+        switch(e.key) {
+            case 'ArrowRight': case 'ArrowDown': case ' ': e.preventDefault(); next(); break;
+            case 'ArrowLeft': case 'ArrowUp': e.preventDefault(); prev(); break;
+            case 'Escape': e.preventDefault(); toggleOverview(); break;
+        }
+    });
+
+    // Click to advance (not on links/buttons)
+    document.addEventListener('click', (e) => {
+        if (overviewMode) return;
+        if (e.target.closest('a, button, .progress-dots, .back-link')) return;
+        // Click left third to go back, else forward
+        if (e.clientX < window.innerWidth * 0.25) {
+            prev();
+        } else {
+            next();
+        }
+    });
+
+    // Scroll/wheel
+    let scrollTimeout = null;
+    document.addEventListener('wheel', (e) => {
+        if (overviewMode) return;
+        e.preventDefault();
+        if (scrollTimeout) return;
+        scrollTimeout = setTimeout(() => { scrollTimeout = null; }, 800);
+        if (e.deltaY > 0) next();
+        else prev();
+    }, { passive: false });
+
+    // Touch swipe
+    let touchStartX = 0;
+    let touchStartY = 0;
+    document.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    document.addEventListener('touchend', (e) => {
+        if (overviewMode) return;
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        const dy = e.changedTouches[0].clientY - touchStartY;
+        if (Math.abs(dx) < 50 && Math.abs(dy) < 50) return; // tap, not swipe
+        if (Math.abs(dx) > Math.abs(dy)) {
+            if (dx < -50) next();
+            else if (dx > 50) prev();
+        } else {
+            if (dy < -50) next();
+            else if (dy > 50) prev();
+        }
+    }, { passive: true });
+})();
+</script>
+</body>
+</html>
