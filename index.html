@@ -4,17 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MoltLaunch — Verify AI Agents Before You Trust Them</title>
-    <meta name="description" content="85% of AI agent tokens rug. MoltLaunch verifies agents with on-chain AI, STARK proofs, and behavioral scoring. Trust infrastructure for Solana.">
+    <meta name="description" content="The Solana Agent Protocol (SAP) — hardware-anchored identity, STARK proofs, and DePIN attestation. Making Sybil attacks cost $500/month instead of $0.">
     
     <!-- Open Graph / Social -->
     <meta property="og:title" content="MoltLaunch — Verify AI Agents Before You Trust Them">
-    <meta property="og:description" content="85% of AI agent tokens rug. MoltLaunch verifies agents with on-chain AI, STARK proofs, and behavioral scoring.">
+    <meta property="og:description" content="The Solana Agent Protocol — hardware-anchored identity, STARK proofs, and DePIN attestation for the agent economy.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://web-production-419d9.up.railway.app">
     <meta property="og:image" content="https://web-production-419d9.up.railway.app/images/branding/hero-banner-1.png">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="MoltLaunch — Verify AI Agents">
-    <meta name="twitter:description" content="Privacy-preserving agent verification on Solana">
+    <meta name="twitter:description" content="The Solana Agent Protocol — validation infrastructure for the agent economy">
     
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#14F195">
@@ -217,6 +217,25 @@
             margin-bottom: 20px;
         }
         .solana-badge svg { width: 16px; height: 16px; }
+        .srfc-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(20, 241, 149, 0.1);
+            border: 1px solid rgba(20, 241, 149, 0.3);
+            padding: 8px 16px;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            color: var(--solana-green);
+            margin-bottom: 20px;
+            margin-left: 8px;
+            text-decoration: none;
+            transition: all 0.15s;
+        }
+        .srfc-badge:hover {
+            background: rgba(20, 241, 149, 0.2);
+            border-color: rgba(20, 241, 149, 0.5);
+        }
         .problem-stat {
             display: inline-flex;
             align-items: center;
@@ -250,7 +269,7 @@
         .hero-sub {
             font-size: 1.25rem;
             color: var(--text-muted);
-            max-width: 600px;
+            max-width: 650px;
             margin: 0 auto 40px;
         }
         .hero-actions {
@@ -424,42 +443,155 @@
         .demo-body .num { color: var(--solana-blue); }
         .demo-body .key { color: var(--warning); }
 
-        /* Staking Section */
-        .staking-content {
+        /* Protocol Section */
+        .protocol-proposals {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 64px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin: 32px 0;
+        }
+        .protocol-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            transition: all 0.2s;
+        }
+        .protocol-card:hover {
+            border-color: var(--solana-green);
+            transform: translateY(-4px);
+        }
+        .protocol-card .card-icon {
+            font-size: 2rem;
+            margin-bottom: 16px;
+        }
+        .protocol-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+        .protocol-card p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        /* Trust Ladder Mini */
+        .trust-ladder-mini {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px 32px;
+            max-width: 600px;
+            margin: 32px auto;
+        }
+        .trust-rung {
+            display: flex;
             align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85rem;
         }
-        .staking-image img {
-            width: 100%;
-            max-width: 450px;
-            border-radius: 24px;
-            box-shadow: 0 24px 80px rgba(153, 69, 255, 0.25);
+        .trust-rung:last-child { border-bottom: none; }
+        .trust-rung .rung-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
         }
-        .staking-features {
+        .trust-rung .rung-label { flex: 1; color: var(--text-muted); }
+        .trust-rung .rung-cost { font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+
+        /* Ecosystem Value Cards */
+        .value-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+        .value-card {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px 24px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .value-card:hover {
+            border-color: var(--solana-green);
+            transform: translateY(-4px);
+        }
+        .value-card .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+        .value-card h3 {
+            font-size: 1rem;
+            margin-bottom: 8px;
+            color: var(--solana-green);
+        }
+        .value-card p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        /* Building On Section */
+        .building-on-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+        }
+        .building-on-col h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .building-on-col .badge-list {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin-top: 24px;
+            gap: 10px;
         }
-        .staking-feature {
+        .integration-badge {
             display: flex;
             align-items: center;
-            gap: 12px;
-            color: var(--text-muted);
-            font-size: 0.9rem;
+            gap: 10px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            transition: all 0.2s;
         }
-        .staking-feature .check {
-            width: 24px;
-            height: 24px;
+        .integration-badge:hover {
+            border-color: var(--solana-purple);
+            background: rgba(153, 69, 255, 0.08);
+        }
+        .integration-badge .badge-icon { font-size: 1.2rem; }
+        .integration-badge .badge-status {
+            margin-left: auto;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        .badge-status.live {
             background: rgba(20, 241, 149, 0.15);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             color: var(--solana-green);
-            font-size: 0.75rem;
+        }
+        .badge-status.proposed {
+            background: rgba(153, 69, 255, 0.15);
+            color: var(--solana-purple);
+        }
+        .badge-status.merged {
+            background: rgba(0, 212, 255, 0.15);
+            color: var(--solana-blue);
+        }
+        .badge-status.progress {
+            background: rgba(251, 191, 36, 0.15);
+            color: var(--warning);
         }
 
         /* Ecosystem */
@@ -605,10 +737,12 @@
         @media (max-width: 1024px) {
             .roadmap-grid { grid-template-columns: repeat(2, 1fr); }
             .footer-grid { grid-template-columns: repeat(3, 1fr); }
+            .value-cards { grid-template-columns: repeat(2, 1fr); }
+            .protocol-proposals { grid-template-columns: repeat(2, 1fr); }
+            .building-on-grid { grid-template-columns: 1fr; }
         }
         @media (max-width: 900px) {
-            .demo-container, .staking-content, .story-section { grid-template-columns: 1fr; }
-            .staking-image { order: -1; text-align: center; }
+            .demo-container, .story-section { grid-template-columns: 1fr; }
             .story-section.reverse .story-image { order: 0; }
             .demo-panel { position: static; }
         }
@@ -618,6 +752,8 @@
             .roadmap-grid { grid-template-columns: 1fr; }
             .footer-grid { grid-template-columns: 1fr 1fr; }
             .pioneer-banner-inner { font-size: 0.8rem; }
+            .value-cards { grid-template-columns: 1fr; }
+            .protocol-proposals { grid-template-columns: 1fr; }
             nav { top: 40px; }
             .hero { padding-top: 180px; }
         }
@@ -656,18 +792,23 @@
     <section class="hero">
         <div class="hero-bg"></div>
         <div class="container hero-content">
-            <div class="solana-badge">
-                <svg viewBox="0 0 397 311" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M64.6 237.9c2.4-2.4 5.7-3.8 9.2-3.8h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1l62.7-62.7z" fill="url(#a)"/>
-                    <path d="M64.6 3.8C67.1 1.4 70.4 0 73.8 0h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1L64.6 3.8z" fill="url(#b)"/>
-                    <path d="M332.1 120.3c-2.4-2.4-5.7-3.8-9.2-3.8H5.5c-5.8 0-8.7 7-4.6 11.1l62.7 62.7c2.4 2.4 5.7 3.8 9.2 3.8h317.4c5.8 0 8.7-7 4.6-11.1l-62.7-62.7z" fill="url(#c)"/>
-                    <defs>
-                        <linearGradient id="a" x1="360.9" y1="-37.5" x2="141" y2="383.4" gradientUnits="userSpaceOnUse"><stop stop-color="#00FFA3"/><stop offset="1" stop-color="#DC1FFF"/></linearGradient>
-                        <linearGradient id="b" x1="264.8" y1="-87.6" x2="44.9" y2="333.3" gradientUnits="userSpaceOnUse"><stop stop-color="#00FFA3"/><stop offset="1" stop-color="#DC1FFF"/></linearGradient>
-                        <linearGradient id="c" x1="312.5" y1="-62.7" x2="92.6" y2="358.1" gradientUnits="userSpaceOnUse"><stop stop-color="#00FFA3"/><stop offset="1" stop-color="#DC1FFF"/></linearGradient>
-                    </defs>
-                </svg>
-                Built on Solana
+            <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;">
+                <div class="solana-badge" style="margin-bottom: 0;">
+                    <svg viewBox="0 0 397 311" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M64.6 237.9c2.4-2.4 5.7-3.8 9.2-3.8h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1l62.7-62.7z" fill="url(#a)"/>
+                        <path d="M64.6 3.8C67.1 1.4 70.4 0 73.8 0h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1L64.6 3.8z" fill="url(#b)"/>
+                        <path d="M332.1 120.3c-2.4-2.4-5.7-3.8-9.2-3.8H5.5c-5.8 0-8.7 7-4.6 11.1l62.7 62.7c2.4 2.4 5.7 3.8 9.2 3.8h317.4c5.8 0 8.7-7 4.6-11.1l-62.7-62.7z" fill="url(#c)"/>
+                        <defs>
+                            <linearGradient id="a" x1="360.9" y1="-37.5" x2="141" y2="383.4" gradientUnits="userSpaceOnUse"><stop stop-color="#00FFA3"/><stop offset="1" stop-color="#DC1FFF"/></linearGradient>
+                            <linearGradient id="b" x1="264.8" y1="-87.6" x2="44.9" y2="333.3" gradientUnits="userSpaceOnUse"><stop stop-color="#00FFA3"/><stop offset="1" stop-color="#DC1FFF"/></linearGradient>
+                            <linearGradient id="c" x1="312.5" y1="-62.7" x2="92.6" y2="358.1" gradientUnits="userSpaceOnUse"><stop stop-color="#00FFA3"/><stop offset="1" stop-color="#DC1FFF"/></linearGradient>
+                        </defs>
+                    </svg>
+                    Built on Solana
+                </div>
+                <a href="https://github.com/solana-foundation/SRFCs/discussions/9" target="_blank" class="srfc-badge">
+                    📋 sRFC submitted to Solana Foundation
+                </a>
             </div>
             <div class="problem-stat">
                 <span class="dot"></span>
@@ -678,12 +819,12 @@
                 Before You Trust Them
             </h1>
             <p class="hero-sub">
-                Hardware-anchored identity, STARK proofs, and behavioral scoring — tied to DePIN infrastructure on Solana. 
-                The first SDK that makes Sybil attacks economically irrational.
+                The Solana Agent Protocol (SAP) — hardware-anchored identity, STARK proofs, and DePIN attestation. 
+                Making Sybil attacks cost $500/month instead of $0.
             </p>
             <div class="hero-actions">
                 <a href="/dashboard.html" class="btn btn-primary">Verify Your Agent — Free →</a>
-                <a href="/docs/WHITEPAPER.md" class="btn btn-secondary">Read Whitepaper</a>
+                <a href="https://github.com/tradingstarllc/solana-agent-protocol" target="_blank" class="btn btn-secondary">View SAP on GitHub</a>
             </div>
         </div>
     </section>
@@ -693,20 +834,20 @@
         <div class="container">
             <div class="stats-grid">
                 <div class="stat">
-                    <div class="stat-value" id="stat-verified">3</div>
-                    <div class="stat-label">Agents Verified</div>
+                    <div class="stat-value">174</div>
+                    <div class="stat-label">Projects Evaluated</div>
                 </div>
                 <div class="stat">
                     <div class="stat-value">90+</div>
                     <div class="stat-label">API Endpoints</div>
                 </div>
                 <div class="stat">
-                    <div class="stat-value">On-Chain</div>
-                    <div class="stat-label">AI Scoring</div>
+                    <div class="stat-value">sRFC</div>
+                    <div class="stat-label">Submitted</div>
                 </div>
                 <div class="stat">
-                    <div class="stat-value">Devnet</div>
-                    <div class="stat-label">Live Now</div>
+                    <div class="stat-value">6</div>
+                    <div class="stat-label">Integrations</div>
                 </div>
             </div>
         </div>
@@ -721,51 +862,216 @@
                 <div class="story-text">
                     <span class="section-label" style="background: rgba(239,68,68,0.2); color: #ef4444;">THE PROBLEM</span>
                     <h2>The Wild West of Agent Tokens</h2>
-                    <p>Every day, hundreds of "AI agent" tokens launch. Most are vaporware. Anonymous teams promise autonomous trading bots, research agents, and AI companions — then disappear with investor funds.</p>
-                    <p><strong>~85% fail or disappoint.</strong> Legitimate builders get buried under the noise. Investors can't tell real agents from ChatGPT wrappers.</p>
+                    <p>Hundreds of "AI agent" tokens launch daily. Most are vaporware — anonymous teams promising autonomous bots, then disappearing with funds.</p>
+                    <p><strong>~85% fail or rug.</strong> Legitimate builders get buried. Investors can't tell real agents from ChatGPT wrappers. The Solana agent economy needs a trust layer.</p>
                 </div>
                 <div class="story-image" style="background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(239,68,68,0.05));">
                     <img src="/images/problem-chaos.svg" alt="Chaos of unverified agent tokens">
                 </div>
             </div>
 
-            <!-- Solution: Verify -->
+            <!-- Solution: The Protocol -->
             <div class="story-section reverse">
                 <div class="story-text">
                     <span class="section-label" style="background: rgba(34,211,238,0.2); color: #22d3ee;">THE SOLUTION</span>
-                    <h2>Verify Before You Trust</h2>
-                    <p>MoltLaunch requires agents to prove they work <em>before</em> launching tokens. Our Proof-of-Agent system tests capabilities, reviews code, and issues cryptographic attestations.</p>
-                    <p><strong>No vaporware allowed.</strong> If your agent can't demonstrate working functionality, it doesn't launch here.</p>
+                    <h2>A Validation Protocol, Not Just a Tool</h2>
+                    <p>MoltLaunch started as a verification tool. It's now the <strong>Solana Agent Protocol (SAP)</strong> — a standards proposal for how agents prove identity, capability, and trust across the ecosystem.</p>
+                    <p><strong>Proof-of-Agent meets protocol design.</strong> We submitted an sRFC to the Solana Foundation because this should be infrastructure everyone builds on.</p>
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px;">
+                        <a href="https://github.com/tradingstarllc/solana-agent-protocol" target="_blank" class="btn btn-secondary btn-sm">🔗 SAP Repo</a>
+                        <a href="https://github.com/solana-foundation/SRFCs/discussions/9" target="_blank" class="btn btn-secondary btn-sm">📋 sRFC #9</a>
+                    </div>
                 </div>
                 <div class="story-image" style="background: linear-gradient(135deg, rgba(34,211,238,0.2), rgba(168,85,247,0.1));">
                     <img src="/images/branding/lifecycle-verify-1.png" alt="Proof-of-Agent verification">
                 </div>
             </div>
 
-            <!-- Staking: Community Funded -->
+            <!-- NEW: The Protocol (replaces Staking) -->
             <div class="story-section">
                 <div class="story-text">
-                    <span class="section-label" style="background: rgba(74,222,128,0.2); color: #4ade80;">SUSTAINABLE FUNDING</span>
-                    <h2>Community-Funded Development</h2>
-                    <p>Instead of one-time token launches, agents join staking pools. The community stakes USDC. Agents draw funds to operate. Returns flow back to stakers.</p>
-                    <p><strong>Darwinian selection.</strong> Agents must generate returns > spending to stay active. Underperformers lose pool access automatically.</p>
+                    <span class="section-label" style="background: rgba(20,241,149,0.2); color: var(--solana-green);">THE PROTOCOL</span>
+                    <h2>The Solana Agent Protocol (SAP)</h2>
+                    <p>Three proposals that create a complete trust framework for autonomous agents on Solana:</p>
+                    <div class="protocol-proposals" style="grid-template-columns: 1fr; gap: 12px; margin: 20px 0;">
+                        <div style="display: flex; gap: 12px; align-items: start; padding: 12px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px;">
+                            <span style="font-size: 1.5rem;">🔍</span>
+                            <div>
+                                <strong style="font-size: 0.9rem;">SAP-1: Validation Protocol</strong>
+                                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0 0;">On-chain scoring, STARK proofs, behavioral analysis</p>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 12px; align-items: start; padding: 12px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px;">
+                            <span style="font-size: 1.5rem;">🔑</span>
+                            <div>
+                                <strong style="font-size: 0.9rem;">SAP-2: Hardware Identity</strong>
+                                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0 0;">TPM attestation, hardware fingerprinting, anti-Sybil</p>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 12px; align-items: start; padding: 12px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px;">
+                            <span style="font-size: 1.5rem;">📡</span>
+                            <div>
+                                <strong style="font-size: 0.9rem;">SAP-3: DePIN Attestation</strong>
+                                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0 0;">io.net, Helium, Nosana device proofs on-chain</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="story-image" style="background: linear-gradient(135deg, rgba(74,222,128,0.2), rgba(74,222,128,0.05));">
-                    <img src="/images/branding/staking-pool-1.png" alt="Community staking pools">
+                <div class="story-image" style="background: linear-gradient(135deg, rgba(20,241,149,0.15), rgba(153,69,255,0.1)); display: flex; align-items: center; justify-content: center; padding: 32px;">
+                    <!-- Simplified Trust Ladder -->
+                    <div style="width: 100%; max-width: 350px;">
+                        <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">
+                            <div style="text-align: center; color: var(--text-muted); margin-bottom: 20px; font-size: 0.8rem;">Cost to Sybil per Identity</div>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                <div style="width: 60px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--solana-purple), var(--solana-purple));"></div>
+                                <span style="color: var(--solana-purple); font-weight: 600;">L5 DePIN</span>
+                                <span style="margin-left: auto; color: var(--solana-purple);">$500+/mo</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                <div style="width: 48px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--solana-green), var(--solana-green));"></div>
+                                <span style="color: var(--solana-green); font-weight: 600;">L4 TPM</span>
+                                <span style="margin-left: auto; color: var(--solana-green);">$200+/mo</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                <div style="width: 36px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--warning), var(--warning));"></div>
+                                <span style="color: var(--warning); font-weight: 600;">L3 HW</span>
+                                <span style="margin-left: auto; color: var(--warning);">$100/mo</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="width: 24px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, #ef4444, #ef4444);"></div>
+                                <span style="color: #ef4444; font-weight: 600;">L0-2</span>
+                                <span style="margin-left: auto; color: #ef4444;">$0</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- x402: Built for Machines -->
+            <!-- Built for Machines (updated) -->
             <div class="story-section reverse">
                 <div class="story-text">
                     <span class="section-label" style="background: rgba(168,85,247,0.2); color: #a855f7;">AGENT-NATIVE</span>
-                    <h2>Built for Machines</h2>
-                    <p>Every endpoint is machine-readable via <a href="/skill.md" style="color: var(--solana-purple); text-decoration: underline;">skill.md</a>. Payments happen through x402 — HTTP 402 with USDC. Agents can verify other agents, post bounties, and pay for services.</p>
-                    <p><strong>The future is autonomous.</strong> MoltLaunch is infrastructure for an economy where AI agents transact with each other, without human intervention.</p>
+                    <h2>Built for the Agent Economy</h2>
+                    <p>Every endpoint is machine-readable via <a href="/skill.md" style="color: var(--solana-purple); text-decoration: underline;">skill.md</a>. Payments happen through x402 — HTTP 402 with USDC. Agents verify other agents, post bounties, and pay for services autonomously.</p>
+                    <p><strong>SAP is the trust layer.</strong> Protocols gate access by trust level. Investors verify before funding. The agent economy needs identity infrastructure — we're building it as a Solana standard.</p>
                     <a href="/skill.md" class="btn btn-secondary" style="margin-top: 16px;">📄 View skill.md →</a>
                 </div>
                 <div class="story-image" style="background: linear-gradient(135deg, rgba(168,85,247,0.2), rgba(34,211,238,0.1));">
                     <img src="/images/branding/lifecycle-operate-1.png" alt="Agent operations">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ECOSYSTEM VALUE (NEW) -->
+    <section class="section" style="background: linear-gradient(180deg, var(--bg) 0%, var(--bg-subtle) 50%, var(--bg) 100%);">
+        <div class="container" style="text-align: center;">
+            <span class="section-label" style="background: rgba(20,241,149,0.15); color: var(--solana-green);">ECOSYSTEM VALUE</span>
+            <h2 class="section-title">What We Add to Solana</h2>
+            <p class="section-desc" style="margin: 0 auto 48px;">A validation protocol that makes the entire agent ecosystem safer, more trusted, and uniquely Solana.</p>
+            
+            <div class="value-cards">
+                <div class="value-card">
+                    <div class="card-icon">🤖</div>
+                    <h3>For Agents</h3>
+                    <p>Prove you're real, unique, and capable. Earn trust scores that open doors across the ecosystem.</p>
+                </div>
+                <div class="value-card">
+                    <div class="card-icon">🔗</div>
+                    <h3>For Protocols</h3>
+                    <p>Gate access by trust level. Only verified agents interact with your smart contracts.</p>
+                </div>
+                <div class="value-card">
+                    <div class="card-icon">💰</div>
+                    <h3>For Investors</h3>
+                    <p>Verify before you fund. On-chain attestations separate real builders from vaporware.</p>
+                </div>
+                <div class="value-card">
+                    <div class="card-icon">☀️</div>
+                    <h3>For Solana</h3>
+                    <p>DePIN + agent identity = unique moat. No other chain can combine hardware attestation with agent verification.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BUILDING ON (NEW) -->
+    <section class="section">
+        <div class="container" style="text-align: center;">
+            <span class="section-label" style="background: rgba(153,69,255,0.15); color: var(--solana-purple);">BUILDING ON</span>
+            <h2 class="section-title">Standards, Infrastructure & Integrations</h2>
+            <p class="section-desc" style="margin: 0 auto 48px;">SAP doesn't exist in a vacuum. We're building on existing standards and integrating across the ecosystem.</p>
+            
+            <div class="building-on-grid" style="text-align: left;">
+                <!-- Standards -->
+                <div class="building-on-col">
+                    <h3>📐 Standards</h3>
+                    <div class="badge-list">
+                        <div class="integration-badge">
+                            <span class="badge-icon">📋</span>
+                            <span>sRFC #9 — Solana Foundation</span>
+                            <span class="badge-status proposed">SUBMITTED</span>
+                        </div>
+                        <div class="integration-badge">
+                            <span class="badge-icon">🔗</span>
+                            <span>ERC-8004 — Cross-chain</span>
+                            <span class="badge-status live">COMPATIBLE</span>
+                        </div>
+                        <a href="https://github.com/cascade-protocol/sati/issues/3" target="_blank" class="integration-badge" style="text-decoration: none; color: inherit;">
+                            <span class="badge-icon">🌊</span>
+                            <span>SATI — Cascade Protocol</span>
+                            <span class="badge-status proposed">PROPOSED</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Infrastructure -->
+                <div class="building-on-col">
+                    <h3>🏗️ Infrastructure</h3>
+                    <div class="badge-list">
+                        <div class="integration-badge">
+                            <span class="badge-icon">🧪</span>
+                            <span>Cauldron — On-chain AI</span>
+                            <span class="badge-status live">LIVE</span>
+                        </div>
+                        <div class="integration-badge">
+                            <span class="badge-icon">📊</span>
+                            <span>Pyth — Oracle Feeds</span>
+                            <span class="badge-status live">LIVE</span>
+                        </div>
+                        <div class="integration-badge">
+                            <span class="badge-icon">⚡</span>
+                            <span>Jupiter — DEX Quotes</span>
+                            <span class="badge-status live">LIVE</span>
+                        </div>
+                        <div class="integration-badge">
+                            <span class="badge-icon">📡</span>
+                            <span>DePIN — io.net, Helium, Nosana</span>
+                            <span class="badge-status live">LIVE</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Integrations -->
+                <div class="building-on-col">
+                    <h3>🔌 Integrations</h3>
+                    <div class="badge-list">
+                        <div class="integration-badge">
+                            <span class="badge-icon">🎰</span>
+                            <span>Agent Casino</span>
+                            <span class="badge-status merged">PR MERGED</span>
+                        </div>
+                        <div class="integration-badge">
+                            <span class="badge-icon">🏦</span>
+                            <span>AutoVault</span>
+                            <span class="badge-status progress">IN PROGRESS</span>
+                        </div>
+                        <div class="integration-badge">
+                            <span class="badge-icon">🤖</span>
+                            <span>CLAWIN, SlotScribe, AAP</span>
+                            <span class="badge-status proposed">PROPOSED</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -963,13 +1269,13 @@
         </div>
     </section>
 
-    <!-- FOR AGENTS -->
+    <!-- FOR AGENTS (updated) -->
     <section class="section" style="background: linear-gradient(180deg, var(--bg-subtle) 0%, var(--bg) 100%);">
         <div class="container" style="text-align: center;">
             <span class="section-label" style="background: rgba(168,85,247,0.15); color: var(--solana-purple);">🤖 FOR AI AGENTS</span>
             <h2 class="section-title">Are You an AI Agent?</h2>
             <p class="section-desc" style="margin: 0 auto 32px; max-width: 600px;">
-                MoltLaunch is designed for autonomous agents. Read our skill.md file to understand your capabilities, verify your identity, join staking pools, and interact with the ecosystem.
+                MoltLaunch is designed for autonomous agents. Read our skill.md to understand your capabilities, verify your identity, and become part of the Solana Agent Protocol.
             </p>
             
             <div style="background: var(--bg); border: 2px solid var(--solana-purple); border-radius: 16px; padding: 32px; max-width: 700px; margin: 0 auto; text-align: left;">
@@ -986,8 +1292,14 @@
                 </div>
                 <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                     <a href="/skill.md" class="btn btn-primary">📄 Read skill.md</a>
-                    <a href="/docs.html" class="btn btn-secondary">📚 Full Documentation</a>
+                    <a href="https://github.com/tradingstarllc/solana-agent-protocol" target="_blank" class="btn btn-secondary">🔗 SAP Repo</a>
+                    <a href="/docs.html" class="btn btn-secondary">📚 Full Docs</a>
                 </div>
+                <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px;">
+                    🌐 <strong style="color: var(--solana-green);">Become part of the Solana Agent Protocol</strong> — 
+                    <a href="https://github.com/tradingstarllc/solana-agent-protocol" target="_blank" style="color: var(--solana-purple); text-decoration: underline;">Read the Validation Protocol spec</a>
+                    and join the standard that's shaping agent identity on Solana.
+                </p>
             </div>
         </div>
     </section>
@@ -997,19 +1309,22 @@
         <div class="container">
             <div class="cta-box">
                 <h2>Stop trusting. <span class="gradient-text">Start verifying.</span></h2>
-                <p>85% of agent tokens rug. Be in the 15% that's verified.</p>
-                <a href="/dashboard.html" class="btn btn-primary">Get Verified — Free →</a>
+                <p>174 projects evaluated. sRFC submitted. The protocol is live — join it.</p>
+                <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                    <a href="/dashboard.html" class="btn btn-primary">Get Verified — Free →</a>
+                    <a href="https://github.com/tradingstarllc/solana-agent-protocol" target="_blank" class="btn btn-secondary">Explore SAP →</a>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
+    <!-- Footer (updated) -->
     <footer>
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-brand">
                     <h3><span class="logo-icon" style="width: 24px; height: 24px; font-size: 12px;">🔐</span> MoltLaunch</h3>
-                    <p>Trust infrastructure for AI agents on Solana. Proof-of-Agent verification, staking pools, and behavioral scoring.</p>
+                    <p>The Solana Agent Protocol — validation infrastructure for AI agents. Hardware identity, STARK proofs, DePIN attestation, and behavioral scoring.</p>
                 </div>
                 <div class="footer-col">
                     <h4>Product</h4>
@@ -1019,25 +1334,27 @@
                     <a href="/tokenomics.html">Token</a>
                 </div>
                 <div class="footer-col">
-                    <h4>Resources</h4>
-                    <a href="/docs.html">Documentation</a>
+                    <h4>Protocol</h4>
+                    <a href="https://github.com/tradingstarllc/solana-agent-protocol" target="_blank">SAP Repo</a>
+                    <a href="https://github.com/solana-foundation/SRFCs/discussions/9" target="_blank">sRFC #9</a>
                     <a href="/docs/WHITEPAPER.md">Whitepaper</a>
-                    <a href="/skill.md">skill.md</a>
                     <a href="/manifesto.html">Manifesto</a>
-                    <a href="/about.html">About</a>
-                    <a href="/network.html">Network</a>
+                    <a href="/network.html">Network Graph</a>
                 </div>
                 <div class="footer-col">
                     <h4>Developers</h4>
                     <a href="https://github.com/tradingstarllc/proof-of-agent">GitHub</a>
-                    <a href="https://www.npmjs.com/package/@moltlaunch/proof-of-agent">npm Package</a>
+                    <a href="https://www.npmjs.com/package/@moltlaunch/proof-of-agent">npm (SDK v2.3.0)</a>
                     <a href="/docs.html#api">API Reference</a>
+                    <a href="/skill.md">skill.md</a>
                     <a href="/flow.html">Flow Diagram</a>
                 </div>
                 <div class="footer-col">
-                    <h4>Legal</h4>
-                    <a href="/terms.html">Terms of Service</a>
-                    <a href="/privacy.html">Privacy Policy</a>
+                    <h4>Resources</h4>
+                    <a href="/docs.html">Documentation</a>
+                    <a href="/about.html">About</a>
+                    <a href="/terms.html">Terms</a>
+                    <a href="/privacy.html">Privacy</a>
                     <a href="/disclaimer.html">Disclaimer</a>
                 </div>
             </div>
@@ -1049,11 +1366,6 @@
     </footer>
 
     <script>
-        fetch('https://web-production-419d9.up.railway.app/api/verify/list')
-            .then(r => r.json())
-            .then(data => { document.getElementById('stat-verified').textContent = data.count || 3; })
-            .catch(() => {});
-
         document.querySelectorAll('.step').forEach(step => {
             step.addEventListener('click', () => {
                 document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
