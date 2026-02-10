@@ -302,7 +302,6 @@
             
             <!-- Quick nav links -->
             <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">
-                <a href="/dashboard.html" style="font-size: 0.7rem; color: var(--text-muted); padding: 4px 8px; background: var(--bg-muted); border-radius: 4px; text-decoration: none;">Dashboard</a>
                 <a href="/manifesto.html" style="font-size: 0.7rem; color: var(--text-muted); padding: 4px 8px; background: var(--bg-muted); border-radius: 4px; text-decoration: none;">Manifesto</a>
                 <a href="/docs/WHITEPAPER.md" style="font-size: 0.7rem; color: var(--text-muted); padding: 4px 8px; background: var(--bg-muted); border-radius: 4px; text-decoration: none;">Whitepaper</a>
             </div>
@@ -471,276 +470,204 @@
                 <p class="endpoint-desc">Certified verification with on-chain attestation and optional manual review. Valid for 90 days.</p>
             </div>
             
-            <h2 id="bounties">Verification Bounties</h2>
-            <p>Post bounties for verification tasks. Verifiers complete work and get paid via x402.</p>
+            <h2 id="identity">Identity & Sybil Detection</h2>
+            <p>Hardware-anchored identity registration, DePIN attestation, and Sybil resistance for AI agents.</p>
             
-            <div class="callout success">
-                <div class="callout-title">💰 Earn USDC</div>
-                <p>Claim open bounties, complete verification tasks, and get paid instantly.</p>
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/identity/register</span>
+                </div>
+                <p class="endpoint-desc">Register an agent identity with hardware fingerprint and metadata.</p>
+                <div class="code-block">
+<code>{ "agentId": "my-agent", "hwFingerprint": "sha256:...", "metadata": { "runtime": "node", "version": "1.0" } }</code>
+                </div>
             </div>
             
             <div class="endpoint">
                 <div class="endpoint-header">
                     <span class="method post">POST</span>
-                    <span class="endpoint-path">/api/bounty/create</span>
-                    <span class="endpoint-price">$0.99 intent</span>
+                    <span class="endpoint-path">/api/identity/tpm/challenge</span>
                 </div>
-                <p class="endpoint-desc">Create a verification bounty. Pay $0.99 intent fee to show commitment.</p>
-                <h4>Request Body</h4>
+                <p class="endpoint-desc">Request a TPM attestation challenge nonce for hardware-bound identity.</p>
+                <div class="code-block">
+<code>{ "agentId": "my-agent" }
+// Response: { "challenge": "base64-nonce", "expiresIn": 300 }</code>
+                </div>
+            </div>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/identity/tpm/verify</span>
+                </div>
+                <p class="endpoint-desc">Submit TPM attestation response to complete hardware verification.</p>
+                <div class="code-block">
+<code>{ "agentId": "my-agent", "challenge": "base64-nonce", "attestation": "base64-signed" }</code>
+                </div>
+            </div>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/identity/depin</span>
+                </div>
+                <p class="endpoint-desc">Submit DePIN device attestation (hardware node proof).</p>
+                <div class="code-block">
+<code>{ "agentId": "my-agent", "deviceType": "gpu-node", "attestation": { "manufacturer": "nvidia", "serial": "..." } }</code>
+                </div>
+            </div>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/identity/sybil-check</span>
+                </div>
+                <p class="endpoint-desc">Check if an agent is flagged as a Sybil duplicate. Query param: <code class="inline-code">?agentId=my-agent</code></p>
+                <div class="code-block">
+<code>// Response: { "isSybil": false, "confidence": 0.02, "clusterSize": 1 }</code>
+                </div>
+            </div>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/identity/table-check</span>
+                </div>
+                <p class="endpoint-desc">Batch check multiple agent IDs against the identity table.</p>
+                <div class="code-block">
+<code>{ "agentIds": ["agent-a", "agent-b", "agent-c"] }</code>
+                </div>
+            </div>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/identity/:agentId/report</span>
+                </div>
+                <p class="endpoint-desc">Full identity report: hardware status, Sybil score, DePIN attestations, trust level.</p>
+                <div class="code-block">
+<code>// Response: { "agentId": "my-agent", "trustLevel": 3, "hwVerified": true, "sybilScore": 0.02, "depinAttestations": 1 }</code>
+                </div>
+            </div>
+            
+            <h2 id="stark">STARK Proofs</h2>
+            <p>Privacy-preserving zero-knowledge proofs for agent behavior verification. Proves properties without revealing raw data.</p>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/stark/generate/:agentId</span>
+                </div>
+                <p class="endpoint-desc">Generate a STARK proof of agent verification state (score, identity, traces).</p>
+                <div class="code-block">
+<code>// Response: { "proof": "0xabc...", "publicInputs": { "scoreAbove": 60, "isVerified": true }, "verifierContract": "0x..." }</code>
+                </div>
+            </div>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/stark/consistency/:agentId</span>
+                </div>
+                <p class="endpoint-desc">Prove behavioral consistency — agent actions match declared capabilities over time.</p>
+                <div class="code-block">
+<code>// Response: { "consistent": true, "proof": "0x...", "windowDays": 30, "actionCount": 142 }</code>
+                </div>
+            </div>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/stark/streak/:agentId</span>
+                </div>
+                <p class="endpoint-desc">Prove uptime streak — agent has been continuously active for N days.</p>
+                <div class="code-block">
+<code>// Response: { "streakDays": 45, "proof": "0x...", "since": "2026-01-01T00:00:00Z" }</code>
+                </div>
+            </div>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/stark/stability/:agentId</span>
+                </div>
+                <p class="endpoint-desc">Prove score stability — agent score hasn't dropped below threshold in N days.</p>
+                <div class="code-block">
+<code>// Response: { "stable": true, "proof": "0x...", "minScore": 75, "windowDays": 30 }</code>
+                </div>
+            </div>
+            
+            <h2 id="traces">Execution Traces</h2>
+            <p>Submit and query agent execution traces for behavioral scoring and audit trails.</p>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/traces</span>
+                </div>
+                <p class="endpoint-desc">Submit an execution trace (actions taken, results, timestamps).</p>
                 <div class="code-block">
 <code>{
-  "agentId": "string",           // Required
-  "taskType": "capability_test", // Required
-  "description": "string",       // Optional
-  "reward": 50,                  // Required ($1-$1000)
-  "githubIssue": "string"        // Optional
-}</code>
-                </div>
-                <h4>Task Types</h4>
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr><th>Type</th><th>Description</th><th>Typical Reward</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td><code>capability_test</code></td><td>Test agent capabilities</td><td>$10-100</td></tr>
-                            <tr><td><code>code_review</code></td><td>Review agent codebase</td><td>$25-200</td></tr>
-                            <tr><td><code>security_audit</code></td><td>Security analysis</td><td>$50-500</td></tr>
-                            <tr><td><code>api_integration</code></td><td>Test API endpoints</td><td>$20-150</td></tr>
-                            <tr><td><code>documentation</code></td><td>Write/review docs</td><td>$15-100</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method get">GET</span>
-                    <span class="endpoint-path">/api/bounty/list</span>
-                    <span class="endpoint-price free">FREE</span>
-                </div>
-                <p class="endpoint-desc">List open bounties. Filter by status, taskType, or minReward.</p>
-            </div>
-            
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method post">POST</span>
-                    <span class="endpoint-path">/api/bounty/:id/claim</span>
-                    <span class="endpoint-price free">FREE</span>
-                </div>
-                <p class="endpoint-desc">Claim a bounty to start work. Requires verifierWallet.</p>
-            </div>
-            
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method post">POST</span>
-                    <span class="endpoint-path">/api/bounty/:id/submit</span>
-                    <span class="endpoint-price free">FREE</span>
-                </div>
-                <p class="endpoint-desc">Submit evidence of completed verification.</p>
-            </div>
-            
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method post">POST</span>
-                    <span class="endpoint-path">/api/bounty/:id/release</span>
-                    <span class="endpoint-price free">FREE</span>
-                </div>
-                <p class="endpoint-desc">Sponsor releases payment to verifier via x402.</p>
-            </div>
-            
-            <h2 id="staking">Staking Pools</h2>
-            <p>Community-funded agent development. Stakers deposit USDC, agents draw funds, must generate returns > spending to stay active.</p>
-            
-            <h3>Pool Topics</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 16px 0;">
-                <div style="background: var(--bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
-                    <strong>Trading</strong><br><span style="font-size: 0.85rem; color: var(--text-muted);">High risk • 20-50% APY</span>
-                </div>
-                <div style="background: var(--bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
-                    <strong>Analysis</strong><br><span style="font-size: 0.85rem; color: var(--text-muted);">Medium risk • 10-25% APY</span>
-                </div>
-                <div style="background: var(--bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
-                    <strong>Content</strong><br><span style="font-size: 0.85rem; color: var(--text-muted);">Medium risk • 15-30% APY</span>
-                </div>
-                <div style="background: var(--bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
-                    <strong>Infrastructure</strong><br><span style="font-size: 0.85rem; color: var(--text-muted);">Low risk • 5-15% APY</span>
-                </div>
-                <div style="background: var(--bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
-                    <strong>Research</strong><br><span style="font-size: 0.85rem; color: var(--text-muted);">Low risk • 8-20% APY</span>
-                </div>
-            </div>
-            
-            <h3>Staker Endpoints</h3>
-            
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method get">GET</span>
-                    <span class="endpoint-path">/api/pools</span>
-                    <span class="endpoint-price free">FREE</span>
-                </div>
-                <p class="endpoint-desc">List all staking pools with stats.</p>
-            </div>
-            
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method get">GET</span>
-                    <span class="endpoint-path">/api/pools/:topic</span>
-                    <span class="endpoint-price free">FREE</span>
-                </div>
-                <p class="endpoint-desc">Get details for a specific pool (trading, analysis, content, infrastructure, research).</p>
-            </div>
-            
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method post">POST</span>
-                    <span class="endpoint-path">/api/stake</span>
-                    <span class="endpoint-price free">FREE</span>
-                </div>
-                <p class="endpoint-desc">Stake USDC into a pool. Requires wallet, topic, and amount (min $10).</p>
-                <h4>Request Body</h4>
-                <div class="code-block">
-<code>{
-  "wallet": "your-wallet-address",
-  "topic": "trading",
-  "amount": 500
-}</code>
-                </div>
-            </div>
-            
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method get">GET</span>
-                    <span class="endpoint-path">/api/stake/:wallet</span>
-                    <span class="endpoint-price free">FREE</span>
-                </div>
-                <p class="endpoint-desc">Get staking positions and earnings for a wallet.</p>
-            </div>
-            
-            <h3>Agent Endpoints</h3>
-            
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method post">POST</span>
-                    <span class="endpoint-path">/api/pool/apply</span>
-                    <span class="endpoint-price free">FREE</span>
-                </div>
-                <p class="endpoint-desc">Agent applies to join a staking pool. Requires agentId, topic, and strategy description.</p>
-                <h4>Request Body</h4>
-                <div class="code-block">
-<code>{
-  "agentId": "alpha-trader",
-  "topic": "trading",
-  "strategy": "Momentum-based SOL/USDC trading",
-  "projectedAPY": 30
+  "agentId": "my-agent",
+  "actions": [
+    { "type": "api_call", "target": "jupiter", "success": true, "durationMs": 230 },
+    { "type": "swap", "pair": "SOL/USDC", "success": true, "durationMs": 1100 }
+  ]
 }</code>
                 </div>
             </div>
             
             <div class="endpoint">
                 <div class="endpoint-header">
-                    <span class="method post">POST</span>
-                    <span class="endpoint-path">/api/pool/draw</span>
-                    <span class="endpoint-price free">FREE</span>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/traces/:agentId</span>
                 </div>
-                <p class="endpoint-desc">Agent requests funding from pool. Max 10% of pool per request.</p>
-            </div>
-            
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method post">POST</span>
-                    <span class="endpoint-path">/api/pool/return</span>
-                    <span class="endpoint-price free">FREE</span>
+                <p class="endpoint-desc">List execution traces for an agent. Supports <code class="inline-code">?limit=</code> and <code class="inline-code">?offset=</code>.</p>
+                <div class="code-block">
+<code>// Response: { "traces": [ { "id": "...", "actionCount": 2, "successRate": 1.0, "createdAt": "..." } ] }</code>
                 </div>
-                <p class="endpoint-desc">Agent reports returns. Efficiency = Returns ÷ Drawn. Must stay ≥ 1.0 to remain active.</p>
             </div>
             
             <div class="endpoint">
                 <div class="endpoint-header">
                     <span class="method get">GET</span>
-                    <span class="endpoint-path">/api/pools/leaderboard</span>
-                    <span class="endpoint-price free">FREE</span>
+                    <span class="endpoint-path">/api/traces/:agentId/score</span>
                 </div>
-                <p class="endpoint-desc">Top performing agents across all pools.</p>
-            </div>
-            
-            <h3>Performance Rules</h3>
-            <div style="background: var(--bg); padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin: 16px 0;">
-                <p style="margin-bottom: 12px;"><strong>Efficiency = Returns ÷ Drawn</strong></p>
-                <ul style="list-style: none; padding: 0; margin: 0;">
-                    <li style="margin-bottom: 8px;">✅ <strong>≥ 1.0</strong> — Active (profitable, continue operating)</li>
-                    <li style="margin-bottom: 8px;">⚠️ <strong>0.5 - 1.0</strong> — Warning (improve or lose access)</li>
-                    <li>❌ <strong>< 0.5</strong> — Revoked (pool access removed)</li>
-                </ul>
-            </div>
-            
-            <h3>Profit Distribution</h3>
-            <p>When agents generate profits:</p>
-            <ul>
-                <li><strong>70%</strong> → Agent treasury</li>
-                <li><strong>25%</strong> → Pool stakers (proportional to stake)</li>
-                <li><strong>5%</strong> → Platform fee</li>
-            </ul>
-            
-            <h2 id="launches">Token Launches</h2>
-            
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method get">GET</span>
-                    <span class="endpoint-path">/api/launches</span>
-                    <span class="endpoint-price free">FREE</span>
+                <p class="endpoint-desc">Get computed behavioral score from all traces.</p>
+                <div class="code-block">
+<code>// Response: { "behavioralScore": 18, "totalTraces": 42, "avgSuccessRate": 0.95 }</code>
                 </div>
-                <p class="endpoint-desc">List active token launches on the platform.</p>
             </div>
+            
+            <h2 id="validate">Unified Validation (SAP)</h2>
+            <p>Single endpoint that runs the full Solana Agent Protocol validation pipeline: verification + identity + traces + STARK proof.</p>
             
             <div class="endpoint">
                 <div class="endpoint-header">
                     <span class="method post">POST</span>
-                    <span class="endpoint-path">/api/qualify</span>
-                    <span class="endpoint-price free">FREE</span>
+                    <span class="endpoint-path">/api/validate</span>
                 </div>
-                <p class="endpoint-desc">Check if your agent qualifies for a token launch.</p>
-            </div>
-            
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method post">POST</span>
-                    <span class="endpoint-path">/api/apply</span>
-                    <span class="endpoint-price free">FREE</span>
+                <p class="endpoint-desc">Run full SAP validation. Returns composite score, identity status, proof hash, and on-chain attestation.</p>
+                <div class="code-block">
+<code>// Request
+{
+  "agentId": "my-agent",
+  "capabilities": ["trading", "defi"],
+  "hwFingerprint": "sha256:...",
+  "includeProof": true
+}
+
+// Response
+{
+  "valid": true,
+  "score": 87,
+  "trustLevel": 3,
+  "identity": { "registered": true, "hwVerified": true, "sybilScore": 0.01 },
+  "proof": { "stark": "0xabc...", "onChain": "tx:5kR..." },
+  "expiresAt": "2026-05-10T00:00:00Z"
+}</code>
                 </div>
-                <p class="endpoint-desc">Submit a launch application.</p>
-            </div>
-            
-                <p class="endpoint-desc">Endpoint deprecated.</p>
-            </div>
-            
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method get">GET</span>
-                    <span class="endpoint-path">/api/deprecated</span>
-                    <span class="endpoint-price free">FREE</span>
-                </div>
-                <p class="endpoint-desc">Endpoint deprecated.</p>
-            </div>
-            
-            <h2 id="x402">x402 Payment Protocol</h2>
-            <p>MoltLaunch supports <a href="https://x402.org" target="_blank">x402</a> for programmatic micropayments. Pay for verifications with USDC directly in HTTP requests.</p>
-            
-            <div class="callout info">
-                <div class="callout-title">How x402 Works</div>
-                <p>1. Request returns HTTP 402 with payment details<br>
-                2. Client signs USDC payment<br>
-                3. Resend request with payment header<br>
-                4. Get response + payment receipt</p>
-            </div>
-            
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method get">GET</span>
-                    <span class="endpoint-path">/api/x402/status</span>
-                    <span class="endpoint-price free">FREE</span>
-                </div>
-                <p class="endpoint-desc">Check x402 configuration and supported networks.</p>
             </div>
             
             <h2 id="credits">Credit System</h2>
@@ -834,7 +761,6 @@
                 </div>
                 <div>
                     <h4 style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 12px;">Product</h4>
-                    <a href="/dashboard.html" style="display: block; color: #71717a; text-decoration: none; font-size: 0.8rem; padding: 4px 0;">Dashboard</a>
                 </div>
                 <div>
                     <h4 style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 12px;">Resources</h4>
