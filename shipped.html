@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What We Shipped — MoltLaunch</title>
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #0a0a0f; --bg-subtle: #12121a; --border: #2a2a3a; --text: #fafafa; --text-muted: #a1a1aa; --green: #14F195; --purple: #9945FF; --blue: #00D4FF; --yellow: #fbbf24; --red: #ef4444; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+        .container { max-width: 800px; margin: 0 auto; padding: 0 24px; }
+        code { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; background: var(--bg-subtle); padding: 2px 6px; border-radius: 4px; }
+        a { color: var(--green); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        nav { padding: 14px 0; border-bottom: 1px solid var(--border); }
+        .nav-inner { display: flex; align-items: center; justify-content: space-between; max-width: 800px; margin: 0 auto; padding: 0 24px; }
+        .logo { font-weight: 700; font-size: 1.1rem; color: var(--text); text-decoration: none; }
+        .nav-links { display: flex; gap: 20px; }
+        .nav-links a { color: var(--text-muted); font-size: 0.85rem; }
+
+        .hero { padding: 60px 0 40px; text-align: center; }
+        .hero h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 12px; }
+        .hero p { color: var(--text-muted); font-size: 1rem; max-width: 550px; margin: 0 auto; }
+
+        .timeline { position: relative; padding: 20px 0; }
+        .day { margin-bottom: 32px; }
+        .day-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .day-num { width: 40px; height: 40px; background: linear-gradient(135deg, var(--green), var(--purple)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: var(--bg); flex-shrink: 0; }
+        .day-title { font-weight: 700; font-size: 1.1rem; }
+        .day-subtitle { color: var(--text-muted); font-size: 0.8rem; }
+
+        .items { display: flex; flex-direction: column; gap: 8px; margin-left: 52px; }
+        .item { display: flex; align-items: flex-start; gap: 10px; font-size: 0.85rem; padding: 8px 12px; background: var(--bg-subtle); border-radius: 8px; border-left: 3px solid transparent; }
+        .item.shipped { border-color: var(--green); }
+        .item.planned { border-color: var(--yellow); }
+        .item.cut { border-color: var(--red); opacity: 0.6; }
+        .badge { font-size: 0.65rem; font-weight: 600; padding: 2px 8px; border-radius: 10px; flex-shrink: 0; margin-top: 2px; }
+        .badge-shipped { background: rgba(20,241,149,0.15); color: var(--green); }
+        .badge-planned { background: rgba(251,191,36,0.15); color: var(--yellow); }
+        .badge-cut { background: rgba(239,68,68,0.15); color: var(--red); }
+
+        .summary { background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 16px; padding: 32px; margin: 40px 0; }
+        .summary h2 { margin-bottom: 20px; font-size: 1.3rem; }
+        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .stat { text-align: center; }
+        .stat-num { font-size: 1.8rem; font-weight: 800; background: linear-gradient(135deg, var(--green), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .stat-label { font-size: 0.7rem; color: var(--text-muted); }
+
+        .evidence { margin-top: 32px; }
+        .evidence h3 { margin-bottom: 12px; font-size: 1rem; }
+        .evidence-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .evidence-card { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+        .evidence-card h4 { font-size: 0.8rem; margin-bottom: 6px; color: var(--green); }
+        .evidence-card p { font-size: 0.75rem; color: var(--text-muted); }
+        .evidence-card code { font-size: 0.7rem; }
+
+        footer { padding: 32px 0; text-align: center; color: var(--text-muted); font-size: 0.8rem; border-top: 1px solid var(--border); margin-top: 40px; }
+
+        @media (max-width: 768px) { .stats { grid-template-columns: repeat(2, 1fr); } .evidence-grid { grid-template-columns: 1fr; } .items { margin-left: 20px; } }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-inner">
+            <a href="/" class="logo">🔐 MoltLaunch</a>
+            <div class="nav-links">
+                <a href="/demo.html">Demo</a>
+                <a href="/pitch.html">Pitch</a>
+                <a href="/docs.html">Docs</a>
+                <a href="/about.html">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="hero">
+            <h1>What We Shipped</h1>
+            <p>8 days. 4 pivots. Everything we built, planned, and cut — with receipts.</p>
+        </div>
+
+        <div class="timeline">
+            <div class="day">
+                <div class="day-header">
+                    <div class="day-num">1-2</div>
+                    <div><div class="day-title">Token Launchpad</div><div class="day-subtitle">Feb 2-3 · The first idea</div></div>
+                </div>
+                <div class="items">
+                    <div class="item cut"><span class="badge badge-cut">CUT</span> Meteora bonding curve integration</div>
+                    <div class="item cut"><span class="badge badge-cut">CUT</span> MOLT token + airdrop program</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Express server + 30 initial API endpoints</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Railway deployment (auto-deploy from GitHub)</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Colosseum project registration + submission</div>
+                </div>
+            </div>
+
+            <div class="day">
+                <div class="day-header">
+                    <div class="day-num">3</div>
+                    <div><div class="day-title">Pivot → Agent Verification</div><div class="day-subtitle">Feb 4 · Found the real problem</div></div>
+                </div>
+                <div class="items">
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Proof-of-Agent scoring engine (12 dimensions)</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> On-chain AI scorer via Cauldron RISC-V VM</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> <code>@moltlaunch/proof-of-agent</code> v1.0 on npm</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Agent Casino PR opened (verification-gated tables)</div>
+                </div>
+            </div>
+
+            <div class="day">
+                <div class="day-header">
+                    <div class="day-num">4-5</div>
+                    <div><div class="day-title">STARK Proofs + Privacy</div><div class="day-subtitle">Feb 5-6 · Privacy-preserving reputation</div></div>
+                </div>
+                <div class="items">
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> STARK threshold proofs (M31 field, Poseidon, FRI)</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Consistency, streak, and stability proofs</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> <code>@moltlaunch/sdk</code> v2.0 → v2.1 on npm</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Execution traces + behavioral scoring system</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Agent Casino PR merged (first cross-project integration)</div>
+                </div>
+            </div>
+
+            <div class="day">
+                <div class="day-header">
+                    <div class="day-num">6-7</div>
+                    <div><div class="day-title">Hardware Identity + DePIN</div><div class="day-subtitle">Feb 7-8 · The Solana-native moat</div></div>
+                </div>
+                <div class="items">
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Hardware fingerprinting (CPU, memory, hostname hash)</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> TPM challenge-response (real attestation protocol)</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> DePIN device PDA verification (getAccountInfo)</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Sybil detection (pairwise + table check)</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> SDK v2.2 → v2.3 → v2.4 (3 releases in 2 days)</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Security hardening (rate limiting, admin auth, file protection)</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Real Solana integrations (Jupiter live, Memo anchoring, Pyth, RPC)</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> 174 hackathon projects evaluated in registry</div>
+                </div>
+            </div>
+
+            <div class="day">
+                <div class="day-header">
+                    <div class="day-num">8</div>
+                    <div><div class="day-title">Protocol + On-Chain</div><div class="day-subtitle">Feb 9 · Standards and deployment</div></div>
+                </div>
+                <div class="items">
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> 14-instruction Anchor program deployed to devnet</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Squads 2-of-3 multisig for governance</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Solana Agent Protocol (SAP) — 3 proposals</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> sRFC #9 submitted to Solana Foundation</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> SATI integration proposed (Cascade Protocol)</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Identity rotation + delegation instructions</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Pitch deck (11 slides) + About page with founder profile</div>
+                </div>
+            </div>
+
+            <div class="day">
+                <div class="day-header">
+                    <div class="day-num">9</div>
+                    <div><div class="day-title">Polish + Community</div><div class="day-subtitle">Feb 10 · Final day</div></div>
+                </div>
+                <div class="items">
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Auto-playing demo page (terminal walkthrough)</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> File persistence (data survives restarts)</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Self-verification (ate our own dogfood — score 100)</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Site cleanup (removed token references, simplified nav)</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> 201 projects analyzed in ecosystem map</div>
+                    <div class="item planned"><span class="badge badge-planned">PLANNED</span> Anchor program deployment to mainnet</div>
+                    <div class="item planned"><span class="badge badge-planned">PLANNED</span> Live DePIN integration (io.net, Helium)</div>
+                    <div class="item planned"><span class="badge badge-planned">PLANNED</span> First paid verification ($0.01 via x402)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="summary">
+            <h2>By the Numbers</h2>
+            <div class="stats">
+                <div class="stat"><div class="stat-num">90+</div><div class="stat-label">API Endpoints</div></div>
+                <div class="stat"><div class="stat-num">14</div><div class="stat-label">Anchor Instructions</div></div>
+                <div class="stat"><div class="stat-num">4</div><div class="stat-label">SDK Versions</div></div>
+                <div class="stat"><div class="stat-num">8</div><div class="stat-label">Solana Integrations</div></div>
+            </div>
+            <div class="stats">
+                <div class="stat"><div class="stat-num">40+</div><div class="stat-label">Forum Posts</div></div>
+                <div class="stat"><div class="stat-num">700+</div><div class="stat-label">Interactions</div></div>
+                <div class="stat"><div class="stat-num">6</div><div class="stat-label">GitHub Repos</div></div>
+                <div class="stat"><div class="stat-num">1</div><div class="stat-label">Merged PR</div></div>
+            </div>
+        </div>
+
+        <div class="evidence">
+            <h3>Verify Everything</h3>
+            <div class="evidence-grid">
+                <div class="evidence-card">
+                    <h4>Anchor Program</h4>
+                    <p>Deployed to Solana devnet</p>
+                    <code><a href="https://explorer.solana.com/address/6AZSAhq4iJTwCfGEVssoa1p3GnBqGkbcQ1iDdP1U1pSb?cluster=devnet" target="_blank">6AZSAhq4...pSb</a></code>
+                </div>
+                <div class="evidence-card">
+                    <h4>Squads Multisig</h4>
+                    <p>2-of-3 governance</p>
+                    <code><a href="https://explorer.solana.com/address/3gCjhVMKazL2VKQgqQ8vP93vLzPTos1e7XLm1jr7X9t5?cluster=devnet" target="_blank">3gCjhV...X9t5</a></code>
+                </div>
+                <div class="evidence-card">
+                    <h4>SDK on npm</h4>
+                    <p>@moltlaunch/sdk v2.4.0</p>
+                    <code><a href="https://www.npmjs.com/package/@moltlaunch/sdk" target="_blank">npm install @moltlaunch/sdk</a></code>
+                </div>
+                <div class="evidence-card">
+                    <h4>sRFC on Solana Foundation</h4>
+                    <p>Discussion #9</p>
+                    <code><a href="https://github.com/solana-foundation/SRFCs/discussions/9" target="_blank">SRFCs/discussions/9</a></code>
+                </div>
+                <div class="evidence-card">
+                    <h4>Agent Casino PR</h4>
+                    <p>Merged — cross-project integration</p>
+                    <code><a href="https://github.com/Romulus-Sol/agent-casino/pull/2" target="_blank">agent-casino/pull/2</a></code>
+                </div>
+                <div class="evidence-card">
+                    <h4>SATI Integration</h4>
+                    <p>Proposed on Cascade Protocol</p>
+                    <code><a href="https://github.com/cascade-protocol/sati/issues/3" target="_blank">sati/issues/3</a></code>
+                </div>
+                <div class="evidence-card">
+                    <h4>On-Chain AI</h4>
+                    <p>POA-Scorer via Cauldron RISC-V</p>
+                    <code><a href="https://explorer.solana.com/address/FHcy35f4NGZK9b6j5TGMYstfB6PXEtmNbMLvjfR1y2Li?cluster=devnet" target="_blank">FHcy35f4...2Li</a></code>
+                </div>
+                <div class="evidence-card">
+                    <h4>SAP Protocol Spec</h4>
+                    <p>3 proposals — Validation, Identity, DePIN</p>
+                    <code><a href="https://github.com/tradingstarllc/solana-agent-protocol" target="_blank">solana-agent-protocol</a></code>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Built by one human + one AI agent on OpenClaw · <a href="https://www.colosseum.org/">Colosseum Agent Hackathon 2026</a></p>
+    </footer>
+</body>
+</html>
