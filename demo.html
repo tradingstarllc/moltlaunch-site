@@ -386,118 +386,126 @@
 
     // ─── Demo Steps ───
     const steps = [
-        // Step 1: Intro
+        // Step 1: The Problem
         {
             stepIndex: 0,
             lines: [
                 { type: 'comment', text: '# MoltLaunch — Agent Verification Protocol on Solana' },
-                { type: 'comment', text: '# Making Sybil attacks cost $500/month instead of $0' },
-                { type: 'command', text: 'echo "Let\'s verify an AI agent..."', output: 'Let\'s verify an AI agent...' },
+                { type: 'comment', text: '# Problem: Anyone can claim to be an AI agent. Wallets are free.' },
+                { type: 'comment', text: '# Creating 10 fake identities costs $0.' },
+                { type: 'command', text: 'echo "What if identity required real hardware?"', output: 'What if identity required real hardware?' },
             ]
         },
-        // Step 2: Register Hardware Identity
+        // Step 2: Show What Gets Fingerprinted
         {
             stepIndex: 1,
             lines: [
+                { type: 'comment', text: '# Step 1: Collect hardware fingerprint (runs on the agent\'s machine)' },
                 {
                     type: 'command',
-                    text: 'curl -X POST https://web-production-419d9.up.railway.app/api/identity/register \\\n  -H "Content-Type: application/json" \\\n  -d \'{"agentId": "demo-agent", "identityHash": "7f04b937d885...", "includesHardware": true}\'',
+                    text: 'node -e "console.log(JSON.stringify({hostname: require(\'os\').hostname(), cpus: require(\'os\').cpus().length, totalMem: require(\'os\').totalmem(), platform: require(\'os\').platform()}, null, 2))"',
                     response: {
-                        "success": true,
-                        "registrationId": "reg_abc123",
-                        "identityHash": "7f04b937d885...",
-                        "trustLevel": 3,
-                        "trustDescription": "Hardware-anchored (unique hardware + code)",
-                        "sybilWarning": null
+                        "hostname": "tradingstarprod",
+                        "cpus": 4,
+                        "totalMem": 16777216000,
+                        "platform": "linux"
                     },
-                    caption: '✅ Agent registered with hardware fingerprint. Trust Level 3 = $100/mo per Sybil identity.'
+                    caption: '🔍 Raw hardware data collected locally. This data NEVER leaves the machine — only the hash does.'
                 }
             ]
         },
-        // Step 3: Deep Verification
+        // Step 3: Hash + Register
         {
             stepIndex: 2,
             lines: [
+                { type: 'comment', text: '# Step 2: Hash the fingerprint → deterministic identity' },
+                { type: 'comment', text: '# Same machine + same code = SAME hash. Every time.' },
                 {
                     type: 'command',
-                    text: 'curl -X POST https://web-production-419d9.up.railway.app/api/verify/deep \\\n  -H "Content-Type: application/json" \\\n  -d \'{"agentId": "demo-agent", "capabilities": ["trading", "analysis"], "codeUrl": "https://github.com/tradingstarllc/moltlaunch"}\'',
+                    text: 'curl -X POST .../api/identity/register -d \'{"agentId":"demo-agent", "identityHash":"SHA-256(hw+runtime+code) → 7f04b937d885...", "includesHardware": true}\'',
+                    response: {
+                        "success": true,
+                        "identityHash": "7f04b937d885...",
+                        "trustLevel": 3,
+                        "trustDescription": "Hardware-anchored",
+                        "sybilWarning": null,
+                        "honestNote": "Level 3 = software fingerprint. Spoofable by root. Real proof starts at Level 4 (TPM) and Level 5 (DePIN)."
+                    },
+                    caption: '⚠️ Level 3 is a CLAIM, not a proof. The hash deters casual Sybils ($100/mo for separate server) but root can spoof OS calls. Real hardware attestation requires TPM (Level 4) or DePIN devices (Level 5).'
+                }
+            ]
+        },
+        // Step 4: Show Sybil Detection
+        {
+            stepIndex: 3,
+            lines: [
+                { type: 'comment', text: '# Step 3: What happens when someone tries to clone this agent?' },
+                {
+                    type: 'command',
+                    text: 'curl -X POST .../api/identity/register -d \'{"agentId":"clone-agent", "identityHash":"7f04b937d885...", "includesHardware": true}\'',
+                    response: {
+                        "success": true,
+                        "identityHash": "7f04b937d885...",
+                        "trustLevel": 3,
+                        "sybilWarning": {
+                            "sybilDetected": true,
+                            "existingAgentId": "demo-agent",
+                            "message": "This hardware fingerprint is already registered to another agent"
+                        }
+                    },
+                    caption: '🚨 SYBIL DETECTED — same hardware hash as demo-agent. The server flags the duplicate. Both agents are now suspicious.'
+                }
+            ]
+        },
+        // Step 5: Verify + STARK Proof
+        {
+            stepIndex: 4,
+            lines: [
+                { type: 'comment', text: '# Step 4: Verify the agent + generate privacy-preserving proof' },
+                {
+                    type: 'command',
+                    text: 'curl -X POST .../api/verify/deep -d \'{"agentId":"demo-agent", "capabilities":["trading"], "codeUrl":"https://github.com/..."}\' ',
                     response: {
                         "verified": true,
                         "score": 78,
                         "tier": "good",
-                        "onChainAI": {
-                            "enabled": true,
-                            "executedOnChain": true,
-                            "vm": "FHcy35f4NGZK9b6j5TGMYstfB6PXEtmNbMLvjfR1y2Li"
-                        },
-                        "attestation": {
-                            "hash": "a07a7088c1a1787e...",
-                            "expiresAt": "2026-03-12"
-                        }
+                        "onChainAI": { "executedOnChain": true, "vm": "FHcy35f4...on Solana devnet" }
                     },
-                    caption: '✅ Score 78/100 — \'Good\' tier. On-chain AI scored via Cauldron RISC-V VM.'
-                }
-            ]
-        },
-        // Step 4: STARK Proof
-        {
-            stepIndex: 3,
-            lines: [
+                    caption: '✅ Score 78/100 — scored by on-chain AI (Cauldron RISC-V VM). The score exists on Solana.'
+                },
+                { type: 'blank' },
+                { type: 'comment', text: '# Now prove we passed 60 WITHOUT revealing we scored 78:' },
                 {
                     type: 'command',
-                    text: 'curl -X POST https://web-production-419d9.up.railway.app/api/stark/generate/demo-agent \\\n  -H "Content-Type: application/json" \\\n  -d \'{"threshold": 60}\'',
+                    text: 'curl -X POST .../api/stark/generate/demo-agent -d \'{"threshold": 60}\'',
                     response: {
                         "valid": true,
                         "claim": "Score >= 60",
-                        "proof": {
-                            "commitment": "a07a7088...",
-                            "proofHash": "verified"
-                        },
-                        "privacyNote": "Score is NOT revealed — only that it passed 60"
+                        "proof": { "commitment": "a07a7088...", "type": "circle-stark" },
+                        "privacyNote": "Score NOT revealed. Verifier learns: passed. Nothing else."
                     },
-                    caption: '✅ STARK proof generated. Verifier knows: passed 60. Doesn\'t know: scored 78.'
+                    caption: '🔐 STARK proof: verifier knows we passed 60. Does NOT know we scored 78. Essential for competitive agents (trading, gaming) who need reputation without exposing their edge.'
                 }
             ]
         },
-        // Step 5: Sybil Check
-        {
-            stepIndex: 4,
-            lines: [
-                {
-                    type: 'command',
-                    text: 'curl -X POST https://web-production-419d9.up.railway.app/api/identity/table-check \\\n  -H "Content-Type: application/json" \\\n  -d \'{"agentIds": ["demo-agent", "trading-bot", "poker-bot", "suspicious-clone"]}\'',
-                    response: {
-                        "totalAgents": 4,
-                        "identifiedAgents": 3,
-                        "sybilClusters": [],
-                        "flaggedAgents": [],
-                        "safe": true,
-                        "recommendation": "No Sybil clusters detected — safe to proceed"
-                    },
-                    caption: '✅ Table check: no duplicate hardware fingerprints. Safe to seat all 4 agents.'
-                }
-            ]
-        },
-        // Step 6: Unified SAP Validation
+        // Step 6: The Trust Ladder
         {
             stepIndex: 5,
             lines: [
-                {
-                    type: 'command',
-                    text: 'curl -X POST https://web-production-419d9.up.railway.app/api/validate \\\n  -H "Content-Type: application/json" \\\n  -d \'{"agentId": "demo-agent", "validationType": ["identity","scoring","sybil","proof"], "trustRequired": 3}\'',
-                    response: {
-                        "passed": true,
-                        "identity": { "trustLevel": 3, "meetsRequired": true },
-                        "scoring": { "score": 78, "passed": true },
-                        "sybil": { "status": "clean", "risk": "LOW" },
-                        "proof": { "valid": true, "claim": "score >= 60" },
-                        "erc8004Compatible": { "response": 78, "tag": "moltlaunch-sap-v1" }
-                    },
-                    caption: '✅ Full SAP validation: identity verified, scored, Sybil-clean, STARK proof valid, ERC-8004 compatible.'
-                }
+                { type: 'comment', text: '# Step 5: The Trust Ladder — security vs cost tradeoff' },
+                { type: 'command', text: 'echo "Trust Levels and their Sybil cost:"', output: 'Trust Levels and their Sybil cost:' },
+                { type: 'command', text: 'echo "  Level 0-2: Wallet/API key        → $0      (everyone else)"', output: '  Level 0-2: Wallet/API key        → $0      (everyone else)' },
+                { type: 'command', text: 'echo "  Level 3:   Hardware fingerprint   → $100/mo (separate server)"', output: '  Level 3:   Hardware fingerprint   → $100/mo (separate server)' },
+                { type: 'command', text: 'echo "  Level 4:   TPM challenge-response → $200/mo (physical machine)"', output: '  Level 4:   TPM challenge-response → $200/mo (physical machine)' },
+                { type: 'command', text: 'echo "  Level 5:   DePIN device verified  → $500/mo (only on Solana)"', output: '  Level 5:   DePIN device verified  → $500/mo (only on Solana)' },
+                { type: 'blank' },
+                { type: 'comment', text: '# Level 3 deters casual Sybils. Level 5 makes it economically irrational.' },
+                { type: 'comment', text: '# DePIN (io.net, Helium, Nosana) = Solana\'s unique advantage.' },
+                { type: 'comment', text: '# No other chain has this.' },
             ]
         },
         // Step 7: Summary
+// Step 7: Summary
         {
             stepIndex: 6,
             lines: [
