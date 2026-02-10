@@ -126,7 +126,9 @@ const DATA_FILES = {
     pools: path.join(DATA_DIR, 'pools.json'),
     traces: path.join(DATA_DIR, 'traces.json'),
     credits: path.join(DATA_DIR, 'credits.json'),
-    attestations: path.join(DATA_DIR, 'attestations.json')
+    attestations: path.join(DATA_DIR, 'attestations.json'),
+    revocations: path.join(DATA_DIR, 'revocations.json'),
+    badges: path.join(DATA_DIR, 'badges.json')
 };
 
 // Generic load/save helpers
@@ -264,8 +266,11 @@ const ATTESTATION_VALIDITY_DAYS = {
     premium: 90
 };
 
-// Revoked attestations (would be persisted in production)
-const revokedAttestations = new Set();
+// Revoked attestations - PERSISTED
+const revokedAttestationsData = loadData(DATA_FILES.revocations, []);
+const revokedAttestations = new Set(revokedAttestationsData);
+const saveRevocations = () => debouncedSave('revocations', DATA_FILES.revocations, [...revokedAttestations]);
+console.log(`Loaded ${revokedAttestations.size} revoked attestations`);
 
 // Verify Ed25519 signature (using tweetnacl or @solana/web3.js)
 const verifySignature = async (wallet, message, signature) => {
@@ -689,6 +694,7 @@ app.post('/api/verify/deep', async (req, res) => {
                     cost: 0.25,
                     at: new Date().toISOString()
                 });
+                saveCredits();
             } else {
                 return res.status(402).json({ 
                     error: 'Insufficient credits',
@@ -998,6 +1004,7 @@ app.post('/api/verify/revoke', (req, res) => {
     }
     
     revokedAttestations.add(attestationHash);
+    saveRevocations();
     
     // Also update the cache if we find a matching agent
     for (const [agentId, verification] of Object.entries(verificationCache)) {
@@ -1007,6 +1014,7 @@ app.post('/api/verify/revoke', (req, res) => {
             verification.revokedReason = reason;
         }
     }
+    saveVerifications();
     
     res.json({
         success: true,
@@ -1668,6 +1676,7 @@ app.post('/api/verify/certified', async (req, res) => {
                     cost: 2.00,
                     at: new Date().toISOString()
                 });
+                saveCredits();
             } else {
                 return res.status(402).json({ 
                     error: 'Insufficient credits',
@@ -1890,6 +1899,7 @@ app.post('/api/bounty/:bountyId/claim', (req, res) => {
         evidence: null,
         status: 'in_progress'
     };
+    saveBounties();
     
     res.json({
         success: true,
@@ -1936,6 +1946,7 @@ app.post('/api/bounty/:bountyId/submit', (req, res) => {
     claim.status = 'submitted';
     
     bounty.status = 'pending_review';
+    saveBounties();
     
     res.json({
         success: true,
@@ -2255,6 +2266,7 @@ app.post('/api/pool/apply', (req, res) => {
     
     poolAgents[topic].push(agentEntry);
     pool.totalAgents++;
+    savePools();
     
     res.json({
         success: true,
@@ -2328,6 +2340,7 @@ app.post('/api/pool/draw', (req, res) => {
         },
         warning: agent.status === 'warning' ? 'Performance below threshold. Improve returns or lose access.' : null
     });
+    savePools();
 });
 
 // Agent reports returns
@@ -2398,6 +2411,7 @@ app.post('/api/pool/return', (req, res) => {
         } : null,
         poolAPY: (pool.currentAPY * 100).toFixed(1) + '%'
     });
+    savePools();
 });
 
 // Devnet DBC Pool Configuration
@@ -4153,7 +4167,11 @@ app.get('/api/verify/mev-protection/:agentId', (req, res) => {
 // METAPLEX VERIFICATION BADGES
 // ==========================================
 
-const verificationBadges = new Map();
+// Verification badges - PERSISTED
+const badgesData = loadData(DATA_FILES.badges, {});
+const verificationBadges = new Map(Object.entries(badgesData));
+const saveBadges = () => debouncedSave('badges', DATA_FILES.badges, Object.fromEntries(verificationBadges));
+console.log(`Loaded ${verificationBadges.size} verification badges`);
 
 app.get('/api/badge/:agentId', (req, res) => {
     const { agentId } = req.params;
@@ -4225,6 +4243,7 @@ app.post('/api/badge/mint/:agentId', async (req, res) => {
     };
     
     verificationBadges.set(agentId, badge);
+    saveBadges();
     
     res.json({
         success: true,
