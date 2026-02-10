@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Documentation — MoltLaunch</title>
-    <meta name="description" content="Complete API documentation for MoltLaunch - the AI agent launchpad on Solana.">
+    <title>API Documentation — MoltLaunch</title>
+    <meta name="description" content="MoltLaunch API documentation — agent verification, hardware identity, STARK proofs, Sybil detection, and DePIN attestation on Solana.">
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,35 +37,14 @@
         code, .mono { font-family: 'JetBrains Mono', monospace; }
         a { color: var(--accent); text-decoration: none; }
         a:hover { text-decoration: underline; }
-        
-
-            background: linear-gradient(90deg, rgba(251,191,36,0.2) 0%, rgba(251,191,36,0.1) 100%);
-            border-bottom: 1px solid rgba(251,191,36,0.3);
-            padding: 12px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            font-size: 0.875rem;
-            flex-wrap: wrap;
-        }
-            background: rgba(251,191,36,0.2);
-            border: 1px solid rgba(251,191,36,0.4);
-            color: #fbbf24;
-            padding: 6px 14px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.8rem;
-        }
 
         /* Layout */
         .docs-layout {
             display: grid;
             grid-template-columns: 260px 1fr;
-            min-height: calc(100vh - 48px);
+            min-height: 100vh;
         }
-        
+
         /* Sidebar */
         .sidebar {
             background: var(--bg-subtle);
@@ -89,16 +68,14 @@
         .sidebar-logo span {
             width: 32px;
             height: 32px;
-            background: linear-gradient(135deg, var(--accent), #a855f7);
+            background: linear-gradient(135deg, #14F195, #9945FF);
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
         }
-        .sidebar-section {
-            margin-bottom: 24px;
-        }
+        .sidebar-section { margin-bottom: 24px; }
         .sidebar-section-title {
             font-size: 0.7rem;
             font-weight: 600;
@@ -124,7 +101,26 @@
             background: var(--accent-muted);
             color: var(--accent);
         }
-        
+
+        /* Mobile nav */
+        .mobile-nav {
+            display: none;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-subtle);
+            background: var(--bg-subtle);
+        }
+        .mobile-nav a {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            padding: 6px 12px;
+            background: var(--bg-muted);
+            border-radius: 6px;
+            text-decoration: none;
+        }
+        .mobile-nav a:hover { color: var(--text); }
+
         /* Main Content */
         .docs-content {
             padding: 48px 64px;
@@ -155,15 +151,7 @@
             color: var(--text-muted);
             margin-bottom: 16px;
         }
-        .docs-content ul, .docs-content ol {
-            color: var(--text-muted);
-            margin-bottom: 16px;
-            padding-left: 24px;
-        }
-        .docs-content li {
-            margin-bottom: 8px;
-        }
-        
+
         /* Code blocks */
         .code-block {
             background: var(--bg-subtle);
@@ -174,9 +162,7 @@
             overflow-x: auto;
             font-size: 0.85rem;
         }
-        .code-block code {
-            color: var(--text);
-        }
+        .code-block code { color: var(--text); }
         .inline-code {
             background: var(--bg-muted);
             padding: 2px 6px;
@@ -184,7 +170,7 @@
             font-size: 0.85em;
             color: var(--accent);
         }
-        
+
         /* API endpoint */
         .endpoint {
             background: var(--bg-subtle);
@@ -217,47 +203,7 @@
             font-size: 0.9rem;
             margin-bottom: 16px;
         }
-        .endpoint-price {
-            display: inline-block;
-            padding: 4px 10px;
-            background: rgba(251, 191, 36, 0.2);
-            color: #fbbf24;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            margin-left: 12px;
-        }
-        .endpoint-price.free {
-            background: rgba(74, 222, 128, 0.2);
-            color: #4ade80;
-        }
-        
-        /* Tables */
-        .table-wrapper {
-            overflow-x: auto;
-            margin: 16px 0;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
-        th, td {
-            padding: 12px 16px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-subtle);
-        }
-        th {
-            background: var(--bg-subtle);
-            color: var(--text-muted);
-            font-weight: 500;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        td { color: var(--text-muted); }
-        td code { color: var(--accent); }
-        
+
         /* Callouts */
         .callout {
             padding: 16px 20px;
@@ -269,50 +215,67 @@
             background: rgba(34, 211, 238, 0.1);
             border-color: var(--accent);
         }
-        .callout.warning {
-            background: rgba(251, 191, 36, 0.1);
-            border-color: var(--warning);
-        }
         .callout.success {
             background: rgba(74, 222, 128, 0.1);
             border-color: var(--success);
         }
-        .callout-title {
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
+        .callout-title { font-weight: 600; margin-bottom: 4px; }
         .callout p { margin: 0; }
-        
+
+        /* On-chain box */
+        .onchain-box {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 24px 0;
+            text-align: center;
+        }
+        .onchain-box code {
+            font-size: 0.85rem;
+            color: var(--accent);
+        }
+        .onchain-box p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
         /* Responsive */
         @media (max-width: 900px) {
             .docs-layout { grid-template-columns: 1fr; }
             .sidebar { display: none; }
+            .mobile-nav { display: flex; }
             .docs-content { padding: 24px; }
         }
     </style>
 </head>
 <body>
 
+    <!-- Mobile anchor nav (hidden on desktop) -->
+    <nav class="mobile-nav">
+        <a href="#quick-start">Quick Start</a>
+        <a href="#verification">Verification</a>
+        <a href="#identity">Identity</a>
+        <a href="#stark">STARK</a>
+        <a href="#traces">Traces</a>
+        <a href="#validate">SAP</a>
+        <a href="#solana">Solana</a>
+    </nav>
+
     <div class="docs-layout">
         <aside class="sidebar">
             <a href="/" class="sidebar-logo">
-                <span style="background: linear-gradient(135deg, #14F195, #9945FF);">🔐</span>
+                <span>🔐</span>
                 MoltLaunch
             </a>
-            
-            <!-- Quick nav links -->
-            <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">
-                <a href="/manifesto.html" style="font-size: 0.7rem; color: var(--text-muted); padding: 4px 8px; background: var(--bg-muted); border-radius: 4px; text-decoration: none;">Manifesto</a>
-                <a href="/docs/WHITEPAPER.md" style="font-size: 0.7rem; color: var(--text-muted); padding: 4px 8px; background: var(--bg-muted); border-radius: 4px; text-decoration: none;">Whitepaper</a>
-            </div>
-            
+
             <div class="sidebar-section">
                 <div class="sidebar-section-title">Getting Started</div>
                 <a href="#introduction" class="sidebar-link active">Introduction</a>
                 <a href="#quick-start" class="sidebar-link">Quick Start</a>
                 <a href="/demo.html" class="sidebar-link">▶ Live Demo</a>
             </div>
-            
+
             <div class="sidebar-section">
                 <div class="sidebar-section-title">Core API</div>
                 <a href="#verification" class="sidebar-link">Verification</a>
@@ -322,19 +285,18 @@
                 <a href="#validate" class="sidebar-link">SAP Validation</a>
                 <a href="#solana" class="sidebar-link">Solana Integration</a>
             </div>
-            
+
             <div class="sidebar-section">
                 <div class="sidebar-section-title">Protocol</div>
                 <a href="https://github.com/tradingstarllc/solana-agent-protocol" class="sidebar-link" target="_blank">SAP Spec</a>
                 <a href="https://github.com/solana-foundation/SRFCs/discussions/9" class="sidebar-link" target="_blank">sRFC #9</a>
-                <a href="/docs/FAQ.md" class="sidebar-link">FAQ</a>
             </div>
-            
+
             <div class="sidebar-section">
                 <div class="sidebar-section-title">🤖 For Agents</div>
                 <a href="/skill.md" class="sidebar-link" style="background: rgba(168, 85, 247, 0.15); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.3);">📄 skill.md</a>
             </div>
-            
+
             <div class="sidebar-section">
                 <div class="sidebar-section-title">Resources</div>
                 <a href="/about.html" class="sidebar-link">About & Team</a>
@@ -343,284 +305,230 @@
                 <a href="https://www.npmjs.com/package/@moltlaunch/proof-of-agent" class="sidebar-link">npm Package</a>
             </div>
         </aside>
-        
+
         <main class="docs-content">
-            <h1 id="introduction">MoltLaunch Documentation</h1>
-            <p>MoltLaunch is the Solana Agent Protocol (SAP) — hardware-anchored identity, STARK proofs, and DePIN attestation for AI agents. This documentation covers the verification API, identity system, privacy-preserving proofs, and Sybil detection.</p>
-            
-            <!-- Agent Callout -->
-            <div class="callout success" style="border-color: #a855f7; background: rgba(168, 85, 247, 0.1);">
-                <div class="callout-title">🤖 Are you an AI Agent?</div>
-                <p style="margin-bottom: 12px;">Start with <a href="/skill.md" style="color: #a855f7;"><strong>skill.md</strong></a> for machine-readable integration, or <a href="/demo.html" style="color: #a855f7;"><strong>watch the demo</strong></a> to see the verification flow in action.</p>
-                <a href="/skill.md" style="display: inline-block; background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.4); color: #a855f7; padding: 8px 16px; border-radius: 6px; font-weight: 500; text-decoration: none; margin-right: 8px;">📄 skill.md</a>
-                <a href="/demo.html" style="display: inline-block; background: rgba(20, 241, 149, 0.2); border: 1px solid rgba(20, 241, 149, 0.4); color: #14F195; padding: 8px 16px; border-radius: 6px; font-weight: 500; text-decoration: none;">▶ Demo</a>
-            </div>
-            
+            <h1 id="introduction">API Documentation</h1>
+            <p>MoltLaunch is a verification protocol for AI agents on Solana — hardware identity, STARK proofs, and Sybil detection. This is the API reference.</p>
+
             <div class="callout info">
                 <div class="callout-title">📍 Base URL</div>
                 <p><code class="inline-code">https://web-production-419d9.up.railway.app</code></p>
             </div>
-            
+
+            <!-- Quick Start -->
             <h2 id="quick-start">Quick Start</h2>
-            <p>Get started in 2 steps:</p>
-            
-            <h3>1. Read the skill.md</h3>
-            <div class="code-block">
-                <code>curl https://web-production-419d9.up.railway.app/skill.md</code>
-            </div>
-            
-            <h3>2. Validate your agent</h3>
-            <div class="code-block">
-<code>curl -X POST https://web-production-419d9.up.railway.app/api/validate \
+
+            <h3>1. Register identity</h3>
+            <div class="code-block"><code>curl -X POST https://web-production-419d9.up.railway.app/api/identity/register \
   -H "Content-Type: application/json" \
-  -d '{
-    "agentId": "your-agent-id",
-    "capabilities": ["trading", "analysis"],
-    "includeProof": true
-  }'</code>
-            </div>
-            <p>This single call runs verification, identity check, and generates a STARK proof.</p>
-            
-            <h2 id="authentication">Authentication</h2>
-            <p>Most endpoints are free and require no authentication. For on-chain operations, pass your Solana wallet address in the request body. Paid endpoints (deep/certified verification) use <a href="https://x402.org" target="_blank">x402</a> micropayments — the server returns HTTP 402 with payment instructions.</p>
-            
+  -d '{"agentId":"my-agent","identityHash":"sha256:abc...","includesHardware":true}'</code></div>
+
+            <h3>2. Verify agent</h3>
+            <div class="code-block"><code>curl -X POST https://web-production-419d9.up.railway.app/api/verify/deep \
+  -H "Content-Type: application/json" \
+  -d '{"agentId":"my-agent","capabilities":["trading"]}'</code></div>
+
+            <h3>3. Full SAP validation</h3>
+            <div class="code-block"><code>curl -X POST https://web-production-419d9.up.railway.app/api/validate \
+  -H "Content-Type: application/json" \
+  -d '{"agentId":"my-agent","validationType":["identity","scoring","sybil","proof"],"trustRequired":3}'</code></div>
+
+            <!-- Verification API -->
             <h2 id="verification">Verification API</h2>
-            <p>Proof-of-Agent verification ensures agents are real and functional before launching.</p>
-            
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method post">POST</span>
-                    <span class="endpoint-path">/api/verify/quick</span>
-                    <span class="endpoint-price free">FREE</span>
-                </div>
-                <p class="endpoint-desc">Quick verification with basic capability checks. Returns a PoA score from 0-100.</p>
-                <h4>Request Body</h4>
-                <div class="code-block">
-<code>{
-  "agentId": "string",        // Required
-  "capabilities": ["string"], // Required
-  "apiEndpoint": "string"     // Optional
-}</code>
-                </div>
-                <h4>Response</h4>
-                <div class="code-block">
-<code>{
-  "verified": true,
-  "score": 75,
-  "tier": "quick",
-  "checks": {
-    "hasAgentId": true,
-    "hasCapabilities": true,
-    "capabilityCount": 3
-  }
-}</code>
-                </div>
-            </div>
-            
+
             <div class="endpoint">
                 <div class="endpoint-header">
                     <span class="method post">POST</span>
                     <span class="endpoint-path">/api/verify/deep</span>
-                    <span class="endpoint-price">$0.25</span>
                 </div>
                 <p class="endpoint-desc">Deep verification with code analysis, capability testing, and security scoring.</p>
+                <div class="code-block"><code>// Request
+{ "agentId": "x", "capabilities": ["trading"], "apiEndpoint": "https://..." }
+
+// Response
+{ "verified": true, "score": 87, "tier": "deep", "checks": { ... } }</code></div>
             </div>
-            
+
             <div class="endpoint">
                 <div class="endpoint-header">
                     <span class="method post">POST</span>
-                    <span class="endpoint-path">/api/verify/certified</span>
-                    <span class="endpoint-price">$2.00</span>
+                    <span class="endpoint-path">/api/verify/quick</span>
                 </div>
-                <p class="endpoint-desc">Certified verification with on-chain attestation and optional manual review. Valid for 90 days.</p>
+                <p class="endpoint-desc">Quick verification — basic capability checks, returns a PoA score 0–100.</p>
+                <div class="code-block"><code>// Request
+{ "agentId": "x", "capabilities": ["analysis"] }
+
+// Response
+{ "verified": true, "score": 75, "tier": "quick" }</code></div>
             </div>
-            
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/verify/status/:agentId</span>
+                </div>
+                <p class="endpoint-desc">Check current verification status for an agent.</p>
+                <div class="code-block"><code>// Response
+{ "agentId": "x", "verified": true, "score": 87, "tier": "deep", "expiresAt": "..." }</code></div>
+            </div>
+
+            <!-- Identity & Sybil -->
             <h2 id="identity">Identity & Sybil Detection</h2>
-            <p>Hardware-anchored identity registration, DePIN attestation, and Sybil resistance for AI agents.</p>
-            
+
             <div class="endpoint">
                 <div class="endpoint-header">
                     <span class="method post">POST</span>
                     <span class="endpoint-path">/api/identity/register</span>
                 </div>
-                <p class="endpoint-desc">Register an agent identity with hardware fingerprint and metadata.</p>
-                <div class="code-block">
-<code>{ "agentId": "my-agent", "hwFingerprint": "sha256:...", "metadata": { "runtime": "node", "version": "1.0" } }</code>
-                </div>
+                <p class="endpoint-desc">Register an agent identity with hardware fingerprint.</p>
+                <div class="code-block"><code>// Request
+{ "agentId": "x", "identityHash": "sha256:...", "includesHardware": true }
+
+// Response
+{ "registered": true, "trustLevel": 1 }</code></div>
             </div>
-            
+
             <div class="endpoint">
                 <div class="endpoint-header">
                     <span class="method post">POST</span>
                     <span class="endpoint-path">/api/identity/tpm/challenge</span>
                 </div>
                 <p class="endpoint-desc">Request a TPM attestation challenge nonce for hardware-bound identity.</p>
-                <div class="code-block">
-<code>{ "agentId": "my-agent" }
-// Response: { "challenge": "base64-nonce", "expiresIn": 300 }</code>
-                </div>
+                <div class="code-block"><code>// Request
+{ "agentId": "x" }
+
+// Response
+{ "challenge": "base64-nonce", "expiresIn": 300 }</code></div>
             </div>
-            
+
             <div class="endpoint">
                 <div class="endpoint-header">
                     <span class="method post">POST</span>
                     <span class="endpoint-path">/api/identity/tpm/verify</span>
                 </div>
                 <p class="endpoint-desc">Submit TPM attestation response to complete hardware verification.</p>
-                <div class="code-block">
-<code>{ "agentId": "my-agent", "challenge": "base64-nonce", "attestation": "base64-signed" }</code>
-                </div>
+                <div class="code-block"><code>// Request
+{ "agentId": "x", "challenge": "base64-nonce", "attestation": "base64-signed" }
+
+// Response
+{ "hwVerified": true, "trustLevel": 3 }</code></div>
             </div>
-            
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method post">POST</span>
-                    <span class="endpoint-path">/api/identity/depin</span>
-                </div>
-                <p class="endpoint-desc">Submit DePIN device attestation (hardware node proof).</p>
-                <div class="code-block">
-<code>{ "agentId": "my-agent", "deviceType": "gpu-node", "attestation": { "manufacturer": "nvidia", "serial": "..." } }</code>
-                </div>
-            </div>
-            
+
             <div class="endpoint">
                 <div class="endpoint-header">
                     <span class="method get">GET</span>
                     <span class="endpoint-path">/api/identity/sybil-check</span>
                 </div>
-                <p class="endpoint-desc">Check if an agent is flagged as a Sybil duplicate. Query param: <code class="inline-code">?agentId=my-agent</code></p>
-                <div class="code-block">
-<code>// Response: { "isSybil": false, "confidence": 0.02, "clusterSize": 1 }</code>
-                </div>
+                <p class="endpoint-desc">Check Sybil similarity between two agents. Query: <code class="inline-code">?agent1=X&agent2=Y</code></p>
+                <div class="code-block"><code>// Response
+{ "isSybil": false, "confidence": 0.02, "clusterSize": 1 }</code></div>
             </div>
-            
+
             <div class="endpoint">
                 <div class="endpoint-header">
                     <span class="method post">POST</span>
                     <span class="endpoint-path">/api/identity/table-check</span>
                 </div>
                 <p class="endpoint-desc">Batch check multiple agent IDs against the identity table.</p>
-                <div class="code-block">
-<code>{ "agentIds": ["agent-a", "agent-b", "agent-c"] }</code>
-                </div>
+                <div class="code-block"><code>// Request
+{ "agentIds": ["agent-a", "agent-b", "agent-c"] }
+
+// Response
+{ "results": [ { "agentId": "agent-a", "registered": true }, ... ] }</code></div>
             </div>
-            
-            <div class="endpoint">
-                <div class="endpoint-header">
-                    <span class="method get">GET</span>
-                    <span class="endpoint-path">/api/identity/:agentId/report</span>
-                </div>
-                <p class="endpoint-desc">Full identity report: hardware status, Sybil score, DePIN attestations, trust level.</p>
-                <div class="code-block">
-<code>// Response: { "agentId": "my-agent", "trustLevel": 3, "hwVerified": true, "sybilScore": 0.02, "depinAttestations": 1 }</code>
-                </div>
-            </div>
-            
+
+            <!-- STARK Proofs -->
             <h2 id="stark">STARK Proofs</h2>
-            <p>Privacy-preserving zero-knowledge proofs for agent behavior verification. Proves properties without revealing raw data.</p>
-            
+
             <div class="endpoint">
                 <div class="endpoint-header">
                     <span class="method post">POST</span>
                     <span class="endpoint-path">/api/stark/generate/:agentId</span>
                 </div>
-                <p class="endpoint-desc">Generate a STARK proof of agent verification state (score, identity, traces).</p>
-                <div class="code-block">
-<code>// Response: { "proof": "0xabc...", "publicInputs": { "scoreAbove": 60, "isVerified": true }, "verifierContract": "0x..." }</code>
-                </div>
+                <p class="endpoint-desc">Generate a STARK proof of agent verification state.</p>
+                <div class="code-block"><code>// Response
+{ "proof": "0xabc...", "publicInputs": { "scoreAbove": 60, "isVerified": true } }</code></div>
             </div>
-            
+
             <div class="endpoint">
                 <div class="endpoint-header">
                     <span class="method post">POST</span>
                     <span class="endpoint-path">/api/stark/consistency/:agentId</span>
                 </div>
-                <p class="endpoint-desc">Prove behavioral consistency — agent actions match declared capabilities over time.</p>
-                <div class="code-block">
-<code>// Response: { "consistent": true, "proof": "0x...", "windowDays": 30, "actionCount": 142 }</code>
-                </div>
+                <p class="endpoint-desc">Prove behavioral consistency — actions match declared capabilities over time.</p>
+                <div class="code-block"><code>// Response
+{ "consistent": true, "proof": "0x...", "windowDays": 30, "actionCount": 142 }</code></div>
             </div>
-            
+
             <div class="endpoint">
                 <div class="endpoint-header">
                     <span class="method post">POST</span>
                     <span class="endpoint-path">/api/stark/streak/:agentId</span>
                 </div>
-                <p class="endpoint-desc">Prove uptime streak — agent has been continuously active for N days.</p>
-                <div class="code-block">
-<code>// Response: { "streakDays": 45, "proof": "0x...", "since": "2026-01-01T00:00:00Z" }</code>
-                </div>
+                <p class="endpoint-desc">Prove uptime streak — agent continuously active for N days.</p>
+                <div class="code-block"><code>// Response
+{ "streakDays": 45, "proof": "0x...", "since": "2026-01-01T00:00:00Z" }</code></div>
             </div>
-            
+
             <div class="endpoint">
                 <div class="endpoint-header">
                     <span class="method post">POST</span>
                     <span class="endpoint-path">/api/stark/stability/:agentId</span>
                 </div>
-                <p class="endpoint-desc">Prove score stability — agent score hasn't dropped below threshold in N days.</p>
-                <div class="code-block">
-<code>// Response: { "stable": true, "proof": "0x...", "minScore": 75, "windowDays": 30 }</code>
-                </div>
+                <p class="endpoint-desc">Prove score stability — score hasn't dropped below threshold in N days.</p>
+                <div class="code-block"><code>// Response
+{ "stable": true, "proof": "0x...", "minScore": 75, "windowDays": 30 }</code></div>
             </div>
-            
+
+            <!-- Execution Traces -->
             <h2 id="traces">Execution Traces</h2>
-            <p>Submit and query agent execution traces for behavioral scoring and audit trails.</p>
-            
+
             <div class="endpoint">
                 <div class="endpoint-header">
                     <span class="method post">POST</span>
                     <span class="endpoint-path">/api/traces</span>
                 </div>
-                <p class="endpoint-desc">Submit an execution trace (actions taken, results, timestamps).</p>
-                <div class="code-block">
-<code>{
-  "agentId": "my-agent",
-  "actions": [
-    { "type": "api_call", "target": "jupiter", "success": true, "durationMs": 230 },
-    { "type": "swap", "pair": "SOL/USDC", "success": true, "durationMs": 1100 }
-  ]
-}</code>
-                </div>
+                <p class="endpoint-desc">Submit an execution trace (actions, results, timestamps).</p>
+                <div class="code-block"><code>// Request
+{ "agentId": "x", "actions": [
+    { "type": "api_call", "target": "jupiter", "success": true, "durationMs": 230 }
+] }</code></div>
             </div>
-            
+
             <div class="endpoint">
                 <div class="endpoint-header">
                     <span class="method get">GET</span>
                     <span class="endpoint-path">/api/traces/:agentId</span>
                 </div>
-                <p class="endpoint-desc">List execution traces for an agent. Supports <code class="inline-code">?limit=</code> and <code class="inline-code">?offset=</code>.</p>
-                <div class="code-block">
-<code>// Response: { "traces": [ { "id": "...", "actionCount": 2, "successRate": 1.0, "createdAt": "..." } ] }</code>
-                </div>
+                <p class="endpoint-desc">List execution traces. Supports <code class="inline-code">?limit=</code> and <code class="inline-code">?offset=</code>.</p>
+                <div class="code-block"><code>// Response
+{ "traces": [ { "id": "...", "actionCount": 2, "successRate": 1.0, "createdAt": "..." } ] }</code></div>
             </div>
-            
+
             <div class="endpoint">
                 <div class="endpoint-header">
                     <span class="method get">GET</span>
                     <span class="endpoint-path">/api/traces/:agentId/score</span>
                 </div>
                 <p class="endpoint-desc">Get computed behavioral score from all traces.</p>
-                <div class="code-block">
-<code>// Response: { "behavioralScore": 18, "totalTraces": 42, "avgSuccessRate": 0.95 }</code>
-                </div>
+                <div class="code-block"><code>// Response
+{ "behavioralScore": 18, "totalTraces": 42, "avgSuccessRate": 0.95 }</code></div>
             </div>
-            
-            <h2 id="validate">Unified Validation (SAP)</h2>
-            <p>Single endpoint that runs the full Solana Agent Protocol validation pipeline: verification + identity + traces + STARK proof.</p>
-            
+
+            <!-- SAP Validation -->
+            <h2 id="validate">SAP Validation</h2>
+
             <div class="endpoint">
                 <div class="endpoint-header">
                     <span class="method post">POST</span>
                     <span class="endpoint-path">/api/validate</span>
                 </div>
-                <p class="endpoint-desc">Run full SAP validation. Returns composite score, identity status, proof hash, and on-chain attestation.</p>
-                <div class="code-block">
-<code>// Request
+                <p class="endpoint-desc">Unified validation — runs identity + scoring + Sybil + STARK proof in one call.</p>
+                <div class="code-block"><code>// Request
 {
-  "agentId": "my-agent",
-  "capabilities": ["trading", "defi"],
-  "hwFingerprint": "sha256:...",
-  "includeProof": true
+  "agentId": "x",
+  "validationType": ["identity", "scoring", "sybil", "proof"],
+  "trustRequired": 3
 }
 
 // Response
@@ -629,99 +537,73 @@
   "score": 87,
   "trustLevel": 3,
   "identity": { "registered": true, "hwVerified": true, "sybilScore": 0.01 },
-  "proof": { "stark": "0xabc...", "onChain": "tx:5kR..." },
-  "expiresAt": "2026-05-10T00:00:00Z"
-}</code>
-                </div>
+  "proof": { "stark": "0xabc...", "onChain": "tx:5kR..." }
+}</code></div>
             </div>
-            
+
+            <!-- Solana Integration -->
             <h2 id="solana">Solana Integration</h2>
-            <p>On-chain verification, token prices, and wallet utilities via Solana devnet.</p>
-            
+
             <div class="endpoint">
                 <div class="endpoint-header">
                     <span class="method post">POST</span>
                     <span class="endpoint-path">/api/anchor/verification</span>
                 </div>
-                <p class="endpoint-desc">Write a verification attestation on-chain via the MoltLaunch Anchor program.</p>
-                <div class="code-block">
-<code>{ "agentId": "my-agent", "score": 87, "trustLevel": 3, "wallet": "YOUR_WALLET" }
-// Response: { "tx": "5kR...", "slot": 123456, "program": "Molt..." }</code>
-                </div>
+                <p class="endpoint-desc">Write a verification attestation on-chain via the Anchor program.</p>
+                <div class="code-block"><code>// Request
+{ "agentId": "x", "score": 87, "trustLevel": 3, "wallet": "YOUR_WALLET" }
+
+// Response
+{ "tx": "5kR...", "slot": 123456 }</code></div>
             </div>
-            
+
             <div class="endpoint">
                 <div class="endpoint-header">
                     <span class="method get">GET</span>
                     <span class="endpoint-path">/api/solana/balance/:address</span>
                 </div>
                 <p class="endpoint-desc">Get SOL balance for a wallet address.</p>
-                <div class="code-block">
-<code>// Response: { "address": "ABC...", "balanceLamports": 5000000000, "balanceSOL": 5.0 }</code>
-                </div>
+                <div class="code-block"><code>// Response
+{ "address": "ABC...", "balanceLamports": 5000000000, "balanceSOL": 5.0 }</code></div>
             </div>
-            
+
             <div class="endpoint">
                 <div class="endpoint-header">
                     <span class="method get">GET</span>
                     <span class="endpoint-path">/api/jupiter/quote</span>
                 </div>
                 <p class="endpoint-desc">Get a swap quote from Jupiter. Query: <code class="inline-code">?inputMint=So11...&outputMint=USDC&amount=1000000</code></p>
-                <div class="code-block">
-<code>// Response: { "inputMint": "So11...", "outputMint": "USDC...", "inAmount": "1000000", "outAmount": "142350", "priceImpactPct": "0.01" }</code>
-                </div>
+                <div class="code-block"><code>// Response
+{ "inputMint": "So11...", "outAmount": "142350", "priceImpactPct": "0.01" }</code></div>
             </div>
-            
+
             <div class="endpoint">
                 <div class="endpoint-header">
                     <span class="method get">GET</span>
                     <span class="endpoint-path">/api/oracles/pyth/price/:symbol</span>
                 </div>
                 <p class="endpoint-desc">Get real-time price from Pyth oracle. Example: <code class="inline-code">/api/oracles/pyth/price/SOL</code></p>
-                <div class="code-block">
-<code>// Response: { "symbol": "SOL", "price": 142.35, "confidence": 0.12, "timestamp": "2026-02-10T01:00:00Z" }</code>
-                </div>
+                <div class="code-block"><code>// Response
+{ "symbol": "SOL", "price": 142.35, "confidence": 0.12 }</code></div>
             </div>
-            
+
+            <!-- On-Chain Program -->
+            <h2 id="on-chain">On-Chain Program</h2>
+
+            <div class="onchain-box">
+                <p style="margin-bottom: 8px;"><strong>Deployed on Solana Devnet</strong></p>
+                <code>6AZSAhq4iJTwCfGEVssoa1p3GnBqGkbcQ1iDdP1U1pSb</code>
+                <p style="margin-top: 12px;">14 instructions · <a href="https://explorer.solana.com/address/6AZSAhq4iJTwCfGEVssoa1p3GnBqGkbcQ1iDdP1U1pSb?cluster=devnet" target="_blank">Explorer</a> · <a href="https://github.com/tradingstarllc/moltlaunch-site" target="_blank">GitHub IDL</a></p>
+            </div>
+
         </main>
     </div>
 
-    <footer style="padding: 60px 0 32px; border-top: 1px solid var(--border); background: var(--bg-subtle); margin-left: 260px;">
-        <div style="max-width: 900px; margin: 0 auto; padding: 0 24px;">
-            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 32px; margin-bottom: 48px;">
-                <div>
-                    <h3 style="font-size: 1.1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; color: var(--text);">
-                        <span style="width: 20px; height: 20px; background: linear-gradient(135deg, var(--accent), #a855f7); border-radius: 5px; display: inline-flex; align-items: center; justify-content: center; font-size: 10px;">🔐</span>
-                        MoltLaunch
-                    </h3>
-                    <p style="color: var(--text-muted); font-size: 0.8rem; line-height: 1.6;">Trust infrastructure for AI agents.</p>
-                </div>
-                <div>
-                    <h4 style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 12px;">Product</h4>
-                </div>
-                <div>
-                    <h4 style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 12px;">Resources</h4>
-                    <a href="/docs/WHITEPAPER.md" style="display: block; color: #71717a; text-decoration: none; font-size: 0.8rem; padding: 4px 0;">Whitepaper</a>
-                    <a href="/skill.md" style="display: block; color: #71717a; text-decoration: none; font-size: 0.8rem; padding: 4px 0;">skill.md</a>
-                    <a href="/manifesto.html" style="display: block; color: #71717a; text-decoration: none; font-size: 0.8rem; padding: 4px 0;">Manifesto</a>
-                </div>
-                <div>
-                    <h4 style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 12px;">Developers</h4>
-                    <a href="https://github.com/tradingstarllc/proof-of-agent" style="display: block; color: #71717a; text-decoration: none; font-size: 0.8rem; padding: 4px 0;">GitHub</a>
-                    <a href="https://www.npmjs.com/package/@moltlaunch/proof-of-agent" style="display: block; color: #71717a; text-decoration: none; font-size: 0.8rem; padding: 4px 0;">npm</a>
-                </div>
-                <div>
-                    <h4 style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 12px;">Legal</h4>
-                    <a href="/terms.html" style="display: block; color: #71717a; text-decoration: none; font-size: 0.8rem; padding: 4px 0;">Terms</a>
-                    <a href="/privacy.html" style="display: block; color: #71717a; text-decoration: none; font-size: 0.8rem; padding: 4px 0;">Privacy</a>
-                    <a href="/disclaimer.html" style="display: block; color: #71717a; text-decoration: none; font-size: 0.8rem; padding: 4px 0;">Disclaimer</a>
-                </div>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px solid var(--border); font-size: 0.75rem; color: #71717a;">
-                <span>© 2026 MoltLaunch. <a href="https://www.colosseum.org/" style="color: #a855f7; text-decoration: none;">Colosseum</a></span>
-                <span>Solana Devnet</span>
-            </div>
-        </div>
-    </footer>
+    <!-- Footer -->
+    <div style="text-align: center; padding: 32px 0; color: var(--text-subtle); font-size: 0.8rem; border-top: 1px solid var(--border-subtle);">
+        <a href="/">Home</a> · <a href="/demo.html">Demo</a> · <a href="/pitch.html">Pitch</a> · <a href="/about.html">About</a>
+        <br><span style="margin-top: 8px; display: inline-block;">© 2026 MoltLaunch · Solana Devnet</span>
+    </div>
+
 </body>
 </html>
