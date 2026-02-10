@@ -29,6 +29,7 @@
     "test:coverage": "jest --coverage"
   },
   "dependencies": {
+    "@sqds/multisig": "^2.1.4",
     "@t54-labs/clawcredit-sdk": "^0.2.18",
     "@x402/core": "^2.3.0",
     "@x402/express": "^2.3.0",

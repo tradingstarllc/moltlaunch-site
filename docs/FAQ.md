@@ -149,7 +149,6 @@ We're decentralizing in four phases:
 | 1. Single authority | Now (hackathon) | Our server signs attestations |
 | 2. Squads multisig | Month 1 | 2-of-3 signatures required (deployed on devnet ✅) |
 | 3. Validator network | Month 3 | 4-5 independent validators with staking |
-| 4. DAO governance | Month 6+ | Realms-based, MOLT token voting |
 
 The DAO will govern protocol rules (scoring weights, trust thresholds, fee structure) but NOT individual verification results (validators do that via consensus).
 
