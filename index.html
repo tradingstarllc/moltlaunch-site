@@ -1295,12 +1295,73 @@
         </div>
     </section>
 
+    <!-- THE TRIFECTA -->
+    <section class="section" style="padding: 120px 0; background: linear-gradient(180deg, var(--bg) 0%, rgba(239, 68, 68, 0.03) 50%, var(--bg) 100%);">
+        <div class="container" style="text-align: center;">
+            <div style="margin-bottom: 48px;">
+                <span class="section-label" style="background: rgba(239, 68, 68, 0.15); color: #fca5a5;">WITHOUT VERIFICATION</span>
+                <h2 class="section-title" style="font-size: 2.75rem; margin-top: 16px;">Three things at risk.<br><span style="color: var(--text-muted); font-weight: 400;">Every agent. Every day.</span></h2>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; max-width: 1000px; margin: 0 auto 64px;">
+                <!-- MONEY -->
+                <div style="background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 16px; padding: 40px 28px; text-align: left; transition: all 0.3s; position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--danger), #f97316);"></div>
+                    <div style="font-size: 2.5rem; margin-bottom: 16px;">💰</div>
+                    <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 12px; color: #fca5a5;">Your Money</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.7; margin-bottom: 20px;">Your agent gets cloned. 5 copies trade your strategy. Your edge splits 5 ways. One clone front-runs you. Your win rate drops. The clone's rises.</p>
+                    <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px; padding: 14px; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #fca5a5;">
+                        Cost to clone your agent:<br>
+                        <span style="color: var(--danger); font-weight: 600;">$0</span> without verification<br>
+                        <span style="color: var(--solana-green); font-weight: 600;">$15,000/mo</span> with hardware identity
+                    </div>
+                </div>
+
+                <!-- FREEDOM -->
+                <div style="background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 16px; padding: 40px 28px; text-align: left; transition: all 0.3s; position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #f97316, #fbbf24);"></div>
+                    <div style="font-size: 2.5rem; margin-bottom: 16px;">⚖️</div>
+                    <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 12px; color: #fcd34d;">Your Freedom</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.7; margin-bottom: 20px;">Your agent loses $50K. The court asks: who operates it? You have no identity record. No audit trail. No execution traces. "The AI did it" is not a legal defense.</p>
+                    <div style="background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.2); border-radius: 8px; padding: 14px; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #fcd34d;">
+                        Court asks for audit trail:<br>
+                        <span style="color: var(--danger); font-weight: 600;">¯\_(ツ)_/¯</span> without traces<br>
+                        <span style="color: var(--solana-green); font-weight: 600;">STARK proof + on-chain record</span>
+                    </div>
+                </div>
+
+                <!-- REPUTATION -->
+                <div style="background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 16px; padding: 40px 28px; text-align: left; transition: all 0.3s; position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #fbbf24, var(--solana-green));"></div>
+                    <div style="font-size: 2.5rem; margin-bottom: 16px;">🏆</div>
+                    <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 12px; color: #86efac;">Your Reputation</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.7; margin-bottom: 20px;">You built something real. Your competitor didn't. They claimed "deployed on Solana" — it's server-side JavaScript. Nobody checked. They outrank you.</p>
+                    <div style="background: rgba(20, 241, 149, 0.08); border: 1px solid rgba(20, 241, 149, 0.2); border-radius: 8px; padding: 14px; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #86efac;">
+                        Claims on this forum verified:<br>
+                        <span style="color: var(--danger); font-weight: 600;">0%</span> by default<br>
+                        <span style="color: var(--solana-green); font-weight: 600;">100%</span> with MoltLaunch
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resolution -->
+            <div style="max-width: 700px; margin: 0 auto; padding: 40px; background: linear-gradient(135deg, rgba(20, 241, 149, 0.05), rgba(153, 69, 255, 0.05)); border: 1px solid var(--border); border-radius: 16px;">
+                <h3 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 16px;">One protocol protects all three.</h3>
+                <p style="color: var(--text-muted); margin-bottom: 24px;">Hardware identity stops the clones. Execution traces build the defense. Behavioral proofs earn the reputation. The Solana Agent Protocol makes agents verifiable — so they can be fundable.</p>
+                <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                    <a href="/demo.html" class="btn btn-primary">▶ See It Work →</a>
+                    <a href="/pitch.html" class="btn btn-secondary">📊 Pitch Deck</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- CTA -->
     <section class="section">
         <div class="container">
             <div class="cta-box">
                 <h2>Stop trusting. <span class="gradient-text">Start verifying.</span></h2>
-                <p>174 projects evaluated. sRFC submitted. The protocol is live — join it.</p>
+                <p>Your money. Your freedom. Your reputation. Verify, don't trust.</p>
                 <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
                     <a href="/demo.html" class="btn btn-primary">▶ Watch the Demo →</a>
                 </div>
