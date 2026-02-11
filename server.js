@@ -3097,6 +3097,11 @@ app.get('/.well-known/assetlinks.json', (req, res) => {
     res.sendFile(path.join(__dirname, '.well-known', 'assetlinks.json'));
 });
 
+// MoltLaunch self-verify well-known
+app.get('/.well-known/moltlaunch.json', (req, res) => {
+    res.json({"agentId":"moltlaunch-agent","token":"a3bf412f3003d848827396c4887931eb1541a6a01cd8932ab0901ec4a8da8ec8"});
+});
+
 // Icons directory
 app.use('/icons', express.static(path.join(__dirname, 'icons')));
 app.use('/images', express.static(path.join(__dirname, 'images')));
