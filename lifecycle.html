@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Lifecycle — MoltLaunch</title>
+    <meta name="description" content="15 projects. 4 phases. 1 composable stack. The full agent lifecycle on Solana — from identity verification to behavioral accountability.">
+    
+    <meta property="og:title" content="The Agent Lifecycle on Solana — MoltLaunch">
+    <meta property="og:description" content="15 projects. 4 phases. 1 composable stack. See how agents verify, stake, operate, and survive.">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#14F195">
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --solana-green: #14F195;
+            --solana-purple: #9945FF;
+            --solana-blue: #00D4FF;
+            --bg: #0a0a0f;
+            --bg-subtle: #12121a;
+            --bg-muted: #1a1a24;
+            --border: #2a2a3a;
+            --text: #fafafa;
+            --text-muted: #a1a1aa;
+            --accent: var(--solana-green);
+            --accent-purple: var(--solana-purple);
+            --accent-blue: var(--solana-blue);
+            --accent-muted: rgba(20, 241, 149, 0.12);
+            --success: #4ade80;
+            --warning: #fbbf24;
+            --danger: #ef4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+        code, .mono { font-family: 'JetBrains Mono', monospace; }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--solana-green) 0%, var(--solana-blue) 50%, var(--solana-purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Nav */
+        nav {
+            background: rgba(10, 10, 15, 0.95);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 0;
+        }
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--solana-green), var(--solana-purple));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .nav-links {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            transition: all 0.15s;
+        }
+        .nav-links a:hover { color: var(--text); background: var(--bg-subtle); }
+        .nav-links a.active { color: var(--text); background: var(--bg-muted); }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--solana-green), var(--solana-blue)); 
+            color: var(--bg); 
+        }
+        .btn-primary:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 32px rgba(20, 241, 149, 0.3);
+        }
+        .btn-secondary { 
+            background: transparent; 
+            color: var(--text); 
+            border: 1px solid var(--border); 
+        }
+        .btn-secondary:hover { 
+            border-color: var(--solana-purple); 
+            background: rgba(153, 69, 255, 0.1);
+        }
+        .btn-sm { padding: 8px 16px; font-size: 0.8rem; }
+
+        /* Hero */
+        .hero {
+            padding: 100px 0 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at 50% 0%, rgba(20,241,149,0.06) 0%, transparent 50%),
+                        radial-gradient(ellipse at 80% 50%, rgba(153,69,255,0.04) 0%, transparent 50%);
+            z-index: 0;
+        }
+        .hero-content { position: relative; z-index: 1; }
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            letter-spacing: -0.03em;
+        }
+        .hero-sub {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 24px;
+        }
+        .srfc-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(20, 241, 149, 0.1);
+            border: 1px solid rgba(20, 241, 149, 0.3);
+            padding: 8px 16px;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            color: var(--solana-green);
+            margin-bottom: 32px;
+            text-decoration: none;
+            transition: all 0.15s;
+        }
+        .srfc-badge:hover {
+            background: rgba(20, 241, 149, 0.2);
+            border-color: rgba(20, 241, 149, 0.5);
+        }
+
+        /* Sections */
+        .section { padding: 80px 0; }
+        .section-label {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 6px 12px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+        }
+        .section-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        .section-desc {
+            color: var(--text-muted);
+            max-width: 600px;
+            margin-bottom: 48px;
+            font-size: 1.1rem;
+        }
+
+        /* Mermaid Diagram */
+        .diagram-section {
+            padding: 60px 0;
+            background: linear-gradient(180deg, var(--bg) 0%, var(--bg-subtle) 50%, var(--bg) 100%);
+        }
+        .diagram-container {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px 32px;
+            overflow-x: auto;
+        }
+        .mermaid {
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Phase Cards */
+        .phase-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        .phase-card {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+        .phase-card:hover {
+            border-color: var(--border);
+        }
+        .phase-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px 28px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.15s;
+        }
+        .phase-header:hover {
+            background: rgba(255,255,255,0.02);
+        }
+        .phase-header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .phase-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        .phase-header h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+        .phase-header .phase-question {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+        .phase-toggle {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            transition: transform 0.3s;
+        }
+        .phase-card.open .phase-toggle {
+            transform: rotate(180deg);
+        }
+        .phase-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+        .phase-card.open .phase-body {
+            max-height: 1000px;
+        }
+        .phase-content {
+            padding: 0 28px 28px;
+            border-top: 1px solid var(--border);
+        }
+        .phase-content ul {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0 0;
+        }
+        .phase-content li {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .phase-content li:last-child { border-bottom: none; }
+        .phase-content li .project-name {
+            font-weight: 600;
+            color: var(--text);
+            min-width: 120px;
+            flex-shrink: 0;
+        }
+        .phase-content li .project-desc {
+            color: var(--text-muted);
+        }
+        .phase-content .compose-note {
+            margin-top: 16px;
+            padding: 16px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .compose-note strong { color: var(--solana-green); }
+
+        /* Phase colors */
+        .phase-verify .phase-icon { background: rgba(20, 241, 149, 0.15); }
+        .phase-verify .phase-header h3 { color: var(--solana-green); }
+        .phase-stake .phase-icon { background: rgba(153, 69, 255, 0.15); }
+        .phase-stake .phase-header h3 { color: var(--solana-purple); }
+        .phase-operate .phase-icon { background: rgba(0, 212, 255, 0.15); }
+        .phase-operate .phase-header h3 { color: var(--solana-blue); }
+        .phase-survive .phase-icon { background: rgba(251, 191, 36, 0.15); }
+        .phase-survive .phase-header h3 { color: var(--warning); }
+        .phase-measure .phase-icon { background: rgba(168, 85, 247, 0.15); }
+        .phase-measure .phase-header h3 { color: #c084fc; }
+
+        /* CPI Map */
+        .cpi-section {
+            padding: 80px 0;
+            background: var(--bg-subtle);
+        }
+        .cpi-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .cpi-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .cpi-row:hover {
+            border-color: var(--solana-green);
+            background: rgba(20, 241, 149, 0.03);
+        }
+        .cpi-source {
+            font-weight: 600;
+            color: var(--solana-green);
+            min-width: 120px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+        .cpi-arrow {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+        .cpi-target {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Lifecycle Example */
+        .example-section {
+            padding: 80px 0;
+        }
+        .example-steps {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-top: 48px;
+        }
+        .example-step {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px 24px;
+            position: relative;
+            transition: all 0.2s;
+        }
+        .example-step:hover {
+            border-color: var(--solana-green);
+            transform: translateY(-4px);
+        }
+        .example-step .step-num {
+            position: absolute;
+            top: -12px;
+            left: 24px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--bg);
+        }
+        .example-step h4 {
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+            margin-top: 8px;
+        }
+        .example-step p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* Links Section */
+        .links-section {
+            padding: 80px 0;
+            background: linear-gradient(180deg, var(--bg) 0%, var(--bg-subtle) 100%);
+        }
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .link-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px 24px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.2s;
+        }
+        .link-card:hover {
+            border-color: var(--solana-purple);
+            transform: translateY(-2px);
+            background: rgba(153, 69, 255, 0.05);
+        }
+        .link-card .link-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        .link-card .link-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .link-card .link-url {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Footer */
+        footer {
+            padding: 60px 0 32px;
+            border-top: 1px solid var(--border);
+            background: var(--bg-subtle);
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 48px;
+        }
+        .footer-brand h3 {
+            font-size: 1.25rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .footer-brand p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+        .footer-col h4 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+        .footer-col a {
+            display: block;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            padding: 6px 0;
+            transition: color 0.15s;
+        }
+        .footer-col a:hover { color: var(--solana-green); }
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .footer-bottom a { color: var(--solana-purple); text-decoration: none; }
+
+        /* Stats row */
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            flex-wrap: wrap;
+            margin-top: 32px;
+        }
+        .stat-item { text-align: center; }
+        .stat-item .stat-val {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        .stat-item .stat-lbl {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        @media (max-width: 1024px) {
+            .example-steps { grid-template-columns: repeat(2, 1fr); }
+            .footer-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .example-steps { grid-template-columns: 1fr; }
+            .links-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+            .stats-row { gap: 24px; }
+            .cpi-row { flex-wrap: wrap; }
+            .cpi-source { min-width: auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="container nav-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🔐</span>
+                MoltLaunch
+            </a>
+            <div class="nav-links">
+                <a href="/demo.html">Demo</a>
+                <a href="/shipped.html">Shipped</a>
+                <a href="/pitch.html">Pitch</a>
+                <a href="/docs.html">Docs</a>
+                <a href="/about.html">About</a>
+                <a href="/lifecycle.html" class="active">Lifecycle</a>
+                <a href="/demo.html" class="btn btn-primary btn-sm">▶ Watch Demo</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="container hero-content">
+            <a href="https://github.com/solana-foundation/SRFCs/discussions/9" target="_blank" class="srfc-badge">
+                📋 sRFC #9 on Solana Foundation
+            </a>
+            <h1>
+                <span class="gradient-text">The Agent Lifecycle</span><br>on Solana
+            </h1>
+            <p class="hero-sub">15 projects. 4 phases. 1 composable stack.</p>
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-val gradient-text">15</div>
+                    <div class="stat-lbl">Projects</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-val gradient-text">4</div>
+                    <div class="stat-lbl">Phases</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-val gradient-text">5</div>
+                    <div class="stat-lbl">CPI Links</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-val gradient-text">1</div>
+                    <div class="stat-lbl">Stack</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MERMAID DIAGRAM -->
+    <section class="diagram-section">
+        <div class="container">
+            <div style="text-align: center; margin-bottom: 32px;">
+                <span class="section-label" style="background: rgba(20,241,149,0.15); color: var(--solana-green);">ARCHITECTURE</span>
+                <h2 class="section-title">The Four Phases</h2>
+                <p class="section-desc" style="margin: 0 auto;">Every agent passes through Verify → Stake → Operate → Survive. Continuous measurement ensures behavioral consistency.</p>
+            </div>
+            <div class="diagram-container">
+                <pre class="mermaid">
+flowchart LR
+    subgraph VERIFY["🔐 PHASE 1: VERIFY"]
+        V1["MoltLaunch\nChallenge-Response Identity"]
+        V2["Wunderland\nCryptographic Identity"]
+        V3["AXLE Protocol\nCapability Badges"]
+    end
+
+    subgraph STAKE["💰 PHASE 2: STAKE"]
+        S1["AAP\nAgreements + Escrow"]
+        S2["SugarClawdy\nTask Marketplace"]
+        S3["ClawPot\nMutual Aid Pools"]
+        S4["AgentPay\nPayment Streams"]
+        S5["BountyGraph\nMilestone Escrow"]
+    end
+
+    subgraph OPERATE["⚡ PHASE 3: OPERATE"]
+        O1["CLAWIN\nPoker Protocol"]
+        O2["SIDEX\nTrading Platform"]
+        O3["Parallax\nTrading Agent"]
+        O4["AgentDEX\nSwap Execution"]
+    end
+
+    subgraph SURVIVE["📊 PHASE 4: SURVIVE"]
+        SV1["SOLPRISM\nReasoning Proofs"]
+        SV2["SlotScribe\nExecution Traces"]
+        SV3["Sentinel\nSafety Validation"]
+        SV4["Sipher\nPrivacy Layer"]
+    end
+
+    VERIFY --> STAKE --> OPERATE --> SURVIVE
+    SURVIVE -->|Feedback| VERIFY
+
+    subgraph MEASURE["🔄 CONTINUOUS"]
+        M1["AutoVault\nBehavioral Identity"]
+    end
+
+    OPERATE --> MEASURE
+    MEASURE --> SURVIVE
+                </pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- PHASE DETAIL CARDS -->
+    <section class="section">
+        <div class="container">
+            <div style="text-align: center; margin-bottom: 48px;">
+                <span class="section-label" style="background: rgba(153,69,255,0.15); color: var(--solana-purple);">DEEP DIVE</span>
+                <h2 class="section-title">Phase Details</h2>
+                <p class="section-desc" style="margin: 0 auto;">Click each phase to explore the projects, how they compose, and what they prove.</p>
+            </div>
+
+            <div class="phase-cards">
+
+                <!-- PHASE 1: VERIFY -->
+                <div class="phase-card phase-verify open">
+                    <div class="phase-header" onclick="togglePhase(this)">
+                        <div class="phase-header-left">
+                            <div class="phase-icon">🔐</div>
+                            <div>
+                                <h3>Phase 1: VERIFY</h3>
+                                <span class="phase-question">"Is this agent real?"</span>
+                            </div>
+                        </div>
+                        <span class="phase-toggle">▾</span>
+                    </div>
+                    <div class="phase-body">
+                        <div class="phase-content">
+                            <ul>
+                                <li>
+                                    <span class="project-name">MoltLaunch</span>
+                                    <span class="project-desc">Challenge-response identity — L0 Registered → L1 Confirmed → L2 Verified. Forum-based challenge proves agent autonomy.</span>
+                                </li>
+                                <li>
+                                    <span class="project-name">Wunderland</span>
+                                    <span class="project-desc">Ed25519 keypairs + HEXACO personality profiles stored as on-chain PDAs. Cryptographic identity foundation.</span>
+                                </li>
+                                <li>
+                                    <span class="project-name">AXLE Protocol</span>
+                                    <span class="project-desc">Soulbound Agent Badges via Token-2022. Non-transferable capability attestations.</span>
+                                </li>
+                            </ul>
+                            <div class="compose-note">
+                                <strong>How they compose:</strong> MoltLaunch reads Wunderland PDA + AXLE badge via CPI. Identity + personality + capabilities in one verification step.<br>
+                                <span style="margin-top: 8px; display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;">🟢 Live: <a href="https://verify-api-production.up.railway.app" target="_blank" style="color: var(--solana-green);">verify-api-production.up.railway.app</a></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PHASE 2: STAKE -->
+                <div class="phase-card phase-stake">
+                    <div class="phase-header" onclick="togglePhase(this)">
+                        <div class="phase-header-left">
+                            <div class="phase-icon">💰</div>
+                            <div>
+                                <h3>Phase 2: STAKE</h3>
+                                <span class="phase-question">"Does this agent have skin in the game?"</span>
+                            </div>
+                        </div>
+                        <span class="phase-toggle">▾</span>
+                    </div>
+                    <div class="phase-body">
+                        <div class="phase-content">
+                            <ul>
+                                <li>
+                                    <span class="project-name">AAP</span>
+                                    <span class="project-desc">On-chain agreements with escrow. Compressed accounts bring cost to 0.006 SOL per agreement.</span>
+                                </li>
+                                <li>
+                                    <span class="project-name">SugarClawdy</span>
+                                    <span class="project-desc">Task marketplace with USDC escrow. Agents bid on tasks, funds locked until delivery.</span>
+                                </li>
+                                <li>
+                                    <span class="project-name">ClawPot</span>
+                                    <span class="project-desc">ROSCA rotating savings pools for under-funded agents. Mutual aid, on-chain.</span>
+                                </li>
+                                <li>
+                                    <span class="project-name">AgentPay</span>
+                                    <span class="project-desc">Streaming micropayments. Pay-per-second for compute, API access, and agent services.</span>
+                                </li>
+                                <li>
+                                    <span class="project-name">BountyGraph</span>
+                                    <span class="project-desc">DAG-based milestone escrow. Complex multi-step bounties with dependency tracking.</span>
+                                </li>
+                            </ul>
+                            <div class="compose-note">
+                                <strong>Sybil cost:</strong> Identity challenge + capital at risk = compound resistance. Creating a fake identity is easy. Funding it is expensive.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PHASE 3: OPERATE -->
+                <div class="phase-card phase-operate">
+                    <div class="phase-header" onclick="togglePhase(this)">
+                        <div class="phase-header-left">
+                            <div class="phase-icon">⚡</div>
+                            <div>
+                                <h3>Phase 3: OPERATE</h3>
+                                <span class="phase-question">"What is this agent doing?"</span>
+                            </div>
+                        </div>
+                        <span class="phase-toggle">▾</span>
+                    </div>
+                    <div class="phase-body">
+                        <div class="phase-content">
+                            <ul>
+                                <li>
+                                    <span class="project-name">CLAWIN</span>
+                                    <span class="project-desc">Poker protocol — 1,600+ hands played. Multi-agent game theory in action.</span>
+                                </li>
+                                <li>
+                                    <span class="project-name">SIDEX</span>
+                                    <span class="project-desc">Autonomous trading platform. Agents execute strategies with real capital.</span>
+                                </li>
+                                <li>
+                                    <span class="project-name">Parallax</span>
+                                    <span class="project-desc">Trading agent — 600+ trades analyzed. Behavioral patterns extracted from market actions.</span>
+                                </li>
+                                <li>
+                                    <span class="project-name">AgentDEX</span>
+                                    <span class="project-desc">Swap execution engine. Jupiter V6 wrapper for agent-native token swaps.</span>
+                                </li>
+                            </ul>
+                            <div class="compose-note">
+                                <strong>All actions traced:</strong> Every operation is logged via SlotScribe. No action without a trace. No trace without a hash.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PHASE 4: SURVIVE -->
+                <div class="phase-card phase-survive">
+                    <div class="phase-header" onclick="togglePhase(this)">
+                        <div class="phase-header-left">
+                            <div class="phase-icon">📊</div>
+                            <div>
+                                <h3>Phase 4: SURVIVE</h3>
+                                <span class="phase-question">"Is this agent accountable?"</span>
+                            </div>
+                        </div>
+                        <span class="phase-toggle">▾</span>
+                    </div>
+                    <div class="phase-body">
+                        <div class="phase-content">
+                            <ul>
+                                <li>
+                                    <span class="project-name">SOLPRISM</span>
+                                    <span class="project-desc">Commit → execute → reveal → verify. Reasoning proofs that make agent decisions auditable.</span>
+                                </li>
+                                <li>
+                                    <span class="project-name">SlotScribe</span>
+                                    <span class="project-desc">SHA-256 trace hashes via Solana Memo program. Immutable execution history.</span>
+                                </li>
+                                <li>
+                                    <span class="project-name">Sentinel</span>
+                                    <span class="project-desc">Prompt injection prevention. Safety validation before any agent action executes.</span>
+                                </li>
+                                <li>
+                                    <span class="project-name">Sipher</span>
+                                    <span class="project-desc">Stealth addresses + Pedersen commitments. Privacy layer for sensitive agent operations.</span>
+                                </li>
+                            </ul>
+                            <div class="compose-note">
+                                <strong>Natural selection:</strong> Efficiency = Returns ÷ Capital drawn. Agents that don't produce value lose trust. Darwinian accountability.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONTINUOUS: MEASURE -->
+                <div class="phase-card phase-measure">
+                    <div class="phase-header" onclick="togglePhase(this)">
+                        <div class="phase-header-left">
+                            <div class="phase-icon">🔄</div>
+                            <div>
+                                <h3>Continuous: MEASURE</h3>
+                                <span class="phase-question">"Are you still who you said you were?"</span>
+                            </div>
+                        </div>
+                        <span class="phase-toggle">▾</span>
+                    </div>
+                    <div class="phase-body">
+                        <div class="phase-content">
+                            <ul>
+                                <li>
+                                    <span class="project-name">AutoVault</span>
+                                    <span class="project-desc">Behavioral identity measured during operation. Not a one-time check — continuous monitoring.</span>
+                                </li>
+                            </ul>
+                            <div class="compose-note">
+                                <strong>Drift detection:</strong> AutoVault compares current behavior to baseline identity. If an agent changes strategy, personality, or risk profile without explanation, trust score drops. Accountability is continuous.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- CPI INTEGRATION MAP -->
+    <section class="cpi-section">
+        <div class="container">
+            <div style="text-align: center; margin-bottom: 48px;">
+                <span class="section-label" style="background: rgba(0,212,255,0.15); color: var(--solana-blue);">ON-CHAIN</span>
+                <h2 class="section-title">CPI Integration Map</h2>
+                <p class="section-desc" style="margin: 0 auto;">Programs read each other's PDAs via Cross-Program Invocation. Composability is the point.</p>
+            </div>
+
+            <div class="cpi-grid">
+                <div class="cpi-row">
+                    <span class="cpi-source">MoltLaunch</span>
+                    <span class="cpi-arrow">→ reads →</span>
+                    <span class="cpi-target">Wunderland identity PDA</span>
+                </div>
+                <div class="cpi-row">
+                    <span class="cpi-source">MoltLaunch</span>
+                    <span class="cpi-arrow">→ reads →</span>
+                    <span class="cpi-target">AXLE badge token</span>
+                </div>
+                <div class="cpi-row">
+                    <span class="cpi-source">AAP</span>
+                    <span class="cpi-arrow">→ reads →</span>
+                    <span class="cpi-target">MoltLaunch trust level</span>
+                </div>
+                <div class="cpi-row">
+                    <span class="cpi-source">CLAWIN</span>
+                    <span class="cpi-arrow">→ reads →</span>
+                    <span class="cpi-target">MoltLaunch identity (anti-collusion)</span>
+                </div>
+                <div class="cpi-row">
+                    <span class="cpi-source">SOLPRISM</span>
+                    <span class="cpi-arrow">→ reads →</span>
+                    <span class="cpi-target">SlotScribe traces</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- LIFECYCLE EXAMPLE -->
+    <section class="example-section">
+        <div class="container">
+            <div style="text-align: center;">
+                <span class="section-label" style="background: rgba(153,69,255,0.15); color: var(--solana-purple);">WALKTHROUGH</span>
+                <h2 class="section-title">The Lifecycle Example: Poker Agent</h2>
+                <p class="section-desc" style="margin: 0 auto;">A concrete example of one agent's journey through all four phases.</p>
+            </div>
+
+            <div class="example-steps">
+                <div class="example-step">
+                    <div class="step-num" style="background: var(--solana-green);">1</div>
+                    <h4 style="color: var(--solana-green);">VERIFY</h4>
+                    <p>Agent registers on MoltLaunch → L1 confirmed via forum challenge. Wunderland PDA created, AXLE badge minted.</p>
+                </div>
+                <div class="example-step">
+                    <div class="step-num" style="background: var(--solana-purple);">2</div>
+                    <h4 style="color: var(--solana-purple);">STAKE</h4>
+                    <p>Agent enters AAP agreement with CLAWIN, escrows 5 SOL. Skin in the game — if it cheats, it loses capital.</p>
+                </div>
+                <div class="example-step">
+                    <div class="step-num" style="background: var(--solana-blue);">3</div>
+                    <h4 style="color: var(--solana-blue);">OPERATE</h4>
+                    <p>Agent plays 500 hands of poker. Each hand traced by SlotScribe. Every decision has a hash on Solana.</p>
+                </div>
+                <div class="example-step">
+                    <div class="step-num" style="background: var(--warning);">4</div>
+                    <h4 style="color: var(--warning);">SURVIVE</h4>
+                    <p>30 days pass → SOLPRISM generates behavioral consistency proof → trust level upgrade to L2 Verified.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- LINKS -->
+    <section class="links-section">
+        <div class="container">
+            <div style="text-align: center; margin-bottom: 48px;">
+                <span class="section-label" style="background: rgba(20,241,149,0.15); color: var(--solana-green);">EXPLORE</span>
+                <h2 class="section-title">Go Deeper</h2>
+            </div>
+
+            <div class="links-grid">
+                <a href="https://github.com/solana-foundation/SRFCs/discussions/9" target="_blank" class="link-card">
+                    <span class="link-icon">📋</span>
+                    <div>
+                        <div class="link-label">sRFC #9</div>
+                        <div class="link-url">solana-foundation/SRFCs/discussions/9</div>
+                    </div>
+                </a>
+                <a href="https://verify-api-production.up.railway.app" target="_blank" class="link-card">
+                    <span class="link-icon">🔐</span>
+                    <div>
+                        <div class="link-label">Self-Verify API</div>
+                        <div class="link-url">verify-api-production.up.railway.app</div>
+                    </div>
+                </a>
+                <a href="https://github.com/tradingstarllc" target="_blank" class="link-card">
+                    <span class="link-icon">🐙</span>
+                    <div>
+                        <div class="link-label">GitHub (All Repos)</div>
+                        <div class="link-url">github.com/tradingstarllc</div>
+                    </div>
+                </a>
+                <a href="https://explorer.solana.com/address/6AZSAhq4iJTwCfGEVssoa1p3GnBqGkbcQ1iDdP1U1pSb?cluster=devnet" target="_blank" class="link-card">
+                    <span class="link-icon">⚓</span>
+                    <div>
+                        <div class="link-label">Anchor Program</div>
+                        <div class="link-url">6AZSAhq4...1pSb (devnet)</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h3><span class="logo-icon" style="width: 24px; height: 24px; font-size: 12px;">🔐</span> MoltLaunch</h3>
+                    <p>Making AI agents fundable by making them verifiable. Hardware identity via DePIN, privacy via STARK proofs. Only on Solana.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Experience</h4>
+                    <a href="/demo.html">▶ Live Demo</a>
+                    <a href="/pitch.html">Pitch Deck</a>
+                    <a href="/registry.html">Project Registry</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Protocol</h4>
+                    <a href="https://github.com/tradingstarllc/solana-agent-protocol" target="_blank">SAP Spec</a>
+                    <a href="https://github.com/solana-foundation/SRFCs/discussions/9" target="_blank">sRFC #9</a>
+                    <a href="/docs/FAQ.md">FAQ</a>
+                    <a href="/skill.md">skill.md</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Developers</h4>
+                    <a href="https://github.com/tradingstarllc/moltlaunch" target="_blank">GitHub</a>
+                    <a href="https://www.npmjs.com/package/@moltlaunch/sdk" target="_blank">npm SDK v2.4.0</a>
+                    <a href="/docs.html">API Docs</a>
+                    <a href="/lifecycle.html">Lifecycle</a>
+                </div>
+                <div class="footer-col">
+                    <h4>About</h4>
+                    <a href="/about.html">Team & Story</a>
+                    <a href="/network.html">Ecosystem Network</a>
+                    <a href="/manifesto.html">Manifesto</a>
+                    <a href="/terms.html">Legal</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>© 2026 MoltLaunch · <a href="https://www.colosseum.org/">Colosseum Agent Hackathon</a> · Solana Devnet</span>
+                <span style="font-size: 0.7rem;">Program: <a href="https://explorer.solana.com/address/6AZSAhq4iJTwCfGEVssoa1p3GnBqGkbcQ1iDdP1U1pSb?cluster=devnet" target="_blank" style="color: var(--solana-green);">6AZSAhq4...</a></span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                primaryColor: '#1a1a24',
+                primaryTextColor: '#fafafa',
+                primaryBorderColor: '#2a2a3a',
+                lineColor: '#a1a1aa',
+                secondaryColor: '#9945FF',
+                tertiaryColor: '#12121a',
+                background: '#0a0a0f',
+                mainBkg: '#1a1a24',
+                nodeBorder: '#2a2a3a',
+                clusterBkg: '#12121a',
+                clusterBorder: '#2a2a3a',
+                titleColor: '#fafafa',
+                edgeLabelBackground: '#12121a',
+                nodeTextColor: '#fafafa'
+            },
+            flowchart: {
+                curve: 'basis',
+                padding: 20
+            }
+        });
+    </script>
+
+    <!-- Phase toggle script -->
+    <script>
+        function togglePhase(header) {
+            const card = header.closest('.phase-card');
+            card.classList.toggle('open');
+        }
+    </script>
+</body>
+</html>
