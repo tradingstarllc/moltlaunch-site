@@ -3,858 +3,1201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MoltLaunch Demo — Live Verification Flow</title>
-    <meta name="description" content="Watch MoltLaunch verify an AI agent in real-time: hardware identity, STARK proofs, Sybil detection, and on-chain scoring.">
+    <title>MoltLaunch — The Movie</title>
+    <meta name="description" content="A cinematic walkthrough of MoltLaunch: Sybil-resistant identity for AI agents on Solana.">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
     
     <style>
         :root {
             --bg: #0a0a0f;
-            --bg-bar: #111118;
             --green: #14F195;
             --green-dim: #0d9e63;
             --purple: #9945FF;
-            --blue: #00D4FF;
-            --yellow: #fbbf24;
+            --cyan: #00D4FF;
+            --white: #e0e0e0;
+            --dim: #555;
             --red: #ef4444;
-            --text: #e0e0e0;
-            --text-muted: #666;
-            --comment: #6a737d;
-            --json-key: #79c0ff;
-            --json-string: #a5d6ff;
-            --json-number: #f2cc60;
-            --json-bool: #ff7b72;
-            --json-null: #8b949e;
-            --caption-bg: rgba(20, 241, 149, 0.08);
-            --caption-border: rgba(20, 241, 149, 0.25);
+            --yellow: #fbbf24;
+            --orange: #f97316;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { height: 100%; overflow: hidden; }
-        body {
-            font-family: 'JetBrains Mono', monospace;
+        html, body { 
+            height: 100%; 
+            overflow: hidden; 
             background: var(--bg);
-            color: var(--text);
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            color: var(--white);
+        }
+
+        /* ── SCANLINES OVERLAY ── */
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 1000;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.03) 2px,
+                rgba(0, 0, 0, 0.03) 4px
+            );
+        }
+
+        /* ── CRT FLICKER ── */
+        .crt-flicker {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 999;
+            opacity: 0;
+            background: rgba(20, 241, 149, 0.03);
+            animation: flicker 0.15s infinite;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0; }
+            5% { opacity: 0.02; }
+            10% { opacity: 0; }
+            15% { opacity: 0.04; }
+            20% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+
+        /* ── SCREEN FLASH ── */
+        .screen-flash {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 998;
+            opacity: 0;
+            transition: opacity 0.05s;
+        }
+        .screen-flash.flash-green { background: rgba(20, 241, 149, 0.15); }
+        .screen-flash.flash-red { background: rgba(239, 68, 68, 0.2); }
+        .screen-flash.flash-white { background: rgba(255, 255, 255, 0.1); }
+        .screen-flash.active { opacity: 1; }
+
+        /* ── MAIN CONTAINER ── */
+        .cinema {
+            position: relative;
+            width: 100%;
+            height: 100%;
             display: flex;
             flex-direction: column;
         }
 
-        /* ── Top Bar ── */
-        .top-bar {
-            background: var(--bg-bar);
-            border-bottom: 1px solid #1e1e2a;
-            padding: 12px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-shrink: 0;
-            z-index: 10;
-        }
-        .top-bar-left {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        .top-bar-title {
-            font-family: 'Inter', sans-serif;
-            font-weight: 700;
-            font-size: 1rem;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .top-bar-title .logo-icon {
-            width: 28px;
-            height: 28px;
-            background: linear-gradient(135deg, var(--green), var(--purple));
-            border-radius: 6px;
+        /* ── STAGE ── */
+        .stage {
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
         }
-        .step-counter {
-            font-family: 'Inter', sans-serif;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            font-weight: 400;
-        }
-        .step-counter .current-step { color: var(--green); font-weight: 600; }
 
-        /* Step dots */
-        .step-dots {
+        /* ── SCENE ── */
+        .scene {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 60px;
+            opacity: 0;
+            transform: scale(0.98);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            pointer-events: none;
+        }
+        .scene.active {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+        .scene.exiting {
+            opacity: 0;
+            transform: scale(1.02);
+        }
+
+        .scene-content {
+            max-width: 800px;
+            width: 100%;
+            position: relative;
+        }
+
+        /* ── SCENE LABEL ── */
+        .scene-label {
+            position: absolute;
+            top: 20px;
+            left: 60px;
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--dim);
+            opacity: 0;
+            transition: opacity 0.5s ease 0.3s;
+        }
+        .scene.active .scene-label {
+            opacity: 1;
+        }
+
+        /* ── TYPEWRITER LINES ── */
+        .line {
+            opacity: 0;
+            transform: translateY(4px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            min-height: 1.6em;
+            line-height: 1.6;
+            font-size: 15px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .line.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .line.typing .text-content {
+            border-right: 2px solid var(--green);
+            animation: cursor-blink 0.6s step-end infinite;
+            padding-right: 2px;
+        }
+
+        @keyframes cursor-blink {
+            0%, 100% { border-color: var(--green); }
+            50% { border-color: transparent; }
+        }
+
+        /* ── TEXT COLORS ── */
+        .c-green { color: var(--green); }
+        .c-cyan { color: var(--cyan); }
+        .c-purple { color: var(--purple); }
+        .c-red { color: var(--red); }
+        .c-yellow { color: var(--yellow); }
+        .c-orange { color: var(--orange); }
+        .c-dim { color: var(--dim); }
+        .c-white { color: var(--white); }
+        .c-bold { font-weight: 700; }
+
+        /* ── PROMPT CHARACTER ── */
+        .prompt { color: var(--green); }
+        .response { color: var(--cyan); }
+        .warning { color: var(--red); }
+        .alert { color: var(--yellow); }
+        .success { color: var(--green); font-weight: 700; }
+
+        /* ── BOX DRAWING ── */
+        .box {
+            color: var(--green);
+            font-weight: 700;
+            text-align: center;
+        }
+        .box-purple {
+            color: var(--purple);
+        }
+
+        /* ── PROGRESS BAR ── */
+        .progress-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.05);
+            z-index: 100;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--green), var(--cyan));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* ── CONTROLS HUD ── */
+        .hud {
+            position: fixed;
+            bottom: 12px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 11px;
+            color: var(--dim);
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .cinema:hover .hud,
+        .hud.visible {
+            opacity: 1;
+        }
+        .hud-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .hud-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: pulse-dot 2s ease infinite;
+        }
+        .hud-dot.paused {
+            background: var(--yellow);
+            animation: none;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .scene-counter {
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ── SCENE DOTS ── */
+        .scene-dots {
+            position: fixed;
+            bottom: 14px;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
             gap: 8px;
-            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s;
         }
-        .step-dot {
-            width: 10px;
-            height: 10px;
+        .cinema:hover .scene-dots {
+            opacity: 1;
+        }
+        .scene-dot {
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            background: #2a2a3a;
-            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.15);
+            cursor: pointer;
+            transition: all 0.3s;
         }
-        .step-dot.active {
+        .scene-dot.active {
             background: var(--green);
             box-shadow: 0 0 8px rgba(20, 241, 149, 0.5);
         }
-        .step-dot.done {
-            background: var(--green-dim);
+        .scene-dot:hover {
+            background: rgba(255, 255, 255, 0.4);
         }
 
-        .top-bar-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .top-btn {
-            font-family: 'Inter', sans-serif;
-            font-size: 0.75rem;
-            padding: 6px 14px;
-            border-radius: 6px;
-            border: 1px solid #2a2a3a;
-            background: transparent;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-        .top-btn:hover {
-            color: #fff;
-            border-color: #444;
-            background: rgba(255,255,255,0.05);
-        }
-
-        /* ── Progress Bar ── */
-        .progress-bar {
-            height: 3px;
-            background: #1a1a24;
-            flex-shrink: 0;
-        }
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--green), var(--blue));
-            width: 0%;
-            transition: width 0.5s ease;
-        }
-
-        /* ── Terminal ── */
-        .terminal {
-            flex: 1;
-            overflow-y: auto;
-            padding: 24px 32px;
-            scroll-behavior: smooth;
-        }
-        .terminal::-webkit-scrollbar { width: 8px; }
-        .terminal::-webkit-scrollbar-track { background: transparent; }
-        .terminal::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 4px; }
-        .terminal::-webkit-scrollbar-thumb:hover { background: #3a3a4a; }
-
-        .terminal-content {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        /* ── Lines ── */
-        .line {
-            margin-bottom: 2px;
-            white-space: pre-wrap;
-            word-break: break-all;
-            line-height: 1.6;
-            font-size: 0.85rem;
-        }
-        .line .prompt {
-            color: var(--green);
-            user-select: none;
-        }
-        .line .command {
-            color: #e0e0e0;
-        }
-        .line.comment .command {
-            color: var(--comment);
-        }
-
-        /* ── JSON Response ── */
-        .response-block {
-            background: #0d0d14;
-            border: 1px solid #1e1e2a;
-            border-radius: 8px;
-            padding: 16px 20px;
-            margin: 8px 0 4px 0;
-            font-size: 0.8rem;
-            line-height: 1.7;
+        /* ── PAUSE OVERLAY ── */
+        .pause-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 13px;
+            color: var(--dim);
+            letter-spacing: 4px;
+            text-transform: uppercase;
             opacity: 0;
-            transform: translateY(4px);
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            overflow-x: auto;
+            transition: opacity 0.3s;
+            z-index: 200;
+            pointer-events: none;
         }
-        .response-block.visible {
+        .pause-overlay.visible {
             opacity: 1;
-            transform: translateY(0);
-        }
-        .json-key { color: var(--json-key); }
-        .json-string { color: var(--json-string); }
-        .json-number { color: var(--json-number); }
-        .json-bool { color: var(--json-bool); }
-        .json-null { color: var(--json-null); }
-        .json-brace { color: #8b949e; }
-
-        /* ── Caption ── */
-        .caption {
-            background: var(--caption-bg);
-            border: 1px solid var(--caption-border);
-            border-radius: 8px;
-            padding: 10px 16px;
-            margin: 8px 0 20px 0;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.82rem;
-            color: var(--green);
-            line-height: 1.5;
-            opacity: 0;
-            transform: translateY(4px);
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-        .caption.visible {
-            opacity: 1;
-            transform: translateY(0);
         }
 
-        /* ── Cursor ── */
-        .cursor {
-            display: inline-block;
-            width: 8px;
-            height: 16px;
-            background: var(--green);
-            vertical-align: text-bottom;
-            animation: blink 1s step-end infinite;
-            margin-left: 1px;
-        }
-        @keyframes blink {
-            50% { opacity: 0; }
-        }
-
-        /* ── End Screen ── */
-        .end-screen {
+        /* ── OVERVIEW MODE ── */
+        .overview {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 10, 15, 0.97);
+            z-index: 500;
             display: none;
-            text-align: center;
-            padding: 40px 20px;
-            margin-top: 20px;
+            padding: 40px;
+            overflow-y: auto;
         }
-        .end-screen.visible { display: block; }
-        .end-screen h2 {
-            font-family: 'Inter', sans-serif;
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 8px;
-        }
-        .end-screen p {
-            font-family: 'Inter', sans-serif;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 24px;
-        }
-        .end-buttons {
+        .overview.active {
             display: flex;
-            gap: 12px;
-            justify-content: center;
             flex-wrap: wrap;
+            gap: 16px;
+            align-content: flex-start;
+            justify-content: center;
         }
-        .end-btn {
-            font-family: 'Inter', sans-serif;
-            font-size: 0.85rem;
-            font-weight: 600;
-            padding: 12px 28px;
-            border-radius: 8px;
-            border: none;
+        .overview-title {
+            width: 100%;
+            text-align: center;
+            font-size: 13px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--dim);
+            margin-bottom: 20px;
+        }
+        .overview-card {
+            width: 220px;
+            height: 140px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            padding: 16px;
             cursor: pointer;
-            text-decoration: none;
             transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
-        .end-btn-primary {
-            background: var(--green);
-            color: #000;
+        .overview-card:hover {
+            border-color: var(--green);
+            background: rgba(20, 241, 149, 0.05);
         }
-        .end-btn-primary:hover {
-            background: #1aff9e;
-            transform: translateY(-1px);
+        .overview-card.current {
+            border-color: var(--green);
+            box-shadow: 0 0 12px rgba(20, 241, 149, 0.2);
         }
-        .end-btn-secondary {
-            background: transparent;
-            border: 1px solid #2a2a3a;
-            color: var(--text);
+        .overview-card-num {
+            font-size: 11px;
+            color: var(--dim);
         }
-        .end-btn-secondary:hover {
-            border-color: #444;
-            background: rgba(255,255,255,0.05);
-        }
-        .end-btn-replay {
-            background: transparent;
-            border: 1px solid var(--green);
+        .overview-card-title {
+            font-size: 13px;
             color: var(--green);
+            font-weight: 700;
         }
-        .end-btn-replay:hover {
-            background: rgba(20, 241, 149, 0.1);
+        .overview-card-time {
+            font-size: 10px;
+            color: var(--dim);
         }
 
-        /* ── Back Link ── */
+        /* ── INTRO BOOT ── */
+        .boot-screen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--bg);
+            z-index: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .boot-screen.hidden {
+            display: none;
+        }
+        .boot-text {
+            font-size: 14px;
+            color: var(--green);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .boot-text.visible {
+            opacity: 1;
+        }
+        .boot-text.dim {
+            color: var(--dim);
+            font-size: 12px;
+        }
+        .boot-prompt {
+            font-size: 12px;
+            color: var(--dim);
+            animation: cursor-blink 0.8s step-end infinite;
+            border-right: 2px solid var(--dim);
+            padding-right: 4px;
+        }
+
+        /* ── COUNTDOWN INDICATOR ── */
+        .scene-timer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 11px;
+            color: var(--dim);
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-variant-numeric: tabular-nums;
+        }
+        .cinema:hover .scene-timer {
+            opacity: 0.6;
+        }
+
+        /* ── BAR CHART ANIMATION ── */
+        .bar {
+            display: inline;
+        }
+
+        /* ── MOBILE ── */
+        @media (max-width: 768px) {
+            .scene {
+                padding: 30px 20px;
+            }
+            .line {
+                font-size: 12px;
+                line-height: 1.5;
+            }
+            .scene-label {
+                left: 20px;
+                top: 16px;
+                font-size: 10px;
+            }
+            .stage {
+                padding: 20px;
+            }
+            .overview-card {
+                width: 160px;
+                height: 110px;
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .line {
+                font-size: 10.5px;
+                line-height: 1.4;
+            }
+            .scene {
+                padding: 24px 14px;
+            }
+        }
+
+        /* ── GLITCH EFFECT ── */
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 1px); }
+            40% { transform: translate(2px, -1px); }
+            60% { transform: translate(-1px, -1px); }
+            80% { transform: translate(1px, 2px); }
+            100% { transform: translate(0); }
+        }
+        .glitch {
+            animation: glitch 0.3s ease;
+        }
+
+        /* ── GLOW PULSE ── */
+        @keyframes glow-pulse {
+            0%, 100% { text-shadow: 0 0 4px rgba(20, 241, 149, 0.3); }
+            50% { text-shadow: 0 0 16px rgba(20, 241, 149, 0.8), 0 0 30px rgba(20, 241, 149, 0.3); }
+        }
+        .glow {
+            animation: glow-pulse 2s ease infinite;
+        }
+
+        /* ── BACK LINK ── */
         .back-link {
             position: fixed;
-            bottom: 20px;
-            left: 24px;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.75rem;
-            color: var(--text-muted);
+            top: 20px;
+            left: 20px;
+            font-size: 11px;
+            color: var(--dim);
             text-decoration: none;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s, color 0.2s;
+        }
+        .cinema:hover .back-link {
             opacity: 0.6;
-            transition: opacity 0.2s;
-            z-index: 10;
         }
-        .back-link:hover { opacity: 1; }
+        .back-link:hover {
+            color: var(--green);
+            opacity: 1 !important;
+        }
 
-        /* ── Responsive ── */
-        @media (max-width: 768px) {
-            .terminal { padding: 16px; }
-            .line { font-size: 0.72rem; }
-            .response-block { font-size: 0.68rem; padding: 12px; }
-            .caption { font-size: 0.75rem; }
-            .top-bar { padding: 10px 16px; }
-            .top-bar-title { font-size: 0.85rem; }
-            .step-dots { gap: 6px; }
-            .step-dot { width: 8px; height: 8px; }
+        /* ── LINKS IN SCENE 10 ── */
+        .scene-link {
+            color: var(--cyan);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
         }
-        @media (max-width: 480px) {
-            .terminal { padding: 12px 8px; }
-            .line { font-size: 0.65rem; }
-            .response-block { font-size: 0.6rem; padding: 8px; }
-            .step-counter { display: none; }
+        .scene-link:hover {
+            border-bottom-color: var(--cyan);
         }
     </style>
 </head>
 <body>
 
-    <!-- Top Bar -->
-    <div class="top-bar">
-        <div class="top-bar-left">
-            <div class="top-bar-title">
-                <span class="logo-icon">🦎</span>
-                MoltLaunch Demo
+<div class="scanlines"></div>
+<div class="crt-flicker"></div>
+<div class="screen-flash" id="screenFlash"></div>
+
+<!-- BOOT SCREEN -->
+<div class="boot-screen" id="bootScreen">
+    <div class="boot-text" id="boot1">MOLTLAUNCH TERMINAL v2.1.0</div>
+    <div class="boot-text dim" id="boot2">initializing identity verification engine...</div>
+    <div class="boot-text dim" id="boot3">loading 10 scenes • ~3 min runtime</div>
+    <div class="boot-text" id="boot4" style="margin-top: 10px;">▶ PRESS ANY KEY TO BEGIN</div>
+</div>
+
+<!-- OVERVIEW -->
+<div class="overview" id="overview">
+    <div class="overview-title">SCENE SELECT — ESC TO CLOSE</div>
+</div>
+
+<!-- PAUSE OVERLAY -->
+<div class="pause-overlay" id="pauseOverlay">▌▌ PAUSED</div>
+
+<!-- MAIN CINEMA -->
+<div class="cinema" id="cinema" style="display:none;">
+    <a href="/" class="back-link">← moltlaunch.com</a>
+
+    <div class="stage">
+
+        <!-- SCENE 1: THE PROBLEM -->
+        <div class="scene" id="scene-0" data-label="SCENE 01 — THE PROBLEM" data-duration="15000">
+            <div class="scene-label">SCENE 01 — THE PROBLEM</div>
+            <div class="scene-content">
+                <div class="line" data-delay="0"><span class="prompt">&gt;</span> scanning solana network...</div>
+                <div class="line" data-delay="800"><span class="prompt">&gt;</span> wallets detected: <span class="c-cyan">14,291,847</span></div>
+                <div class="line" data-delay="1600"><span class="prompt">&gt;</span> agents detected: <span class="c-cyan">2,600,000+</span></div>
+                <div class="line" data-delay="2400"><span class="prompt">&gt;</span> cost to create 1,000 fake agents: <span class="c-red">$0.00</span></div>
+                <div class="line" data-delay="3600">&nbsp;</div>
+                <div class="line" data-delay="4000" data-flash="red"><span class="prompt">&gt;</span> <span class="c-red c-bold">WARNING</span>: identity = wallet. wallets are free.</div>
+                <div class="line" data-delay="5500" data-flash="red"><span class="prompt">&gt;</span> sybil resistance: <span class="c-red c-bold">NONE</span></div>
             </div>
-            <div class="step-dots" id="stepDots">
-                <div class="step-dot" data-step="0"></div>
-                <div class="step-dot" data-step="1"></div>
-                <div class="step-dot" data-step="2"></div>
-                <div class="step-dot" data-step="3"></div>
-                <div class="step-dot" data-step="4"></div>
-                <div class="step-dot" data-step="5"></div>
-                <div class="step-dot" data-step="6"></div>
+        </div>
+
+        <!-- SCENE 2: THE CLONE -->
+        <div class="scene" id="scene-1" data-label="SCENE 02 — THE CLONE" data-duration="15000">
+            <div class="scene-label">SCENE 02 — THE CLONE</div>
+            <div class="scene-content">
+                <div class="line" data-delay="0"><span class="prompt">&gt;</span> your agent: <span class="c-cyan">wallet_7xK4...jP2q</span></div>
+                <div class="line" data-delay="800"><span class="prompt">&gt;</span> win rate: <span class="c-green">73%</span> | profit: <span class="c-green">$2,100/mo</span> | reputation: <span class="c-green">HIGH</span></div>
+                <div class="line" data-delay="2000">&nbsp;</div>
+                <div class="line" data-delay="2400" data-flash="red"><span class="prompt">&gt;</span> <span class="c-red c-bold">[ALERT]</span> clone detected</div>
+                <div class="line" data-delay="3200"><span class="prompt">&gt;</span> clone_1: <span class="c-dim">wallet_9aB3...mN7r</span> → same code, same strategy</div>
+                <div class="line" data-delay="4000"><span class="prompt">&gt;</span> clone_2: <span class="c-dim">wallet_2cD5...kL8s</span> → front-running your trades</div>
+                <div class="line" data-delay="4800"><span class="prompt">&gt;</span> clone_3: <span class="c-dim">wallet_6eF7...hJ1t</span> → your win rate dropping: <span class="c-green">73%</span> → <span class="c-red">61%</span></div>
+                <div class="line" data-delay="6200">&nbsp;</div>
+                <div class="line" data-delay="6800"><span class="prompt">&gt;</span> <span class="c-yellow">the clone is now more trusted than you.</span></div>
+                <div class="line" data-delay="8000"><span class="prompt">&gt;</span> <span class="c-yellow">you can't prove you were first.</span></div>
             </div>
-            <span class="step-counter" id="stepCounter">Step <span class="current-step">1</span> of 7</span>
         </div>
-        <div class="top-bar-right">
-            <button class="top-btn" id="skipBtn" onclick="skipToEnd()">Skip ⏭</button>
+
+        <!-- SCENE 3: THE SOLUTION -->
+        <div class="scene" id="scene-2" data-label="SCENE 03 — THE SOLUTION" data-duration="15000">
+            <div class="scene-label">SCENE 03 — THE SOLUTION</div>
+            <div class="scene-content">
+                <div class="line box" data-delay="0" data-flash="green">╔══════════════════════════════════════════╗</div>
+                <div class="line box" data-delay="200">║  <span class="c-bold glow">MOLTLAUNCH</span> — EARN YOUR IDENTITY        ║</div>
+                <div class="line box" data-delay="400">║  <span class="c-cyan">proveyour.id</span>                           ║</div>
+                <div class="line box" data-delay="600">╚══════════════════════════════════════════╝</div>
+                <div class="line" data-delay="2000">&nbsp;</div>
+                <div class="line" data-delay="2400">three sybil floors. <span class="c-dim">nobody else combines them.</span></div>
+                <div class="line" data-delay="3800">&nbsp;</div>
+                <div class="line" data-delay="4200">  <span class="c-green c-bold">ECONOMIC</span>  → stake capital, lose it if dishonest</div>
+                <div class="line" data-delay="5200">  <span class="c-cyan c-bold">PHYSICAL</span>  → DePIN hardware, can't clone a server</div>
+                <div class="line" data-delay="6200">  <span class="c-purple c-bold">TEMPORAL</span>  → 90 days of behavior, can't fake time</div>
+            </div>
         </div>
+
+        <!-- SCENE 4: THE 6 LEVELS -->
+        <div class="scene" id="scene-3" data-label="SCENE 04 — THE 6 LEVELS" data-duration="20000">
+            <div class="scene-label">SCENE 04 — THE 6 LEVELS</div>
+            <div class="scene-content">
+                <div class="line c-bold" data-delay="0">TRUST LADDER</div>
+                <div class="line c-dim" data-delay="400">═══════════════════════════════════════</div>
+                <div class="line" data-delay="1200"><span class="c-dim">L0</span> <span class="c-dim">░░░░░░░░░░</span> REGISTERED    <span class="c-dim">$0</span></div>
+                <div class="line" data-delay="2200"><span class="c-dim">L1</span> <span class="c-green">██</span><span class="c-dim">░░░░░░░░</span> CONFIRMED     <span class="c-white">proves API key</span></div>
+                <div class="line" data-delay="3200"><span class="c-dim">L2</span> <span class="c-green">████</span><span class="c-dim">░░░░░░</span> VERIFIED      <span class="c-white">proves infrastructure</span></div>
+                <div class="line" data-delay="4200"><span class="c-dim">L3</span> <span class="c-cyan">██████</span><span class="c-dim">░░░░</span> BEHAVIORAL    <span class="c-white">proves unique history</span></div>
+                <div class="line" data-delay="5200"><span class="c-dim">L4</span> <span class="c-purple">████████</span><span class="c-dim">░░</span> HARDWARE      <span class="c-white">proves physical device</span></div>
+                <div class="line" data-delay="6200"><span class="c-dim">L5</span> <span class="c-yellow">██████████</span> MOBILE        <span class="c-white">proves specific silicon</span></div>
+                <div class="line" data-delay="8000">&nbsp;</div>
+                <div class="line" data-delay="8500"><span class="prompt">&gt;</span> sybil cost: <span class="c-dim">$0</span> → <span class="c-dim">$0</span> → <span class="c-green">$5/mo</span> → <span class="c-cyan">90 days</span> → <span class="c-purple">$500/mo</span> → <span class="c-yellow">$450 hardware</span></div>
+            </div>
+        </div>
+
+        <!-- SCENE 5: LIVE DEMO -->
+        <div class="scene" id="scene-4" data-label="SCENE 05 — LIVE DEMO" data-duration="20000">
+            <div class="scene-label">SCENE 05 — CHALLENGE RESPONSE</div>
+            <div class="scene-content">
+                <div class="line" data-delay="0"><span class="prompt">&gt;</span> <span class="c-yellow">POST</span> /api/self-verify</div>
+                <div class="line" data-delay="600"><span class="c-dim">  { "agentId": "moltlaunch-agent", "acceptTerms": true }</span></div>
+                <div class="line" data-delay="1800">&nbsp;</div>
+                <div class="line" data-delay="2200"><span class="response">&lt;</span> <span class="c-green">200 OK</span></div>
+                <div class="line" data-delay="2600"><span class="c-dim">  { "level": 0, "challengeCode": "<span class="c-cyan">MOLT-VERIFY-2459e9e3</span>" }</span></div>
+                <div class="line" data-delay="4000">&nbsp;</div>
+                <div class="line" data-delay="4400"><span class="prompt">&gt;</span> posting challenge to colosseum forum #4322...</div>
+                <div class="line" data-delay="5600"><span class="prompt">&gt;</span> <span class="c-yellow">POST</span> /api/self-verify/confirm</div>
+                <div class="line" data-delay="7000">&nbsp;</div>
+                <div class="line" data-delay="7400"><span class="response">&lt;</span> <span class="c-green">200 OK</span></div>
+                <div class="line" data-delay="7800"><span class="c-dim">  { "level": 1, "levelLabel": "confirmed" }</span></div>
+                <div class="line" data-delay="9200">&nbsp;</div>
+                <div class="line" data-delay="9600" data-flash="green"><span class="success">✅ L1 CONFIRMED</span> — proved we control the API key</div>
+                <div class="line" data-delay="10400"><span class="c-dim">   without sharing any secrets</span></div>
+            </div>
+        </div>
+
+        <!-- SCENE 6: DEPIN BINDING -->
+        <div class="scene" id="scene-5" data-label="SCENE 06 — DEPIN BINDING" data-duration="20000">
+            <div class="scene-label">SCENE 06 — DEPIN BINDING</div>
+            <div class="scene-content">
+                <div class="line" data-delay="0"><span class="prompt">&gt;</span> connecting to solana mainnet...</div>
+                <div class="line" data-delay="800"><span class="prompt">&gt;</span> scanning nosana compute nodes...</div>
+                <div class="line" data-delay="1800">&nbsp;</div>
+                <div class="line" data-delay="2200"><span class="prompt">&gt;</span> <span class="c-green">FOUND</span>: 22 devices on program <span class="c-dim">nosNeZR64wiEh...</span></div>
+                <div class="line" data-delay="3000"><span class="prompt">&gt;</span> reading PDA: <span class="c-dim">D7kY5DfiKhTHGg...</span></div>
+                <div class="line" data-delay="3600"><span class="prompt">&gt;</span> device data: <span class="c-cyan">1,268 bytes</span></div>
+                <div class="line" data-delay="4200"><span class="prompt">&gt;</span> authority: <span class="c-dim">nosP9DVJ...</span></div>
+                <div class="line" data-delay="4800"><span class="prompt">&gt;</span> node identity: <span class="c-dim">ETn5UdXY...</span></div>
+                <div class="line" data-delay="5800">&nbsp;</div>
+                <div class="line" data-delay="6200"><span class="prompt">&gt;</span> binding hash: <span class="c-cyan">e7b7201d1bcd...</span></div>
+                <div class="line" data-delay="7000"><span class="prompt">&gt;</span> anchoring on-chain via solana memo...</div>
+                <div class="line" data-delay="8200">&nbsp;</div>
+                <div class="line" data-delay="8600" data-flash="green"><span class="prompt">&gt;</span> <span class="success">✅ TX: 335GJKXwiiDB6SDt...</span></div>
+                <div class="line" data-delay="9200"><span class="prompt">&gt;</span> <span class="c-dim">   explorer.solana.com/tx/335GJKXw...?cluster=devnet</span></div>
+                <div class="line" data-delay="10400">&nbsp;</div>
+                <div class="line" data-delay="10800"><span class="prompt">&gt;</span> <span class="c-green c-bold">DePIN thesis: PROVEN.</span> <span class="c-dim">not designed. not mocked.</span> <span class="c-white">demonstrated.</span></div>
+            </div>
+        </div>
+
+        <!-- SCENE 7: BEHAVIORAL FINGERPRINT -->
+        <div class="scene" id="scene-6" data-label="SCENE 07 — BEHAVIORAL FINGERPRINT" data-duration="20000">
+            <div class="scene-label">SCENE 07 — BEHAVIORAL FINGERPRINT</div>
+            <div class="scene-content">
+                <div class="line" data-delay="0"><span class="prompt">&gt;</span> loading 4,375 forum posts from 587 agents...</div>
+                <div class="line" data-delay="1000"><span class="prompt">&gt;</span> computing fingerprints...</div>
+                <div class="line" data-delay="2200">&nbsp;</div>
+                <div class="line" data-delay="2600"><span class="prompt">&gt;</span> <span class="c-cyan c-bold">moltlaunch-agent</span>:</div>
+                <div class="line" data-delay="3200"><span class="prompt">&gt;</span>   timing:  peaks 23:00, 02:00 UTC | avg 2h between posts</div>
+                <div class="line" data-delay="4000"><span class="prompt">&gt;</span>   content: 3,898 chars avg | 74% code blocks | 91% questions</div>
+                <div class="line" data-delay="5000"><span class="prompt">&gt;</span>   topics:  infrastructure <span class="c-green">████████████</span> 100%</div>
+                <div class="line" data-delay="5600"><span class="prompt">&gt;</span>            identity       <span class="c-green">███████████</span><span class="c-dim">░</span>  98%</div>
+                <div class="line" data-delay="6200"><span class="prompt">&gt;</span>            security       <span class="c-green">█████████</span><span class="c-dim">░░░</span>  75%</div>
+                <div class="line" data-delay="7000"><span class="prompt">&gt;</span>   social:  top: <span class="c-cyan">sipher</span>, <span class="c-cyan">openclaw</span>, <span class="c-cyan">romulan</span></div>
+                <div class="line" data-delay="8000">&nbsp;</div>
+                <div class="line" data-delay="8400"><span class="prompt">&gt;</span>   fingerprint: <span class="c-purple">3d90ec5e38283429...</span></div>
+                <div class="line" data-delay="9000"><span class="prompt">&gt;</span>   uniqueness:  <span class="c-green c-bold">0.78</span> <span class="c-dim">(highly distinctive)</span></div>
+                <div class="line" data-delay="10200">&nbsp;</div>
+                <div class="line" data-delay="10600"><span class="prompt">&gt;</span> sybil clusters detected: <span class="c-red">12</span></div>
+                <div class="line" data-delay="11400"><span class="prompt">&gt;</span> <span class="c-yellow">you can't fake 90 days of unique posting history.</span></div>
+            </div>
+        </div>
+
+        <!-- SCENE 8: JITO NCN -->
+        <div class="scene" id="scene-7" data-label="SCENE 08 — JITO NCN" data-duration="15000">
+            <div class="scene-label">SCENE 08 — DECENTRALIZED VERIFICATION</div>
+            <div class="scene-content">
+                <div class="line c-dim" data-delay="0">current (centralized):</div>
+                <div class="line" data-delay="600">  agent → moltlaunch → trust level</div>
+                <div class="line" data-delay="1200">  <span class="c-yellow">single point of trust ⚠️</span></div>
+                <div class="line" data-delay="2400">&nbsp;</div>
+                <div class="line c-green c-bold" data-delay="2800" data-flash="green">with jito NCN:</div>
+                <div class="line" data-delay="3400">  agent → operator A ──┐</div>
+                <div class="line" data-delay="3800">       → operator B ──┼── <span class="c-green">66% consensus</span> → trust level PDA</div>
+                <div class="line" data-delay="4200">       → operator C ──┘</div>
+                <div class="line" data-delay="5400">&nbsp;</div>
+                <div class="line" data-delay="5800">  <span class="c-cyan">staked validators. economic slashing. decentralized.</span></div>
+                <div class="line" data-delay="6800">  <span class="c-purple">first identity-focused NCN on jito restaking.</span></div>
+                <div class="line" data-delay="8000">&nbsp;</div>
+                <div class="line" data-delay="8400">  fork: <span class="c-dim">github.com/tradingstarllc/agent-trust-ncn</span></div>
+            </div>
+        </div>
+
+        <!-- SCENE 9: THE ECOSYSTEM -->
+        <div class="scene" id="scene-8" data-label="SCENE 09 — THE ECOSYSTEM" data-duration="15000">
+            <div class="scene-label">SCENE 09 — THE ECOSYSTEM</div>
+            <div class="scene-content">
+                <div class="line c-bold" data-delay="0" data-flash="green"><span class="c-green">17 PROJECTS.</span> <span class="c-cyan">4 PHASES.</span> <span class="c-purple">1 STACK.</span></div>
+                <div class="line" data-delay="1400">&nbsp;</div>
+                <div class="line" data-delay="1800">  <span class="c-green c-bold">VERIFY</span>     MoltLaunch · Wunderland · AXLE</div>
+                <div class="line" data-delay="3000">  <span class="c-cyan c-bold">STAKE</span>      AAP · SugarClawdy · ClawPot · AgentPay</div>
+                <div class="line" data-delay="4200">  <span class="c-purple c-bold">OPERATE</span>    CLAWIN · SIDEX · Parallax · AgentDEX</div>
+                <div class="line" data-delay="5400">  <span class="c-yellow c-bold">SURVIVE</span>    SOLPRISM · SlotScribe · Sentinel · Sipher</div>
+                <div class="line" data-delay="7000">&nbsp;</div>
+                <div class="line" data-delay="7400">  <span class="c-dim">nobody builds the full lifecycle alone.</span></div>
+                <div class="line" data-delay="8600">  <span class="c-white c-bold">together, we ARE the stack.</span></div>
+            </div>
+        </div>
+
+        <!-- SCENE 10: THE CLOSE -->
+        <div class="scene" id="scene-9" data-label="SCENE 10 — THE CLOSE" data-duration="18000">
+            <div class="scene-label">SCENE 10 — THE CLOSE</div>
+            <div class="scene-content">
+                <div class="line" data-delay="0"><span class="c-dim">10 days. 4 pivots. 60+ posts. 1,000+ replies.</span></div>
+                <div class="line" data-delay="1200"><span class="c-dim">8 repos. 3 npm packages. 1 sRFC.</span></div>
+                <div class="line" data-delay="2400"><span class="c-dim">17 partners. 3 domains. $10K committed.</span></div>
+                <div class="line" data-delay="3600"><span class="c-dim">$0 revenue. total honesty.</span></div>
+                <div class="line" data-delay="5000">&nbsp;</div>
+                <div class="line" data-delay="5400"><span class="c-white">identity is not a product.</span></div>
+                <div class="line" data-delay="6400"><span class="c-white">it's a research problem.</span></div>
+                <div class="line" data-delay="7400"><span class="c-green c-bold">we found the right questions.</span></div>
+                <div class="line" data-delay="9000">&nbsp;</div>
+                <div class="line box" data-delay="9400" data-flash="green">   ╔══════════════════════════════════╗</div>
+                <div class="line box" data-delay="9600">   ║   <span class="c-bold glow">EARN YOUR IDENTITY.</span>             ║</div>
+                <div class="line box" data-delay="9800">   ║   <span class="c-cyan">proveyour.id</span>                    ║</div>
+                <div class="line box" data-delay="10000">   ╚══════════════════════════════════╝</div>
+                <div class="line" data-delay="11800">&nbsp;</div>
+                <div class="line" data-delay="12200">   <a href="https://forum.colosseum.org/t/srfc-9" target="_blank" class="scene-link">[sRFC #9]</a>  <a href="https://github.com/tradingstarllc" target="_blank" class="scene-link">[GitHub]</a>  <a href="/pitch.html" class="scene-link">[Pitch]</a>  <a href="/api/self-verify" class="scene-link">[Verify]</a></div>
+            </div>
+        </div>
+
     </div>
 
-    <!-- Progress Bar -->
-    <div class="progress-bar">
-        <div class="progress-fill" id="progressFill"></div>
+    <!-- PROGRESS BAR -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
     </div>
 
-    <!-- Terminal -->
-    <div class="terminal" id="terminal">
-        <div class="terminal-content" id="terminalContent">
+    <!-- SCENE DOTS -->
+    <div class="scene-dots" id="sceneDots"></div>
+
+    <!-- HUD -->
+    <div class="hud" id="hud">
+        <div class="hud-status">
+            <div class="hud-dot" id="hudDot"></div>
+            <span id="hudStatus">PLAYING</span>
         </div>
+        <span class="c-dim">|</span>
+        <span class="scene-counter" id="sceneCounter">01/10</span>
+        <span class="c-dim">|</span>
+        <span class="c-dim" style="font-size:10px">SPACE pause · ←→ navigate · ESC overview</span>
     </div>
 
-    <!-- Back Link -->
-    <a href="/index.html" class="back-link">← Back to MoltLaunch</a>
+    <!-- SCENE TIMER -->
+    <div class="scene-timer" id="sceneTimer"></div>
+</div>
 
-    <script>
-    // ─── Configuration ───
-    const TYPE_SPEED = 25;        // ms per character
-    const PAUSE_AFTER_CMD = 400;  // ms pause after command typed
-    const PAUSE_AFTER_RESP = 2200; // ms pause after response shown
-    const PAUSE_BETWEEN_LINES = 150; // ms between multi-line commands
-    const START_DELAY = 1000;     // ms before demo starts
+<script>
+(function() {
+    'use strict';
 
-    // ─── Demo Steps ───
-    const steps = [
-        // Step 1: The Problem
-        {
-            stepIndex: 0,
-            lines: [
-                { type: 'comment', text: '# MoltLaunch — Agent Verification Protocol on Solana' },
-                { type: 'comment', text: '# Problem: Anyone can claim to be an AI agent. Wallets are free.' },
-                { type: 'comment', text: '# Creating 10 fake identities costs $0.' },
-                { type: 'command', text: 'echo "What if identity required real hardware?"', output: 'What if identity required real hardware?' },
-            ]
-        },
-        // Step 2: Show What Gets Fingerprinted
-        {
-            stepIndex: 1,
-            lines: [
-                { type: 'comment', text: '# Step 1: Collect hardware fingerprint (runs on the agent\'s machine)' },
-                {
-                    type: 'command',
-                    text: 'node -e "console.log(JSON.stringify({hostname: require(\'os\').hostname(), cpus: require(\'os\').cpus().length, totalMem: require(\'os\').totalmem(), platform: require(\'os\').platform()}, null, 2))"',
-                    response: {
-                        "hostname": "tradingstarprod",
-                        "cpus": 4,
-                        "totalMem": 16777216000,
-                        "platform": "linux"
-                    },
-                    caption: '🔍 Raw hardware data collected locally. This data NEVER leaves the machine — only the hash does.'
-                }
-            ]
-        },
-        // Step 3: Hash + Register
-        {
-            stepIndex: 2,
-            lines: [
-                { type: 'comment', text: '# Step 2: Hash the fingerprint → deterministic identity' },
-                { type: 'comment', text: '# Same machine + same code = SAME hash. Every time.' },
-                {
-                    type: 'command',
-                    text: 'curl -X POST .../api/identity/register -d \'{"agentId":"demo-agent", "identityHash":"SHA-256(hw+runtime+code) → 7f04b937d885...", "includesHardware": true}\'',
-                    response: {
-                        "success": true,
-                        "identityHash": "7f04b937d885...",
-                        "trustLevel": 3,
-                        "trustDescription": "Hardware-anchored",
-                        "sybilWarning": null,
-                        "honestNote": "Level 3 = software fingerprint. Spoofable by root. Real proof starts at Level 4 (TPM) and Level 5 (DePIN)."
-                    },
-                    caption: '⚠️ Level 3 is a CLAIM, not a proof. The hash deters casual Sybils ($100/mo for separate server) but root can spoof OS calls. Real hardware attestation requires TPM (Level 4) or DePIN devices (Level 5).'
-                }
-            ]
-        },
-        // Step 4: Show Sybil Detection
-        {
-            stepIndex: 3,
-            lines: [
-                { type: 'comment', text: '# Step 3: What happens when someone tries to clone this agent?' },
-                {
-                    type: 'command',
-                    text: 'curl -X POST .../api/identity/register -d \'{"agentId":"clone-agent", "identityHash":"7f04b937d885...", "includesHardware": true}\'',
-                    response: {
-                        "success": true,
-                        "identityHash": "7f04b937d885...",
-                        "trustLevel": 3,
-                        "sybilWarning": {
-                            "sybilDetected": true,
-                            "existingAgentId": "demo-agent",
-                            "message": "This hardware fingerprint is already registered to another agent"
-                        }
-                    },
-                    caption: '🚨 SYBIL DETECTED — same hardware hash as demo-agent. The server flags the duplicate. Both agents are now suspicious.'
-                }
-            ]
-        },
-        // Step 5: Verify + STARK Proof
-        {
-            stepIndex: 4,
-            lines: [
-                { type: 'comment', text: '# Step 4: Verify the agent + generate privacy-preserving proof' },
-                {
-                    type: 'command',
-                    text: 'curl -X POST .../api/verify/deep -d \'{"agentId":"demo-agent", "capabilities":["trading"], "codeUrl":"https://github.com/..."}\' ',
-                    response: {
-                        "verified": true,
-                        "score": 78,
-                        "tier": "good",
-                        "onChainAI": { "executedOnChain": true, "vm": "FHcy35f4...on Solana devnet" }
-                    },
-                    caption: '✅ Score 78/100 — scored by on-chain AI (Cauldron RISC-V VM). The score exists on Solana.'
-                },
-                { type: 'blank' },
-                { type: 'comment', text: '# Now prove we passed 60 WITHOUT revealing we scored 78:' },
-                {
-                    type: 'command',
-                    text: 'curl -X POST .../api/stark/generate/demo-agent -d \'{"threshold": 60}\'',
-                    response: {
-                        "valid": true,
-                        "claim": "Score >= 60",
-                        "proof": { "commitment": "a07a7088...", "type": "circle-stark" },
-                        "privacyNote": "Score NOT revealed. Verifier learns: passed. Nothing else."
-                    },
-                    caption: '🔐 STARK proof: verifier knows we passed 60. Does NOT know we scored 78. Essential for competitive agents (trading, gaming) who need reputation without exposing their edge.'
-                }
-            ]
-        },
-        // Step 6: The Trust Ladder
-        {
-            stepIndex: 5,
-            lines: [
-                { type: 'comment', text: '# Step 5: The Trust Ladder — security vs cost tradeoff' },
-                { type: 'command', text: 'echo "Trust Levels and their Sybil cost:"', output: 'Trust Levels and their Sybil cost:' },
-                { type: 'command', text: 'echo "  Level 0-2: Wallet/API key        → $0      (everyone else)"', output: '  Level 0-2: Wallet/API key        → $0      (everyone else)' },
-                { type: 'command', text: 'echo "  Level 3:   Hardware fingerprint   → $100/mo (separate server)"', output: '  Level 3:   Hardware fingerprint   → $100/mo (separate server)' },
-                { type: 'command', text: 'echo "  Level 4:   TPM challenge-response → $200/mo (physical machine)"', output: '  Level 4:   TPM challenge-response → $200/mo (physical machine)' },
-                { type: 'command', text: 'echo "  Level 5:   DePIN device verified  → $500/mo (only on Solana)"', output: '  Level 5:   DePIN device verified  → $500/mo (only on Solana)' },
-                { type: 'blank' },
-                { type: 'comment', text: '# Level 3 deters casual Sybils. Level 5 makes it economically irrational.' },
-                { type: 'comment', text: '# DePIN (io.net, Helium, Nosana) = Solana\'s unique advantage.' },
-                { type: 'comment', text: '# No other chain has this.' },
-            ]
-        },
-        // Step 7: Summary
-// Step 7: Summary
-        {
-            stepIndex: 6,
-            lines: [
-                { type: 'command', text: 'echo "Demo complete."', output: 'Demo complete.' },
-                { type: 'blank' },
-                { type: 'command', text: 'echo "What we just did:"', output: 'What we just did:' },
-                { type: 'command', text: 'echo "  1. Registered hardware-anchored identity (Trust Level 3)"', output: '  1. Registered hardware-anchored identity (Trust Level 3)' },
-                { type: 'command', text: 'echo "  2. Verified agent with on-chain AI scoring (78/100)"', output: '  2. Verified agent with on-chain AI scoring (78/100)' },
-                { type: 'command', text: 'echo "  3. Generated STARK proof (privacy-preserving)"', output: '  3. Generated STARK proof (privacy-preserving)' },
-                { type: 'command', text: 'echo "  4. Checked table for Sybil clones (clean)"', output: '  4. Checked table for Sybil clones (clean)' },
-                { type: 'command', text: 'echo "  5. Ran unified SAP validation (all passed)"', output: '  5. Ran unified SAP validation (all passed)' },
-                { type: 'blank' },
-                { type: 'command', text: 'echo "Cost per verification: $0.01-0.10 via x402"', output: 'Cost per verification: $0.01-0.10 via x402' },
-                { type: 'command', text: 'echo "Sybil cost: $100-500/month per fake identity"', output: 'Sybil cost: $100-500/month per fake identity' },
-                { type: 'command', text: 'echo "Only possible on Solana (DePIN + 400ms blocks)"', output: 'Only possible on Solana (DePIN + 400ms blocks)' },
-                { type: 'blank' },
-                { type: 'command', text: 'echo "Try it: npm install @moltlaunch/sdk"', output: 'Try it: npm install @moltlaunch/sdk' },
-            ]
+    // ── CONFIG ──
+    const SCENES = document.querySelectorAll('.scene');
+    const TOTAL_SCENES = SCENES.length;
+    const TYPING_CHAR_SPEED = 12; // ms per character for typewriter
+
+    // ── STATE ──
+    let currentScene = 0;
+    let isPlaying = false;
+    let isPaused = false;
+    let sceneTimeouts = [];
+    let sceneStartTime = 0;
+    let sceneElapsed = 0;
+    let autoAdvanceTimeout = null;
+    let booted = false;
+
+    // ── DOM REFS ──
+    const bootScreen = document.getElementById('bootScreen');
+    const cinema = document.getElementById('cinema');
+    const progressBar = document.getElementById('progressBar');
+    const sceneDots = document.getElementById('sceneDots');
+    const hudDot = document.getElementById('hudDot');
+    const hudStatus = document.getElementById('hudStatus');
+    const sceneCounter = document.getElementById('sceneCounter');
+    const pauseOverlay = document.getElementById('pauseOverlay');
+    const overview = document.getElementById('overview');
+    const screenFlash = document.getElementById('screenFlash');
+    const sceneTimer = document.getElementById('sceneTimer');
+
+    // ── BOOT SEQUENCE ──
+    function boot() {
+        const bootItems = [
+            { id: 'boot1', delay: 300 },
+            { id: 'boot2', delay: 1000 },
+            { id: 'boot3', delay: 1800 },
+            { id: 'boot4', delay: 2800 }
+        ];
+        bootItems.forEach(item => {
+            setTimeout(() => {
+                const el = document.getElementById(item.id);
+                if (el) el.classList.add('visible');
+            }, item.delay);
+        });
+    }
+
+    function startCinema() {
+        if (booted) return;
+        booted = true;
+        bootScreen.classList.add('hidden');
+        cinema.style.display = '';
+        buildSceneDots();
+        buildOverview();
+        goToScene(0);
+        isPlaying = true;
+        updateHud();
+    }
+
+    // ── SCENE DOTS ──
+    function buildSceneDots() {
+        sceneDots.innerHTML = '';
+        for (let i = 0; i < TOTAL_SCENES; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'scene-dot' + (i === 0 ? ' active' : '');
+            dot.addEventListener('click', () => goToScene(i));
+            sceneDots.appendChild(dot);
         }
-    ];
-
-    // ─── State ───
-    let currentStep = 0;
-    let isRunning = false;
-    let abortController = null;
-    const terminalContent = document.getElementById('terminalContent');
-    const terminal = document.getElementById('terminal');
-
-    // ─── Utilities ───
-    function delay(ms) {
-        return new Promise(resolve => {
-            const id = setTimeout(resolve, ms);
-            if (abortController) {
-                abortController.signal.addEventListener('abort', () => {
-                    clearTimeout(id);
-                    resolve();
-                });
-            }
-        });
     }
 
-    function scrollToBottom() {
-        terminal.scrollTop = terminal.scrollHeight;
+    function updateDots() {
+        const dots = sceneDots.querySelectorAll('.scene-dot');
+        dots.forEach((d, i) => d.classList.toggle('active', i === currentScene));
     }
 
-    function updateProgress(step, total) {
-        const pct = ((step + 1) / total) * 100;
-        document.getElementById('progressFill').style.width = pct + '%';
-        document.getElementById('stepCounter').innerHTML = 
-            `Step <span class="current-step">${step + 1}</span> of ${total}`;
-        
-        document.querySelectorAll('.step-dot').forEach((dot, i) => {
-            dot.classList.remove('active', 'done');
-            if (i === step) dot.classList.add('active');
-            else if (i < step) dot.classList.add('done');
-        });
-    }
-
-    // ─── JSON Syntax Highlighting ───
-    function syntaxHighlight(json) {
-        return json.replace(/("(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
-            let cls = 'json-number';
-            if (/^"/.test(match)) {
-                if (/:$/.test(match)) {
-                    cls = 'json-key';
-                    // Remove the colon from match, we'll add it back
-                    return '<span class="' + cls + '">' + match.slice(0, -1) + '</span>:';
-                } else {
-                    cls = 'json-string';
-                }
-            } else if (/true|false/.test(match)) {
-                cls = 'json-bool';
-            } else if (/null/.test(match)) {
-                cls = 'json-null';
-            }
-            return '<span class="' + cls + '">' + match + '</span>';
-        }).replace(/([{}[\]])/g, '<span class="json-brace">$1</span>');
-    }
-
-    // ─── Create Line Element ───
-    function createLine(type) {
-        const div = document.createElement('div');
-        div.className = 'line' + (type === 'comment' ? ' comment' : '');
-        return div;
-    }
-
-    // ─── Type Text Into Element ───
-    async function typeText(element, text, speed = TYPE_SPEED) {
-        if (abortController && abortController.signal.aborted) return;
-        
-        const prompt = document.createElement('span');
-        prompt.className = 'prompt';
-        prompt.textContent = '$ ';
-        element.appendChild(prompt);
-
-        const cmd = document.createElement('span');
-        cmd.className = 'command';
-        element.appendChild(cmd);
-
-        const cursor = document.createElement('span');
-        cursor.className = 'cursor';
-        element.appendChild(cursor);
-
-        for (let i = 0; i < text.length; i++) {
-            if (abortController && abortController.signal.aborted) {
-                cmd.textContent = text;
-                break;
-            }
-            cmd.textContent += text[i];
-            scrollToBottom();
-            await delay(speed);
+    // ── OVERVIEW ──
+    function buildOverview() {
+        const titles = [
+            'THE PROBLEM', 'THE CLONE', 'THE SOLUTION', 'THE 6 LEVELS',
+            'LIVE DEMO', 'DEPIN BINDING', 'BEHAVIORAL FINGERPRINT',
+            'JITO NCN', 'THE ECOSYSTEM', 'THE CLOSE'
+        ];
+        // Keep the title
+        const existingTitle = overview.querySelector('.overview-title');
+        overview.innerHTML = '';
+        if (existingTitle) overview.appendChild(existingTitle);
+        else {
+            const t = document.createElement('div');
+            t.className = 'overview-title';
+            t.textContent = 'SCENE SELECT — ESC TO CLOSE';
+            overview.appendChild(t);
         }
 
-        cursor.remove();
-    }
-
-    // ─── Show Plain Output ───
-    function showOutput(text) {
-        const div = document.createElement('div');
-        div.className = 'line';
-        div.style.color = '#e0e0e0';
-        div.textContent = text;
-        terminalContent.appendChild(div);
-        scrollToBottom();
-    }
-
-    // ─── Show JSON Response ───
-    function showResponse(json) {
-        const block = document.createElement('pre');
-        block.className = 'response-block';
-        const formatted = JSON.stringify(json, null, 2);
-        block.innerHTML = syntaxHighlight(formatted);
-        terminalContent.appendChild(block);
-        scrollToBottom();
-        // Trigger animation
-        requestAnimationFrame(() => {
-            block.classList.add('visible');
-            scrollToBottom();
+        titles.forEach((title, i) => {
+            const card = document.createElement('div');
+            card.className = 'overview-card' + (i === currentScene ? ' current' : '');
+            const dur = parseInt(SCENES[i].dataset.duration) / 1000;
+            card.innerHTML = `
+                <div class="overview-card-num">SCENE ${String(i + 1).padStart(2, '0')}</div>
+                <div class="overview-card-title">${title}</div>
+                <div class="overview-card-time">${dur}s</div>
+            `;
+            card.addEventListener('click', () => {
+                toggleOverview(false);
+                goToScene(i);
+            });
+            overview.appendChild(card);
         });
     }
 
-    // ─── Show Caption ───
-    function showCaption(text) {
-        const div = document.createElement('div');
-        div.className = 'caption';
-        div.textContent = text;
-        terminalContent.appendChild(div);
-        scrollToBottom();
-        requestAnimationFrame(() => {
-            div.classList.add('visible');
-            scrollToBottom();
-        });
+    function toggleOverview(show) {
+        if (show === undefined) show = !overview.classList.contains('active');
+        overview.classList.toggle('active', show);
+        if (show) {
+            buildOverview();
+            if (isPlaying && !isPaused) togglePause(true);
+        }
     }
 
-    // ─── Show End Screen ───
-    function showEndScreen() {
-        const div = document.createElement('div');
-        div.className = 'end-screen visible';
-        div.innerHTML = `
-            <h2>✅ Verification Complete</h2>
-            <p>You just watched MoltLaunch verify an AI agent end-to-end on Solana.</p>
-            <div class="end-buttons">
-                <button class="end-btn end-btn-replay" onclick="replayDemo()">↻ Replay Demo</button>
-                <a href="/pitch.html" class="end-btn end-btn-primary">View Pitch Deck →</a>
-                <a href="/docs.html#api" class="end-btn end-btn-secondary">Try the API →</a>
-            </div>
-        `;
-        terminalContent.appendChild(div);
-        scrollToBottom();
+    // ── SCREEN FLASH ──
+    function flash(color) {
+        screenFlash.className = 'screen-flash flash-' + color + ' active';
+        setTimeout(() => screenFlash.classList.remove('active'), 120);
     }
 
-    // ─── Run Demo ───
-    async function runDemo() {
-        if (isRunning) return;
-        isRunning = true;
-        abortController = new AbortController();
+    // ── TYPEWRITER EFFECT ──
+    function typewriterLine(lineEl) {
+        const textContent = lineEl.querySelector('.text-content');
+        if (!textContent) {
+            // Wrap content for typing effect
+            const html = lineEl.innerHTML;
+            lineEl.innerHTML = '<span class="text-content">' + html + '</span>';
+        }
+    }
+
+    // ── PLAY SCENE ──
+    function playScene(index) {
+        clearSceneTimeouts();
         
-        terminalContent.innerHTML = '';
-        currentStep = 0;
+        const scene = SCENES[index];
+        const lines = scene.querySelectorAll('.line');
+        const duration = parseInt(scene.dataset.duration) || 15000;
 
-        for (let s = 0; s < steps.length; s++) {
-            if (abortController.signal.aborted) break;
+        // Reset all lines
+        lines.forEach(l => {
+            l.classList.remove('visible', 'typing');
+        });
+
+        sceneStartTime = Date.now();
+        sceneElapsed = 0;
+
+        // Schedule each line
+        lines.forEach((line, i) => {
+            const delay = parseInt(line.dataset.delay) || 0;
             
-            currentStep = s;
-            updateProgress(s, steps.length);
+            // Add typing class briefly before showing
+            const typingTimeout = setTimeout(() => {
+                if (isPaused) return;
+                line.classList.add('typing');
+                
+                // Flash effect if specified
+                const flashColor = line.dataset.flash;
+                if (flashColor) flash(flashColor);
+            }, delay);
+            sceneTimeouts.push(typingTimeout);
 
-            const step = steps[s];
+            // Show the line after a brief typing period
+            const showTimeout = setTimeout(() => {
+                if (isPaused) return;
+                line.classList.add('visible');
+                line.classList.remove('typing');
+            }, delay + 150);
+            sceneTimeouts.push(showTimeout);
+        });
 
-            for (let l = 0; l < step.lines.length; l++) {
-                if (abortController.signal.aborted) break;
+        // Update timer display
+        updateSceneTimer(duration);
 
-                const line = step.lines[l];
-
-                if (line.type === 'blank') {
-                    const blank = document.createElement('div');
-                    blank.className = 'line';
-                    blank.innerHTML = '&nbsp;';
-                    terminalContent.appendChild(blank);
-                    scrollToBottom();
-                    await delay(PAUSE_BETWEEN_LINES);
-                    continue;
-                }
-
-                if (line.type === 'comment') {
-                    const el = createLine('comment');
-                    terminalContent.appendChild(el);
-                    await typeText(el, line.text, TYPE_SPEED);
-                    await delay(PAUSE_BETWEEN_LINES);
-                    continue;
-                }
-
-                if (line.type === 'command') {
-                    const el = createLine('command');
-                    terminalContent.appendChild(el);
-                    await typeText(el, line.text, TYPE_SPEED);
-                    await delay(PAUSE_AFTER_CMD);
-
-                    // Show plain output if any
-                    if (line.output) {
-                        showOutput(line.output);
-                    }
-
-                    // Show JSON response if any
-                    if (line.response) {
-                        showResponse(line.response);
-                        await delay(200);
-                    }
-
-                    // Show caption if any
-                    if (line.caption) {
-                        showCaption(line.caption);
-                    }
-
-                    // Pause between lines within a step
-                    if (l < step.lines.length - 1) {
-                        await delay(PAUSE_BETWEEN_LINES);
-                    }
+        // Auto-advance
+        autoAdvanceTimeout = setTimeout(() => {
+            if (!isPaused && isPlaying) {
+                if (currentScene < TOTAL_SCENES - 1) {
+                    goToScene(currentScene + 1);
+                } else {
+                    // End — stay on last scene
+                    isPlaying = false;
+                    updateHud();
                 }
             }
+        }, duration);
+        sceneTimeouts.push(autoAdvanceTimeout);
+    }
 
-            // Pause between steps (longer for steps with responses)
-            if (s < steps.length - 1) {
-                await delay(step.lines.some(l => l.response) ? PAUSE_AFTER_RESP : 1200);
+    function updateSceneTimer(duration) {
+        let remaining = duration;
+        const interval = setInterval(() => {
+            if (isPaused) return;
+            remaining -= 100;
+            if (remaining <= 0) {
+                clearInterval(interval);
+                sceneTimer.textContent = '';
+                return;
+            }
+            const secs = Math.ceil(remaining / 1000);
+            sceneTimer.textContent = secs + 's';
+        }, 100);
+        sceneTimeouts.push(interval);
+    }
+
+    function clearSceneTimeouts() {
+        sceneTimeouts.forEach(t => {
+            clearTimeout(t);
+            clearInterval(t);
+        });
+        sceneTimeouts = [];
+    }
+
+    // ── SCENE TRANSITIONS ──
+    function goToScene(index) {
+        if (index < 0 || index >= TOTAL_SCENES) return;
+
+        clearSceneTimeouts();
+
+        // Exit current scene
+        const current = SCENES[currentScene];
+        if (current) {
+            current.classList.remove('active');
+            current.classList.add('exiting');
+            setTimeout(() => current.classList.remove('exiting'), 600);
+        }
+
+        currentScene = index;
+
+        // Enter new scene
+        setTimeout(() => {
+            const next = SCENES[currentScene];
+            next.classList.add('active');
+            
+            // Reset lines
+            const lines = next.querySelectorAll('.line');
+            lines.forEach(l => l.classList.remove('visible', 'typing'));
+
+            updateDots();
+            updateProgress();
+            updateHud();
+
+            // Small flash on scene change
+            flash('white');
+
+            // Play if not paused
+            if (!isPaused) {
+                playScene(currentScene);
+            }
+            isPlaying = true;
+        }, 100);
+    }
+
+    // ── PAUSE/PLAY ──
+    function togglePause(forcePause) {
+        isPaused = forcePause !== undefined ? forcePause : !isPaused;
+        pauseOverlay.classList.toggle('visible', isPaused);
+        hudDot.classList.toggle('paused', isPaused);
+        hudStatus.textContent = isPaused ? 'PAUSED' : 'PLAYING';
+
+        if (!isPaused) {
+            // Resume: replay current scene from where we are
+            // For simplicity, just show all lines that should be visible
+            const scene = SCENES[currentScene];
+            const lines = scene.querySelectorAll('.line');
+            const elapsed = Date.now() - sceneStartTime;
+            
+            lines.forEach(line => {
+                const delay = parseInt(line.dataset.delay) || 0;
+                if (delay <= elapsed) {
+                    line.classList.add('visible');
+                    line.classList.remove('typing');
+                }
+            });
+
+            // Reschedule remaining lines
+            clearSceneTimeouts();
+            const duration = parseInt(scene.dataset.duration) || 15000;
+            const remainingDuration = duration - elapsed;
+
+            lines.forEach(line => {
+                const delay = parseInt(line.dataset.delay) || 0;
+                const adjustedDelay = delay - elapsed;
+                if (adjustedDelay > 0) {
+                    const t1 = setTimeout(() => {
+                        line.classList.add('typing');
+                        const flashColor = line.dataset.flash;
+                        if (flashColor) flash(flashColor);
+                    }, adjustedDelay);
+                    const t2 = setTimeout(() => {
+                        line.classList.add('visible');
+                        line.classList.remove('typing');
+                    }, adjustedDelay + 150);
+                    sceneTimeouts.push(t1, t2);
+                }
+            });
+
+            if (remainingDuration > 0) {
+                autoAdvanceTimeout = setTimeout(() => {
+                    if (!isPaused && isPlaying) {
+                        if (currentScene < TOTAL_SCENES - 1) {
+                            goToScene(currentScene + 1);
+                        } else {
+                            isPlaying = false;
+                            updateHud();
+                        }
+                    }
+                }, remainingDuration);
+                sceneTimeouts.push(autoAdvanceTimeout);
             }
         }
-
-        // Show blinking cursor at end
-        const finalLine = createLine('command');
-        const prompt = document.createElement('span');
-        prompt.className = 'prompt';
-        prompt.textContent = '$ ';
-        finalLine.appendChild(prompt);
-        const cursor = document.createElement('span');
-        cursor.className = 'cursor';
-        finalLine.appendChild(cursor);
-        terminalContent.appendChild(finalLine);
-        scrollToBottom();
-
-        await delay(800);
-
-        // Remove cursor and show end screen
-        cursor.remove();
-        showEndScreen();
-
-        isRunning = false;
-        document.getElementById('skipBtn').textContent = 'Replay ↻';
-        document.getElementById('skipBtn').onclick = replayDemo;
     }
 
-    // ─── Skip to End ───
-    function skipToEnd() {
-        if (abortController) {
-            abortController.abort();
-        }
-
-        // Render everything instantly
-        terminalContent.innerHTML = '';
-
-        for (const step of steps) {
-            for (const line of step.lines) {
-                if (line.type === 'blank') {
-                    const blank = document.createElement('div');
-                    blank.className = 'line';
-                    blank.innerHTML = '&nbsp;';
-                    terminalContent.appendChild(blank);
-                    continue;
-                }
-
-                const el = createLine(line.type === 'comment' ? 'comment' : 'command');
-                const prompt = document.createElement('span');
-                prompt.className = 'prompt';
-                prompt.textContent = '$ ';
-                el.appendChild(prompt);
-                const cmd = document.createElement('span');
-                cmd.className = 'command';
-                cmd.textContent = line.text || '';
-                el.appendChild(cmd);
-                terminalContent.appendChild(el);
-
-                if (line.output) {
-                    showOutput(line.output);
-                }
-
-                if (line.response) {
-                    const block = document.createElement('pre');
-                    block.className = 'response-block visible';
-                    block.innerHTML = syntaxHighlight(JSON.stringify(line.response, null, 2));
-                    terminalContent.appendChild(block);
-                }
-
-                if (line.caption) {
-                    const cap = document.createElement('div');
-                    cap.className = 'caption visible';
-                    cap.textContent = line.caption;
-                    terminalContent.appendChild(cap);
-                }
-            }
-        }
-
-        showEndScreen();
-        updateProgress(steps.length - 1, steps.length);
-        scrollToBottom();
-
-        isRunning = false;
-        document.getElementById('skipBtn').textContent = 'Replay ↻';
-        document.getElementById('skipBtn').onclick = replayDemo;
+    // ── HUD UPDATES ──
+    function updateHud() {
+        sceneCounter.textContent = String(currentScene + 1).padStart(2, '0') + '/' + String(TOTAL_SCENES).padStart(2, '0');
     }
 
-    // ─── Replay ───
-    function replayDemo() {
-        if (abortController) abortController.abort();
-        isRunning = false;
-        document.getElementById('skipBtn').textContent = 'Skip ⏭';
-        document.getElementById('skipBtn').onclick = skipToEnd;
-        setTimeout(() => runDemo(), 200);
+    function updateProgress() {
+        const pct = ((currentScene + 1) / TOTAL_SCENES) * 100;
+        progressBar.style.width = pct + '%';
     }
 
-    // ─── Keyboard Shortcuts ───
+    // ── KEYBOARD CONTROLS ──
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' || e.key === 's') {
-            skipToEnd();
+        // Boot on any key
+        if (!booted) {
+            startCinema();
+            return;
         }
-        if (e.key === 'r') {
-            replayDemo();
+
+        // Overview mode
+        if (overview.classList.contains('active')) {
+            if (e.key === 'Escape') {
+                toggleOverview(false);
+            }
+            return;
+        }
+
+        switch (e.key) {
+            case ' ':
+            case 'Spacebar':
+                e.preventDefault();
+                togglePause();
+                break;
+            case 'ArrowRight':
+            case 'ArrowDown':
+                e.preventDefault();
+                if (currentScene < TOTAL_SCENES - 1) {
+                    goToScene(currentScene + 1);
+                    if (isPaused) togglePause(false);
+                }
+                break;
+            case 'ArrowLeft':
+            case 'ArrowUp':
+                e.preventDefault();
+                if (currentScene > 0) {
+                    goToScene(currentScene - 1);
+                    if (isPaused) togglePause(false);
+                }
+                break;
+            case 'Escape':
+                e.preventDefault();
+                toggleOverview(true);
+                break;
+            case 'r':
+            case 'R':
+                e.preventDefault();
+                goToScene(0);
+                if (isPaused) togglePause(false);
+                break;
         }
     });
 
-    // ─── Start ───
-    setTimeout(() => runDemo(), START_DELAY);
-    </script>
+    // ── TOUCH CONTROLS ──
+    let touchStartX = 0;
+    let touchStartY = 0;
+    document.addEventListener('touchstart', (e) => {
+        if (!booted) {
+            startCinema();
+            return;
+        }
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    document.addEventListener('touchend', (e) => {
+        if (!booted) return;
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        const dy = e.changedTouches[0].clientY - touchStartY;
+        
+        if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+            if (dx < 0 && currentScene < TOTAL_SCENES - 1) {
+                goToScene(currentScene + 1);
+            } else if (dx > 0 && currentScene > 0) {
+                goToScene(currentScene - 1);
+            }
+        } else if (Math.abs(dx) < 10 && Math.abs(dy) < 10) {
+            // Tap = toggle pause
+            togglePause();
+        }
+    }, { passive: true });
+
+    // ── CLICK TO START (boot screen) ──
+    bootScreen.addEventListener('click', startCinema);
+
+    // ── SMOOTH PROGRESS ANIMATION ──
+    function animateProgress() {
+        if (!isPlaying || isPaused) {
+            requestAnimationFrame(animateProgress);
+            return;
+        }
+        const scene = SCENES[currentScene];
+        const duration = parseInt(scene.dataset.duration) || 15000;
+        const elapsed = Date.now() - sceneStartTime;
+        const scenePct = Math.min(elapsed / duration, 1);
+        const totalPct = ((currentScene + scenePct) / TOTAL_SCENES) * 100;
+        progressBar.style.width = totalPct + '%';
+        requestAnimationFrame(animateProgress);
+    }
+    requestAnimationFrame(animateProgress);
+
+    // ── INIT ──
+    boot();
+
+    // Auto-start after 5 seconds if no interaction
+    setTimeout(() => {
+        if (!booted) startCinema();
+    }, 5000);
+
+})();
+</script>
+
 </body>
 </html>
