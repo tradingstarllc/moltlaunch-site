@@ -96,7 +96,7 @@ app.use('/api/verify/quick', verifyLimiter);
 // Admin middleware
 const ADMIN_KEYS = [process.env.ADMIN_KEY, process.env.BACKUP_KEY].filter(Boolean);
 function requireAdmin(req, res, next) {
-    const key = req.headers['x-admin-key'] || req.query.adminKey;
+    const key = req.headers['x-admin-key'];
     if (!key || ADMIN_KEYS.length === 0 || !ADMIN_KEYS.includes(key)) {
         return res.status(401).json({ error: 'Admin access required' });
     }
