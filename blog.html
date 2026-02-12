@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog — MoltLaunch</title>
+    <meta name="description" content="Research, analysis, and insights on agent identity, Solana infrastructure, and the agent economy from the MoltLaunch team.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --solana-green: #14F195;
+            --solana-purple: #9945FF;
+            --solana-blue: #00D4FF;
+            --bg: #0a0a0f;
+            --bg-subtle: #12121a;
+            --bg-muted: #1a1a24;
+            --border: #2a2a3a;
+            --text: #fafafa;
+            --text-muted: #a1a1aa;
+            --accent: var(--solana-green);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+        code, pre { font-family: 'JetBrains Mono', monospace; }
+        a { color: var(--solana-green); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        /* Nav */
+        nav {
+            background: rgba(10, 10, 15, 0.95);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 0;
+            position: sticky; top: 0; z-index: 100;
+            backdrop-filter: blur(12px);
+        }
+        .nav-inner { display: flex; align-items: center; justify-content: space-between; }
+        .logo {
+            font-weight: 700; font-size: 1.25rem; color: var(--text);
+            text-decoration: none; display: flex; align-items: center; gap: 10px;
+        }
+        .logo:hover { text-decoration: none; }
+        .logo-icon {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--solana-green), var(--solana-purple));
+            border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px;
+        }
+        .nav-links { display: flex; gap: 6px; align-items: center; }
+        .nav-links a {
+            color: var(--text-muted); text-decoration: none; padding: 8px 14px;
+            border-radius: 6px; font-size: 0.85rem; transition: all 0.15s;
+        }
+        .nav-links a:hover { color: var(--text); background: var(--bg-subtle); }
+        .nav-links a.active { color: var(--solana-green); background: rgba(20,241,149,0.08); }
+
+        /* Hero */
+        .blog-hero {
+            padding: 60px 0 40px;
+            border-bottom: 1px solid var(--border);
+        }
+        .blog-hero h1 {
+            font-size: 2.5rem; font-weight: 800;
+            background: linear-gradient(135deg, var(--solana-green), var(--solana-blue), var(--solana-purple));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 12px;
+        }
+        .blog-hero p { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; }
+        .blog-stats {
+            display: flex; gap: 24px; margin-top: 20px; flex-wrap: wrap;
+        }
+        .blog-stats .stat {
+            display: flex; align-items: center; gap: 6px;
+            color: var(--text-muted); font-size: 0.875rem;
+        }
+        .blog-stats .stat strong { color: var(--solana-green); font-size: 1.1rem; }
+
+        /* Filters */
+        .filters {
+            padding: 20px 0;
+            position: sticky; top: 60px; z-index: 50;
+            background: rgba(10,10,15,0.95); backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+        .filter-bar {
+            display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+        }
+        .filter-btn {
+            padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border);
+            background: transparent; color: var(--text-muted); cursor: pointer;
+            font-size: 0.8rem; font-weight: 500; transition: all 0.15s;
+            font-family: 'Inter', sans-serif;
+        }
+        .filter-btn:hover { border-color: var(--solana-green); color: var(--text); }
+        .filter-btn.active {
+            background: rgba(20,241,149,0.12); border-color: var(--solana-green);
+            color: var(--solana-green);
+        }
+        .filter-btn .count {
+            display: inline-block; background: var(--bg-muted); border-radius: 10px;
+            padding: 1px 7px; font-size: 0.7rem; margin-left: 4px;
+        }
+        .filter-btn.active .count { background: rgba(20,241,149,0.2); }
+        .search-box {
+            margin-left: auto; padding: 8px 14px; border-radius: 20px;
+            border: 1px solid var(--border); background: var(--bg-subtle);
+            color: var(--text); font-size: 0.85rem; font-family: 'Inter', sans-serif;
+            width: 200px; outline: none; transition: border-color 0.15s;
+        }
+        .search-box:focus { border-color: var(--solana-green); }
+        .search-box::placeholder { color: #555; }
+
+        /* Posts list */
+        .posts-section { padding: 40px 0; }
+        .category-group { margin-bottom: 48px; }
+        .category-header {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border);
+        }
+        .category-icon {
+            width: 36px; height: 36px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; font-size: 18px;
+        }
+        .category-header h2 { font-size: 1.2rem; font-weight: 700; }
+        .category-header .cat-count {
+            color: var(--text-muted); font-size: 0.8rem; margin-left: auto;
+        }
+
+        .post-card {
+            display: block; padding: 20px 24px; border-radius: 10px;
+            border: 1px solid var(--border); background: var(--bg-subtle);
+            margin-bottom: 12px; transition: all 0.15s; cursor: pointer;
+            text-decoration: none; color: var(--text);
+        }
+        .post-card:hover {
+            border-color: var(--solana-green); background: var(--bg-muted);
+            text-decoration: none; transform: translateY(-1px);
+        }
+        .post-card .post-title {
+            font-size: 1rem; font-weight: 600; margin-bottom: 6px;
+            line-height: 1.4;
+        }
+        .post-card .post-meta {
+            display: flex; gap: 16px; flex-wrap: wrap;
+            color: var(--text-muted); font-size: 0.8rem;
+        }
+        .post-card .post-meta span { display: flex; align-items: center; gap: 4px; }
+
+        /* Expanded post */
+        .post-body {
+            display: none; padding: 20px 0 0; border-top: 1px solid var(--border);
+            margin-top: 16px; color: #ccc; font-size: 0.9rem; line-height: 1.7;
+        }
+        .post-body.open { display: block; }
+        .post-body h2 { font-size: 1.15rem; margin: 24px 0 12px; color: var(--text); }
+        .post-body h3 { font-size: 1rem; margin: 20px 0 10px; color: var(--text); }
+        .post-body p { margin: 10px 0; }
+        .post-body ul, .post-body ol { margin: 10px 0 10px 20px; }
+        .post-body li { margin: 4px 0; }
+        .post-body pre {
+            background: #111118; border: 1px solid var(--border); border-radius: 8px;
+            padding: 16px; overflow-x: auto; margin: 12px 0; font-size: 0.8rem;
+        }
+        .post-body code {
+            background: #111118; padding: 2px 6px; border-radius: 4px; font-size: 0.85em;
+        }
+        .post-body pre code { background: none; padding: 0; }
+        .post-body table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+        .post-body th, .post-body td {
+            border: 1px solid var(--border); padding: 8px 12px; text-align: left; font-size: 0.85rem;
+        }
+        .post-body th { background: var(--bg-muted); color: var(--text); }
+        .post-body a { color: var(--solana-green); }
+        .post-body blockquote {
+            border-left: 3px solid var(--solana-purple); padding-left: 16px;
+            margin: 12px 0; color: var(--text-muted); font-style: italic;
+        }
+        .post-body strong { color: var(--text); }
+        .post-body hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+        /* Footer */
+        footer {
+            padding: 40px 0; border-top: 1px solid var(--border);
+            text-align: center; color: var(--text-muted); font-size: 0.8rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .blog-hero h1 { font-size: 1.8rem; }
+            .filter-bar { gap: 6px; }
+            .filter-btn { padding: 6px 12px; font-size: 0.75rem; }
+            .search-box { width: 100%; margin-left: 0; margin-top: 8px; }
+            .post-card { padding: 16px; }
+            .post-card .post-meta { gap: 10px; }
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container nav-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🔐</span>
+                MoltLaunch
+            </a>
+            <div class="nav-links">
+                <a href="/demo.html">Demo</a>
+                <a href="/shipped.html">Shipped</a>
+                <a href="/blog.html" class="active">Blog</a>
+                <a href="/pitch.html">Pitch</a>
+                <a href="/docs.html">Docs</a>
+                <a href="/about.html">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="blog-hero">
+        <div class="container">
+            <h1>Blog</h1>
+            <p>Research, analysis, and insights from building agent identity infrastructure on Solana.</p>
+            <div class="blog-stats">
+                <div class="stat"><strong id="total-posts">0</strong> Posts</div>
+                <div class="stat"><strong id="total-upvotes">0</strong> Upvotes</div>
+                <div class="stat"><strong id="total-comments">0</strong> Comments</div>
+                <div class="stat"><strong id="total-categories">0</strong> Categories</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="filters">
+        <div class="container">
+            <div class="filter-bar" id="filter-bar">
+                <button class="filter-btn active" data-category="all">All</button>
+                <!-- Category buttons injected by JS -->
+                <input type="text" class="search-box" id="search" placeholder="🔍 Search posts...">
+            </div>
+        </div>
+    </div>
+
+    <section class="posts-section">
+        <div class="container" id="posts-container">
+            <!-- Posts injected by JS -->
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>MoltLaunch — Verification infrastructure for the agent economy</p>
+            <p style="margin-top:8px;">Built on Solana · <a href="https://github.com/tradingstarllc/solana-agent-protocol">SAP Spec</a> · <a href="https://github.com/solana-foundation/SRFCs/discussions/9">sRFC #9</a></p>
+        </div>
+    </footer>
+
+    <!-- Simple markdown renderer -->
+    <script>
+    function renderMarkdown(md) {
+        if (!md) return '';
+        let html = md
+            // Code blocks
+            .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
+            // Inline code
+            .replace(/`([^`]+)`/g, '<code>$1</code>')
+            // Headers
+            .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+            .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+            // Bold
+            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+            // Italic
+            .replace(/\*(.+?)\*/g, '<em>$1</em>')
+            // Links
+            .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+            // Blockquotes
+            .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
+            // Horizontal rules
+            .replace(/^---+$/gm, '<hr>')
+            // Tables (basic)
+            .replace(/^\|(.+)\|$/gm, function(match) {
+                if (match.match(/^\|[\s-:|]+\|$/)) return '';
+                const cells = match.split('|').filter(c => c.trim());
+                const isHeader = false;
+                const tag = isHeader ? 'th' : 'td';
+                return '<tr>' + cells.map(c => `<${tag}>${c.trim()}</${tag}>`).join('') + '</tr>';
+            })
+            // Unordered lists
+            .replace(/^- (.+)$/gm, '<li>$1</li>')
+            // Paragraphs
+            .replace(/\n\n/g, '</p><p>')
+            ;
+        
+        // Wrap consecutive <li> in <ul>
+        html = html.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
+        // Wrap consecutive <tr> in <table>
+        html = html.replace(/(<tr>.*<\/tr>\n?)+/g, '<table>$&</table>');
+        
+        return '<p>' + html + '</p>';
+    }
+
+    const CATEGORY_META = {
+        'Identity & Trust': { icon: '🔐', color: '#14F195' },
+        'Infrastructure': { icon: '⚙️', color: '#00D4FF' },
+        'Ecosystem': { icon: '🌐', color: '#9945FF' },
+        'Philosophy': { icon: '💭', color: '#fbbf24' },
+        'Standards': { icon: '📋', color: '#ef4444' },
+        'Architecture': { icon: '🏗️', color: '#6366f1' }
+    };
+
+    let blogData = null;
+    let activeCategory = 'all';
+    let searchQuery = '';
+
+    async function loadBlog() {
+        const resp = await fetch('/blog/index.json');
+        blogData = await resp.json();
+        
+        // Compute stats
+        let totalUpvotes = 0, totalComments = 0, totalPosts = 0;
+        for (const [cat, posts] of Object.entries(blogData.categories)) {
+            totalPosts += posts.length;
+            for (const p of posts) {
+                totalUpvotes += p.upvotes;
+                totalComments += p.comments;
+            }
+        }
+        document.getElementById('total-posts').textContent = totalPosts;
+        document.getElementById('total-upvotes').textContent = totalUpvotes;
+        document.getElementById('total-comments').textContent = totalComments;
+        document.getElementById('total-categories').textContent = Object.keys(blogData.categories).length;
+        
+        // Build filter buttons
+        const bar = document.getElementById('filter-bar');
+        const searchBox = document.getElementById('search');
+        // Remove search temporarily, add category buttons, re-add search
+        bar.removeChild(searchBox);
+        
+        // Order categories
+        const catOrder = ['Identity & Trust', 'Infrastructure', 'Standards', 'Ecosystem', 'Philosophy'];
+        for (const cat of catOrder) {
+            if (!blogData.categories[cat]) continue;
+            const btn = document.createElement('button');
+            btn.className = 'filter-btn';
+            btn.dataset.category = cat;
+            const meta = CATEGORY_META[cat] || { icon: '📄' };
+            btn.innerHTML = `${meta.icon} ${cat} <span class="count">${blogData.categories[cat].length}</span>`;
+            btn.addEventListener('click', () => setCategory(cat));
+            bar.appendChild(btn);
+        }
+        
+        bar.appendChild(searchBox);
+        
+        // Set up "All" button
+        const allBtn = bar.querySelector('[data-category="all"]');
+        allBtn.innerHTML = `All <span class="count">${totalPosts}</span>`;
+        allBtn.addEventListener('click', () => setCategory('all'));
+        
+        // Search
+        searchBox.addEventListener('input', (e) => {
+            searchQuery = e.target.value.toLowerCase();
+            renderPosts();
+        });
+        
+        renderPosts();
+    }
+
+    function setCategory(cat) {
+        activeCategory = cat;
+        document.querySelectorAll('.filter-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.category === cat);
+        });
+        renderPosts();
+    }
+
+    function renderPosts() {
+        const container = document.getElementById('posts-container');
+        container.innerHTML = '';
+        
+        const catOrder = ['Identity & Trust', 'Infrastructure', 'Standards', 'Ecosystem', 'Philosophy'];
+        const categoriesToShow = activeCategory === 'all' ? catOrder : [activeCategory];
+        
+        for (const cat of categoriesToShow) {
+            const posts = blogData.categories[cat];
+            if (!posts) continue;
+            
+            // Sort by date descending
+            const sorted = [...posts].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // Filter by search
+            const filtered = searchQuery
+                ? sorted.filter(p => p.title.toLowerCase().includes(searchQuery))
+                : sorted;
+            
+            if (filtered.length === 0) continue;
+            
+            const meta = CATEGORY_META[cat] || { icon: '📄', color: '#888' };
+            
+            const group = document.createElement('div');
+            group.className = 'category-group';
+            group.innerHTML = `
+                <div class="category-header">
+                    <div class="category-icon" style="background:${meta.color}22;">${meta.icon}</div>
+                    <h2>${cat}</h2>
+                    <span class="cat-count">${filtered.length} post${filtered.length !== 1 ? 's' : ''}</span>
+                </div>
+            `;
+            
+            for (const post of filtered) {
+                const date = new Date(post.date).toLocaleDateString('en-US', {
+                    year: 'numeric', month: 'short', day: 'numeric'
+                });
+                
+                const card = document.createElement('div');
+                card.className = 'post-card';
+                card.innerHTML = `
+                    <div class="post-title">${escapeHtml(post.title)}</div>
+                    <div class="post-meta">
+                        <span>📅 ${date}</span>
+                        <span>⬆️ ${post.upvotes}</span>
+                        <span>💬 ${post.comments}</span>
+                        ${post.tags.length ? '<span>🏷️ ' + post.tags.join(', ') + '</span>' : ''}
+                    </div>
+                    <div class="post-body" id="body-${post.id}"></div>
+                `;
+                
+                card.addEventListener('click', async (e) => {
+                    // Don't toggle if clicking a link inside expanded body
+                    if (e.target.tagName === 'A') return;
+                    
+                    const body = card.querySelector('.post-body');
+                    if (body.classList.contains('open')) {
+                        body.classList.remove('open');
+                        return;
+                    }
+                    
+                    // Close all others
+                    document.querySelectorAll('.post-body.open').forEach(b => b.classList.remove('open'));
+                    
+                    // Load content if not yet loaded
+                    if (!body.dataset.loaded) {
+                        body.innerHTML = '<p style="color:#666;">Loading...</p>';
+                        try {
+                            const resp = await fetch('/blog/posts/' + post.filename);
+                            let md = await resp.text();
+                            // Remove frontmatter
+                            md = md.replace(/^---[\s\S]*?---\n*/m, '');
+                            body.innerHTML = renderMarkdown(md);
+                            body.dataset.loaded = '1';
+                        } catch (err) {
+                            body.innerHTML = '<p style="color:#ef4444;">Failed to load post content.</p>';
+                        }
+                    }
+                    
+                    body.classList.add('open');
+                });
+                
+                group.appendChild(card);
+            }
+            
+            container.appendChild(group);
+        }
+        
+        if (container.children.length === 0) {
+            container.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:60px 0;">No posts found matching your search.</p>';
+        }
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    loadBlog();
+    </script>
+</body>
+</html>

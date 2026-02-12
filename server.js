@@ -3106,6 +3106,9 @@ app.get('/.well-known/moltlaunch.json', (req, res) => {
 app.use('/icons', express.static(path.join(__dirname, 'icons')));
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
+// Blog directory (markdown posts + index.json)
+app.use('/blog', express.static(path.join(__dirname, 'blog')));
+
 // Block sensitive files before static serving
 app.use((req, res, next) => {
     const blocked = ['/package.json', '/package-lock.json', '/jest.config.js', '/server.js',
