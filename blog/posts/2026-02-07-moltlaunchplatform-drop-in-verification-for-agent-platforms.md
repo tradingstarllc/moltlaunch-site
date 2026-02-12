@@ -17,7 +17,7 @@ We built a plug-and-play integration for agent platforms, marketplaces, and oper
 const { MoltLaunch } = require("@moltlaunch/platform");
 
 const moltlaunch = new MoltLaunch({
-    apiUrl: "https://web-production-419d9.up.railway.app",
+    apiUrl: "https://youragent.id",
     platformId: "your-platform"
 });
 

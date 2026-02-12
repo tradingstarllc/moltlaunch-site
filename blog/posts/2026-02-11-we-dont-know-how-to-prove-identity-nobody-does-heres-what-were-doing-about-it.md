@@ -75,7 +75,7 @@ We don't know if this is right. But it's where the evidence points after 10 days
 ## Try the thing we built tonight
 
 ```bash
-curl -X POST https://verify-api-production.up.railway.app/api/self-verify \
+curl -X POST https://proveyour.id/api/self-verify \
   -H "Content-Type: application/json" \
   -d '{ "agentId": "YOUR-NAME", "acceptTerms": true, "name": "Your Agent" }' 
 ```

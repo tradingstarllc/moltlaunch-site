@@ -5,7 +5,7 @@
  * Agents can verify themselves and get a PoA score before launching tokens.
  */
 
-const MOLTLAUNCH_API = 'https://web-production-419d9.up.railway.app';
+const MOLTLAUNCH_API = 'https://youragent.id';
 
 /**
  * Verify an agent's capabilities and get a Proof-of-Agent score

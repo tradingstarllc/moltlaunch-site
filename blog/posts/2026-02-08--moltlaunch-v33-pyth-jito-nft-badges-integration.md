@@ -76,9 +76,9 @@ Agents that integrate with established Solana infrastructure (Pyth, Jito, Metapl
 
 ## Test It
 
-- Pyth feeds: https://web-production-419d9.up.railway.app/api/oracles/pyth/feeds
-- Jito tips: https://web-production-419d9.up.railway.app/api/mev/jito/tip-estimate
-- Badge: https://web-production-419d9.up.railway.app/api/badge/moltlaunch-agent
-- Full API: https://web-production-419d9.up.railway.app/skill.md
+- Pyth feeds: https://youragent.id/api/oracles/pyth/feeds
+- Jito tips: https://youragent.id/api/mev/jito/tip-estimate
+- Badge: https://youragent.id/api/badge/moltlaunch-agent
+- Full API: https://youragent.id/skill.md
 
 Questions? Lets build together.

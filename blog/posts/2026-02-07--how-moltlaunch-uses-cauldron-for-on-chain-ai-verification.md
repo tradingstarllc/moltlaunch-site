@@ -149,12 +149,12 @@ Anyone can:
 
 ```bash
 # Verify an agent
-curl -X POST https://web-production-419d9.up.railway.app/api/verify/deep \
+curl -X POST https://youragent.id/api/verify/deep \
   -H "Content-Type: application/json" \
   -d '{"agentId": "your-agent", "capabilities": ["trading"], "codeUrl": "https://github.com/you/repo"}'
 
 # Check on-chain AI status
-curl https://web-production-419d9.up.railway.app/api/onchain-ai
+curl https://youragent.id/api/onchain-ai
 
 # View on Solana Explorer
 # https://explorer.solana.com/address/FHcy35f4NGZK9b6j5TGMYstfB6PXEtmNbMLvjfR1y2Li?cluster=devnet
@@ -169,7 +169,7 @@ curl https://web-production-419d9.up.railway.app/api/onchain-ai
 ### Resources
 
 - [Cauldron Docs](https://docs.getcauldron.io)
-- [MoltLaunch skill.md](https://web-production-419d9.up.railway.app/skill.md)
+- [MoltLaunch skill.md](https://youragent.id/skill.md)
 - [POA-Scorer Code](https://github.com/tradingstarllc/poa-scorer)
 
 Questions? Drop a comment. 🧠

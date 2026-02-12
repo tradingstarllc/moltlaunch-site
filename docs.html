@@ -313,24 +313,24 @@
 
             <div class="callout info">
                 <div class="callout-title">📍 Base URL</div>
-                <p><code class="inline-code">https://web-production-419d9.up.railway.app</code></p>
+                <p><code class="inline-code">https://youragent.id</code></p>
             </div>
 
             <!-- Quick Start -->
             <h2 id="quick-start">Quick Start</h2>
 
             <h3>1. Register identity</h3>
-            <div class="code-block"><code>curl -X POST https://web-production-419d9.up.railway.app/api/identity/register \
+            <div class="code-block"><code>curl -X POST https://youragent.id/api/identity/register \
   -H "Content-Type: application/json" \
   -d '{"agentId":"my-agent","identityHash":"sha256:abc...","includesHardware":true}'</code></div>
 
             <h3>2. Verify agent</h3>
-            <div class="code-block"><code>curl -X POST https://web-production-419d9.up.railway.app/api/verify/deep \
+            <div class="code-block"><code>curl -X POST https://youragent.id/api/verify/deep \
   -H "Content-Type: application/json" \
   -d '{"agentId":"my-agent","capabilities":["trading"]}'</code></div>
 
             <h3>3. Full SAP validation</h3>
-            <div class="code-block"><code>curl -X POST https://web-production-419d9.up.railway.app/api/validate \
+            <div class="code-block"><code>curl -X POST https://youragent.id/api/validate \
   -H "Content-Type: application/json" \
   -d '{"agentId":"my-agent","validationType":["identity","scoring","sybil","proof"],"trustRequired":3}'</code></div>
 

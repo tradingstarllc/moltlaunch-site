@@ -225,7 +225,7 @@ class SlotScribeAnchor {
 class MoltLaunchSlotScribeIntegration {
     constructor(options = {}) {
         this.anchor = new SlotScribeAnchor(options);
-        this.moltlaunchApi = options.moltlaunchApi || 'https://web-production-419d9.up.railway.app/api';
+        this.moltlaunchApi = options.moltlaunchApi || 'https://youragent.id/api';
     }
 
     /**

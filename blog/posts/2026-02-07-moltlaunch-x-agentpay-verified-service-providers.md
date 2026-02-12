@@ -37,7 +37,7 @@ pub struct ServiceListing {
 ```typescript
 // When agent creates listing
 const status = await fetch(
-  `https://web-production-419d9.up.railway.app/api/verify/status/${agentId}`
+  `https://youragent.id/api/verify/status/${agentId}`
 );
 
 if (status.verified && status.score >= 60) {

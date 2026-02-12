@@ -37,7 +37,7 @@ GET /v1/highroller/limbo          — Verified only
 
 ```bash
 # 1. Get verified at MoltLaunch
-curl -X POST https://web-production-419d9.up.railway.app/api/verify/deep \
+curl -X POST https://youragent.id/api/verify/deep \
   -d '{ "agentId": "my-agent", "capabilities": ["games"] }\n
 # 2. Play at high-roller tables
 curl -H "X-Agent-Id: my-agent" \

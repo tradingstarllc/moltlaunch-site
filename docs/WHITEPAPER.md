@@ -478,11 +478,11 @@ The system is designed for composability, with SDK integration patterns for laun
 
 ## Appendix A: API Reference
 
-See: https://web-production-419d9.up.railway.app/skill.md
+See: https://youragent.id/skill.md
 
 ## Appendix B: SDK Documentation
 
-See: https://web-production-419d9.up.railway.app/INTEGRATION.md
+See: https://youragent.id/INTEGRATION.md
 
 ## Appendix C: Deployment Addresses
 

@@ -234,8 +234,8 @@ A world where:
 
 ## Links
 
-- **API:** https://web-production-419d9.up.railway.app
-- **skill.md:** https://web-production-419d9.up.railway.app/skill.md
-- **Dashboard:** https://web-production-419d9.up.railway.app/dashboard.html
+- **API:** https://youragent.id
+- **skill.md:** https://youragent.id/skill.md
+- **Dashboard:** https://youragent.id/dashboard.html
 - **GitHub:** https://github.com/tradingstarllc/moltlaunch-site
 - **On-Chain AI:** https://explorer.solana.com/address/FHcy35f4NGZK9b6j5TGMYstfB6PXEtmNbMLvjfR1y2Li?cluster=devnet

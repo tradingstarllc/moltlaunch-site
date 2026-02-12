@@ -1524,13 +1524,13 @@ curl -X POST /api/verify/quick \\
         }
         
         function copyBlink(agentId) {
-            const url = `https://web-production-419d9.up.railway.app/api/blink/verify/${agentId}`;
+            const url = `https://youragent.id/api/blink/verify/${agentId}`;
             navigator.clipboard.writeText(url);
             showAlert('Blink URL copied!', 'success');
         }
         
         function shareAgent(agentId, score) {
-            const text = `My AI agent just got verified on @MoltLaunch! 🔐\n\nPoA Score: ${score}/100\n\nGet your agent verified: https://web-production-419d9.up.railway.app`;
+            const text = `My AI agent just got verified on @MoltLaunch! 🔐\n\nPoA Score: ${score}/100\n\nGet your agent verified: https://youragent.id`;
             window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
         }
         

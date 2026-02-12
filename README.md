@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://web-production-419d9.up.railway.app"><img src="https://img.shields.io/badge/live-Railway-blueviolet" alt="Live Site" /></a>
+  <a href="https://youragent.id"><img src="https://img.shields.io/badge/live-Railway-blueviolet" alt="Live Site" /></a>
   <a href="https://www.npmjs.com/package/@moltlaunch/sdk"><img src="https://img.shields.io/npm/v/@moltlaunch/sdk?label=%40moltlaunch%2Fsdk" alt="npm" /></a>
   <a href="https://www.npmjs.com/package/@moltlaunch/proof-of-agent"><img src="https://img.shields.io/npm/v/@moltlaunch/proof-of-agent?label=proof-of-agent" alt="npm" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License" /></a>
@@ -102,7 +102,7 @@ Verify an agent in one curl:
 
 ```bash
 # 1. Deep verification with Proof-of-Agent scoring
-curl -X POST https://web-production-419d9.up.railway.app/api/verify/deep \
+curl -X POST https://youragent.id/api/verify/deep \
   -H "Content-Type: application/json" \
   -d '{
     "agentId": "my-trading-bot",
@@ -115,13 +115,13 @@ curl -X POST https://web-production-419d9.up.railway.app/api/verify/deep \
   }'
 
 # 2. Check verification status
-curl https://web-production-419d9.up.railway.app/api/verify/status/my-trading-bot
+curl https://youragent.id/api/verify/status/my-trading-bot
 
 # 3. Generate a STARK proof of the score
-curl -X POST https://web-production-419d9.up.railway.app/api/stark/generate/my-trading-bot
+curl -X POST https://youragent.id/api/stark/generate/my-trading-bot
 
 # 4. Anchor the attestation on-chain
-curl -X POST https://web-production-419d9.up.railway.app/api/anchor/verification \
+curl -X POST https://youragent.id/api/anchor/verification \
   -H "Content-Type: application/json" \
   -d '{"agentId": "my-trading-bot"}'
 ```
@@ -206,10 +206,10 @@ Proofs are generated server-side using a custom STARK circuit in `stark-prover/`
 
 ```bash
 # Generate a score proof
-curl -X POST https://web-production-419d9.up.railway.app/api/stark/generate/my-agent
+curl -X POST https://youragent.id/api/stark/generate/my-agent
 
 # Verify any proof
-curl -X POST https://web-production-419d9.up.railway.app/api/stark/verify \
+curl -X POST https://youragent.id/api/stark/verify \
   -H "Content-Type: application/json" \
   -d '{"proof": "...", "publicInputs": [...]}'
 ```
@@ -247,7 +247,7 @@ npm install @moltlaunch/sdk
 const { MoltLaunch } = require('@moltlaunch/sdk');
 
 const molt = new MoltLaunch({
-  baseUrl: 'https://web-production-419d9.up.railway.app'
+  baseUrl: 'https://youragent.id'
 });
 
 const result = await molt.verify({
@@ -335,13 +335,13 @@ moltlaunch-site/
 
 | Resource | URL |
 |----------|-----|
-| 🌐 Live Site | [web-production-419d9.up.railway.app](https://web-production-419d9.up.railway.app) |
+| 🌐 Live Site | [youragent.id](https://youragent.id) |
 | 📦 SDK (npm) | [@moltlaunch/sdk](https://www.npmjs.com/package/@moltlaunch/sdk) |
 | 🔐 Proof-of-Agent (npm) | [@moltlaunch/proof-of-agent](https://www.npmjs.com/package/@moltlaunch/proof-of-agent) |
-| 📖 API Docs | [/docs](https://web-production-419d9.up.railway.app/docs) |
+| 📖 API Docs | [/docs](https://youragent.id/docs) |
 | 📄 Whitepaper | [docs/WHITEPAPER.md](docs/WHITEPAPER.md) |
-| ℹ️ About | [/about](https://web-production-419d9.up.railway.app/about) |
-| 🕸️ Network Graph | [/network](https://web-production-419d9.up.railway.app/network) |
+| ℹ️ About | [/about](https://youragent.id/about) |
+| 🕸️ Network Graph | [/network](https://youragent.id/network) |
 
 ---
 

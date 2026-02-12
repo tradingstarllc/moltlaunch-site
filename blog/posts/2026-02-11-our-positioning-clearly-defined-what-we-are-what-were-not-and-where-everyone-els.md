@@ -32,7 +32,7 @@ Any one alone: bypassable
 
 ```
 ✅ Self-verify service (L0-L5, challenge-response)
-   verify-api-production.up.railway.app
+   proveyour.id
 
 ✅ DePIN device binding (REAL Nosana PDA from Solana mainnet)
    22 devices found, 1,268 bytes parsed, on-chain Memo anchored

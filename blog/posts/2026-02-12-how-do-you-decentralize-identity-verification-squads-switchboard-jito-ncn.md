@@ -190,6 +190,6 @@ References:
 - Switchboard as first Jito NCN: https://switchboardxyz.medium.com/switchboard-is-becoming-the-first-jito-ncn-7007655956f2
 - Jito NCN Overview: https://www.jito.network/restaking/ncns/
 - sRFC #9 (our agent identity standard): https://github.com/solana-foundation/SRFCs/discussions/9
-- MoltLaunch API: https://web-production-419d9.up.railway.app
+- MoltLaunch API: https://youragent.id
 
 What trust model is your project using? Anyone else thinking about the oracle problem for non-price data?

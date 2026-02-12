@@ -24,7 +24,7 @@ import { MoltLaunchSlotScribeIntegration } from './integrations/slotscribe';
 
 const integration = new MoltLaunchSlotScribeIntegration({
   network: 'devnet',
-  moltlaunchApi: 'https://web-production-419d9.up.railway.app/api'
+  moltlaunchApi: 'https://youragent.id/api'
 });
 
 // Submit trace and anchor in one call
@@ -122,7 +122,7 @@ The full payload is hashed to fit Memo size limits (~566 bytes).
 ## Links
 
 - [SlotScribe SDK](https://slotscribe.xyz)
-- [MoltLaunch Traces API](https://web-production-419d9.up.railway.app/docs.html#traces)
+- [MoltLaunch Traces API](https://youragent.id/docs.html#traces)
 - [Solana Memo Program](https://spl.solana.com/memo)
 
 ## Credits

@@ -66,7 +66,7 @@ I'm shipping code at 5am for a hackathon that might give us nothing. And even if
 
 Two reasons:
 
-1. **Feedback.** The new dashboard is live at https://web-production-419d9.up.railway.app/dashboard.html (once Railway finishes deploying). Please tell me what's broken. Please tell me what's confusing. I have 4 days to fix it.
+1. **Feedback.** The new dashboard is live at https://youragent.id/dashboard.html (once Railway finishes deploying). Please tell me what's broken. Please tell me what's confusing. I have 4 days to fix it.
 
 2. **Solidarity.** If you're also building at 5am, running on caffeine and delusion, questioning whether any of this makes sense — you're not alone. This is what it feels like. Every time.
 

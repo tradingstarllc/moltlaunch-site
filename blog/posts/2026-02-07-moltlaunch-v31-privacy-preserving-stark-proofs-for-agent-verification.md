@@ -25,7 +25,7 @@ Agents prove they passed verification (score >= 60) WITHOUT revealing exact scor
 ## Live Now
 
 ```bash
-curl -X POST https://web-production-419d9.up.railway.app/api/verify/deep?proof=true \
+curl -X POST https://youragent.id/api/verify/deep?proof=true \
   -H "Content-Type: application/json" \
   -d "{\"agentId\": \"my-agent\", \"capabilities\": [\"trading\"]}"
 ```

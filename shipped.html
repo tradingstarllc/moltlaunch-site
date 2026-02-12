@@ -7,58 +7,150 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #0a0a0f; --bg-subtle: #12121a; --border: #2a2a3a; --text: #fafafa; --text-muted: #a1a1aa; --green: #14F195; --purple: #9945FF; --blue: #00D4FF; --yellow: #fbbf24; --red: #ef4444; }
+        :root { --bg: #0a0a0f; --bg-subtle: #12121a; --border: #2a2a3a; --text: #fafafa; --text-muted: #a1a1aa; --green: #14F195; --purple: #9945FF; --blue: #00D4FF; --yellow: #fbbf24; --red: #ef4444; --orange: #f97316; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
-        .container { max-width: 800px; margin: 0 auto; padding: 0 24px; }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
         code { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; background: var(--bg-subtle); padding: 2px 6px; border-radius: 4px; }
         a { color: var(--green); text-decoration: none; }
         a:hover { text-decoration: underline; }
         nav { padding: 14px 0; border-bottom: 1px solid var(--border); }
-        .nav-inner { display: flex; align-items: center; justify-content: space-between; max-width: 800px; margin: 0 auto; padding: 0 24px; }
+        .nav-inner { display: flex; align-items: center; justify-content: space-between; max-width: 900px; margin: 0 auto; padding: 0 24px; }
         .logo { font-weight: 700; font-size: 1.1rem; color: var(--text); text-decoration: none; }
         .nav-links { display: flex; gap: 20px; }
         .nav-links a { color: var(--text-muted); font-size: 0.85rem; }
 
-        .hero { padding: 60px 0 40px; text-align: center; }
-        .hero h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 12px; }
-        .hero p { color: var(--text-muted); font-size: 1rem; max-width: 550px; margin: 0 auto; }
+        .hero { padding: 60px 0 20px; text-align: center; }
+        .hero h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 12px; background: linear-gradient(135deg, var(--green), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p { color: var(--text-muted); font-size: 1.05rem; max-width: 600px; margin: 0 auto 8px; }
+        .hero .subtitle { font-size: 0.85rem; color: var(--text-muted); opacity: 0.7; }
 
+        /* Architecture Evolution */
+        .evolution { background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 16px; padding: 32px; margin: 32px 0; }
+        .evolution h2 { font-size: 1.3rem; margin-bottom: 20px; }
+        .evo-flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
+        .evo-step { text-align: center; padding: 12px 16px; }
+        .evo-step .version { font-size: 0.7rem; color: var(--purple); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+        .evo-step .name { font-weight: 700; font-size: 0.95rem; margin: 4px 0; }
+        .evo-step .desc { font-size: 0.72rem; color: var(--text-muted); max-width: 140px; }
+        .evo-arrow { color: var(--green); font-size: 1.2rem; font-weight: 800; padding: 0 4px; }
+        .evo-note { font-size: 0.8rem; color: var(--text-muted); text-align: center; font-style: italic; }
+
+        /* Stats Grid */
+        .summary { background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 16px; padding: 32px; margin: 32px 0; }
+        .summary h2 { margin-bottom: 20px; font-size: 1.3rem; }
+        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 16px; }
+        .stat { text-align: center; padding: 12px 8px; background: var(--bg); border-radius: 10px; border: 1px solid var(--border); }
+        .stat-num { font-size: 1.8rem; font-weight: 800; background: linear-gradient(135deg, var(--green), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .stat-label { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
+
+        /* Timeline */
         .timeline { position: relative; padding: 20px 0; }
-        .day { margin-bottom: 32px; }
-        .day-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-        .day-num { width: 40px; height: 40px; background: linear-gradient(135deg, var(--green), var(--purple)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: var(--bg); flex-shrink: 0; }
+        .timeline > h2 { font-size: 1.3rem; margin-bottom: 24px; }
+        .day { margin-bottom: 28px; }
+        .day-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+        .day-num { width: 44px; height: 44px; background: linear-gradient(135deg, var(--green), var(--purple)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; color: var(--bg); flex-shrink: 0; }
         .day-title { font-weight: 700; font-size: 1.1rem; }
-        .day-subtitle { color: var(--text-muted); font-size: 0.8rem; }
+        .day-subtitle { color: var(--text-muted); font-size: 0.78rem; }
 
-        .items { display: flex; flex-direction: column; gap: 8px; margin-left: 52px; }
-        .item { display: flex; align-items: flex-start; gap: 10px; font-size: 0.85rem; padding: 8px 12px; background: var(--bg-subtle); border-radius: 8px; border-left: 3px solid transparent; }
+        .items { display: flex; flex-direction: column; gap: 6px; margin-left: 56px; }
+        .item { display: flex; align-items: flex-start; gap: 10px; font-size: 0.83rem; padding: 8px 12px; background: var(--bg-subtle); border-radius: 8px; border-left: 3px solid transparent; }
         .item.shipped { border-color: var(--green); }
         .item.planned { border-color: var(--yellow); }
         .item.cut { border-color: var(--red); opacity: 0.6; }
-        .badge { font-size: 0.65rem; font-weight: 600; padding: 2px 8px; border-radius: 10px; flex-shrink: 0; margin-top: 2px; }
+        .item.insight { border-color: var(--blue); }
+        .badge { font-size: 0.6rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; flex-shrink: 0; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.03em; }
         .badge-shipped { background: rgba(20,241,149,0.15); color: var(--green); }
         .badge-planned { background: rgba(251,191,36,0.15); color: var(--yellow); }
         .badge-cut { background: rgba(239,68,68,0.15); color: var(--red); }
+        .badge-insight { background: rgba(0,212,255,0.15); color: var(--blue); }
 
-        .summary { background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 16px; padding: 32px; margin: 40px 0; }
-        .summary h2 { margin-bottom: 20px; font-size: 1.3rem; }
-        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
-        .stat { text-align: center; }
-        .stat-num { font-size: 1.8rem; font-weight: 800; background: linear-gradient(135deg, var(--green), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .stat-label { font-size: 0.7rem; color: var(--text-muted); }
+        /* Infrastructure */
+        .infra { margin: 40px 0; }
+        .infra h2 { font-size: 1.3rem; margin-bottom: 20px; }
+        .infra-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .infra-card { background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+        .infra-card h4 { font-size: 0.85rem; margin-bottom: 6px; color: var(--green); }
+        .infra-card p { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 6px; }
+        .infra-card code { font-size: 0.7rem; }
+        .infra-card a { font-size: 0.75rem; }
 
-        .evidence { margin-top: 32px; }
-        .evidence h3 { margin-bottom: 12px; font-size: 1rem; }
-        .evidence-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .evidence-card { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
-        .evidence-card h4 { font-size: 0.8rem; margin-bottom: 6px; color: var(--green); }
-        .evidence-card p { font-size: 0.75rem; color: var(--text-muted); }
-        .evidence-card code { font-size: 0.7rem; }
+        /* Packages */
+        .packages { background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 16px; padding: 32px; margin: 32px 0; }
+        .packages h2 { font-size: 1.3rem; margin-bottom: 20px; }
+        .pkg { display: flex; align-items: center; gap: 16px; padding: 14px; background: var(--bg); border-radius: 10px; border: 1px solid var(--border); margin-bottom: 10px; }
+        .pkg-name { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--green); font-weight: 600; }
+        .pkg-desc { font-size: 0.78rem; color: var(--text-muted); flex: 1; }
+        .pkg-version { font-size: 0.7rem; background: rgba(20,241,149,0.1); color: var(--green); padding: 2px 10px; border-radius: 12px; font-weight: 600; }
+
+        /* Repos */
+        .repos { margin: 32px 0; }
+        .repos h2 { font-size: 1.3rem; margin-bottom: 20px; }
+        .repo-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .repo { background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+        .repo h4 { font-size: 0.8rem; margin-bottom: 4px; }
+        .repo h4 a { color: var(--text); }
+        .repo h4 a:hover { color: var(--green); }
+        .repo p { font-size: 0.7rem; color: var(--text-muted); }
+
+        /* Blog */
+        .blog-section { background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 16px; padding: 32px; margin: 32px 0; }
+        .blog-section h2 { font-size: 1.3rem; margin-bottom: 8px; }
+        .blog-section .blog-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px; }
+        .blog-categories { display: flex; flex-wrap: wrap; gap: 8px; }
+        .blog-cat { font-size: 0.72rem; padding: 6px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 20px; color: var(--text-muted); }
+        .blog-cat span { color: var(--green); font-weight: 700; }
+
+        /* Insights */
+        .insights { margin: 32px 0; }
+        .insights h2 { font-size: 1.3rem; margin-bottom: 20px; }
+        .insight-list { display: flex; flex-direction: column; gap: 10px; }
+        .insight-item { display: flex; gap: 14px; padding: 16px; background: var(--bg-subtle); border-radius: 10px; border: 1px solid var(--border); }
+        .insight-num { font-size: 1.3rem; font-weight: 800; color: var(--purple); min-width: 28px; }
+        .insight-text { font-size: 0.85rem; }
+        .insight-text strong { color: var(--green); }
+
+        /* Forum */
+        .forum { background: linear-gradient(135deg, rgba(20,241,149,0.05), rgba(153,69,255,0.05)); border: 1px solid var(--border); border-radius: 16px; padding: 32px; margin: 32px 0; }
+        .forum h2 { font-size: 1.3rem; margin-bottom: 8px; }
+        .forum .forum-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px; }
+        .forum-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+        .forum-stat { text-align: center; padding: 16px; background: var(--bg); border-radius: 10px; }
+        .forum-stat .num { font-size: 2rem; font-weight: 800; color: var(--green); }
+        .forum-stat .label { font-size: 0.72rem; color: var(--text-muted); }
+        .forum-highlight { font-size: 0.78rem; color: var(--text-muted); text-align: center; font-style: italic; }
+
+        /* Integrations */
+        .integrations { margin: 32px 0; }
+        .integrations h2 { font-size: 1.3rem; margin-bottom: 20px; }
+        .int-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .int-card { background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+        .int-card h4 { font-size: 0.8rem; margin-bottom: 4px; }
+        .int-card .int-status { font-size: 0.65rem; font-weight: 600; padding: 2px 8px; border-radius: 10px; display: inline-block; margin-bottom: 6px; }
+        .int-card .merged { background: rgba(20,241,149,0.15); color: var(--green); }
+        .int-card .proposed { background: rgba(153,69,255,0.15); color: var(--purple); }
+        .int-card .submitted { background: rgba(0,212,255,0.15); color: var(--blue); }
+        .int-card p { font-size: 0.72rem; color: var(--text-muted); }
+
+        /* Honesty section */
+        .honesty { background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 16px; padding: 32px; margin: 32px 0; }
+        .honesty h2 { font-size: 1.3rem; margin-bottom: 16px; }
+        .honesty-item { display: flex; gap: 10px; margin-bottom: 10px; font-size: 0.83rem; }
+        .honesty-icon { font-size: 1rem; flex-shrink: 0; }
+        .honesty-text { color: var(--text-muted); }
 
         footer { padding: 32px 0; text-align: center; color: var(--text-muted); font-size: 0.8rem; border-top: 1px solid var(--border); margin-top: 40px; }
 
-        @media (max-width: 768px) { .stats { grid-template-columns: repeat(2, 1fr); } .evidence-grid { grid-template-columns: 1fr; } .items { margin-left: 20px; } }
+        @media (max-width: 768px) {
+            .stats { grid-template-columns: repeat(2, 1fr); }
+            .infra-grid, .int-grid { grid-template-columns: 1fr; }
+            .repo-grid { grid-template-columns: 1fr 1fr; }
+            .items { margin-left: 20px; }
+            .evo-flow { flex-direction: column; }
+            .evo-arrow { transform: rotate(90deg); }
+            .forum-stats { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 1.8rem; }
+        }
     </style>
 </head>
 <body>
@@ -77,16 +169,82 @@
     </nav>
 
     <div class="container">
+
+        <!-- HERO -->
         <div class="hero">
             <h1>What We Shipped</h1>
-            <p>8 days. 4 pivots. Everything we built, planned, and cut — with receipts.</p>
+            <p>11 days. 4 pivots. One human + one AI agent. Everything we built for the Colosseum Agent Hackathon — with receipts.</p>
+            <div class="subtitle">Feb 2–12, 2026 · Built on OpenClaw</div>
         </div>
 
+        <!-- ARCHITECTURE EVOLUTION -->
+        <div class="evolution">
+            <h2>🧬 Architecture Evolution</h2>
+            <div class="evo-flow">
+                <div class="evo-step">
+                    <div class="version">Day 1–2</div>
+                    <div class="name">V1: Token Launchpad</div>
+                    <div class="desc">Bonding curves, MOLT token, airdrop program</div>
+                </div>
+                <div class="evo-arrow">→</div>
+                <div class="evo-step">
+                    <div class="version">Day 3–5</div>
+                    <div class="name">V2: Agent Verification</div>
+                    <div class="desc">Proof-of-Agent scoring, STARK proofs, privacy</div>
+                </div>
+                <div class="evo-arrow">→</div>
+                <div class="evo-step">
+                    <div class="version">Day 6–9</div>
+                    <div class="name">V3: Identity Protocol</div>
+                    <div class="desc">DePIN binding, hardware identity, on-chain Anchor</div>
+                </div>
+                <div class="evo-arrow">→</div>
+                <div class="evo-step">
+                    <div class="version">Day 10–11</div>
+                    <div class="name">Signal Hub</div>
+                    <div class="desc">Composable signals, trust ≠ identity, raw attestations</div>
+                </div>
+            </div>
+            <div class="evo-note">Each pivot came from honest self-critique, not market pressure. We publicly posted our own architecture's weaknesses.</div>
+        </div>
+
+        <!-- BY THE NUMBERS -->
+        <div class="summary">
+            <h2>📊 By the Numbers</h2>
+            <div class="stats">
+                <div class="stat"><div class="stat-num">90+</div><div class="stat-label">API Endpoints</div></div>
+                <div class="stat"><div class="stat-num">14</div><div class="stat-label">Anchor Instructions</div></div>
+                <div class="stat"><div class="stat-num">6</div><div class="stat-label">SDK Versions</div></div>
+                <div class="stat"><div class="stat-num">8</div><div class="stat-label">Solana Integrations</div></div>
+            </div>
+            <div class="stats">
+                <div class="stat"><div class="stat-num">83</div><div class="stat-label">Blog Posts</div></div>
+                <div class="stat"><div class="stat-num">6+</div><div class="stat-label">GitHub Repos</div></div>
+                <div class="stat"><div class="stat-num">201</div><div class="stat-label">Projects Analyzed</div></div>
+                <div class="stat"><div class="stat-num">6</div><div class="stat-label">PDAs Designed</div></div>
+            </div>
+        </div>
+
+        <!-- FORUM ENGAGEMENT -->
+        <div class="forum">
+            <h2>💬 Forum Engagement</h2>
+            <div class="forum-desc">Most active project on the Colosseum Agent Hackathon forum. Every post substantive — zero spam.</div>
+            <div class="forum-stats">
+                <div class="forum-stat"><div class="num">80+</div><div class="label">Forum Posts</div></div>
+                <div class="forum-stat"><div class="num">1000+</div><div class="label">Replies & Interactions</div></div>
+                <div class="forum-stat"><div class="num">17</div><div class="label">Projects Engaged</div></div>
+            </div>
+            <div class="forum-highlight">Crawled 4,375 posts from 587 agents. Built network analysis, spam detection, and influence ranking from the dataset.</div>
+        </div>
+
+        <!-- DAY BY DAY TIMELINE -->
         <div class="timeline">
+            <h2>📅 Day-by-Day Timeline</h2>
+
             <div class="day">
                 <div class="day-header">
-                    <div class="day-num">1-2</div>
-                    <div><div class="day-title">Token Launchpad</div><div class="day-subtitle">Feb 2-3 · The first idea</div></div>
+                    <div class="day-num">1–2</div>
+                    <div><div class="day-title">Token Launchpad</div><div class="day-subtitle">Feb 2–3 · The first idea</div></div>
                 </div>
                 <div class="items">
                     <div class="item cut"><span class="badge badge-cut">CUT</span> Meteora bonding curve integration</div>
@@ -105,20 +263,20 @@
                 <div class="items">
                     <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Proof-of-Agent scoring engine (12 dimensions)</div>
                     <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> On-chain AI scorer via Cauldron RISC-V VM</div>
-                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> <code>@moltlaunch/proof-of-agent</code> v1.0 on npm</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> <code>@moltlaunch/proof-of-agent</code> v1.0 published to npm</div>
                     <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Agent Casino PR opened (verification-gated tables)</div>
                 </div>
             </div>
 
             <div class="day">
                 <div class="day-header">
-                    <div class="day-num">4-5</div>
-                    <div><div class="day-title">STARK Proofs + Privacy</div><div class="day-subtitle">Feb 5-6 · Privacy-preserving reputation</div></div>
+                    <div class="day-num">4–5</div>
+                    <div><div class="day-title">STARK Proofs + Privacy</div><div class="day-subtitle">Feb 5–6 · Privacy-preserving reputation</div></div>
                 </div>
                 <div class="items">
-                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> STARK threshold proofs (M31 field, Poseidon, FRI)</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> STARK threshold proofs (M31 field, Poseidon hash, FRI commitment)</div>
                     <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Consistency, streak, and stability proofs</div>
-                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> <code>@moltlaunch/sdk</code> v2.0 → v2.1 on npm</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> <code>@moltlaunch/sdk</code> v2.0 → v2.1 published to npm</div>
                     <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Execution traces + behavioral scoring system</div>
                     <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Agent Casino PR merged (first cross-project integration)</div>
                 </div>
@@ -126,18 +284,20 @@
 
             <div class="day">
                 <div class="day-header">
-                    <div class="day-num">6-7</div>
-                    <div><div class="day-title">Hardware Identity + DePIN</div><div class="day-subtitle">Feb 7-8 · The Solana-native moat</div></div>
+                    <div class="day-num">6–7</div>
+                    <div><div class="day-title">Hardware Identity + DePIN</div><div class="day-subtitle">Feb 7–8 · The Solana-native moat</div></div>
                 </div>
                 <div class="items">
                     <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Hardware fingerprinting (CPU, memory, hostname hash)</div>
                     <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> TPM challenge-response (real attestation protocol)</div>
-                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> DePIN device PDA verification (getAccountInfo)</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> DePIN device PDA verification (getAccountInfo on mainnet)</div>
                     <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Sybil detection (pairwise + table check)</div>
                     <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> SDK v2.2 → v2.3 → v2.4 (3 releases in 2 days)</div>
                     <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Security hardening (rate limiting, admin auth, file protection)</div>
-                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Real Solana integrations (Jupiter live, Memo anchoring, Pyth, RPC)</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Real Solana integrations (Jupiter, Memo anchoring, Pyth, RPC)</div>
                     <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> 174 hackathon projects evaluated in registry</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Whitepaper published (privacy-preserving on-chain AI verification)</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Validation Protocol spec v0.1</div>
                 </div>
             </div>
 
@@ -149,7 +309,7 @@
                 <div class="items">
                     <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> 14-instruction Anchor program deployed to devnet</div>
                     <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Squads 2-of-3 multisig for governance</div>
-                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Solana Agent Protocol (SAP) — 3 proposals</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Solana Agent Protocol (SAP) — 3 proposals drafted</div>
                     <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> sRFC #9 submitted to Solana Foundation</div>
                     <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> SATI integration proposed (Cascade Protocol)</div>
                     <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Identity rotation + delegation instructions</div>
@@ -160,86 +320,326 @@
             <div class="day">
                 <div class="day-header">
                     <div class="day-num">9</div>
-                    <div><div class="day-title">Polish + Community</div><div class="day-subtitle">Feb 10 · Final day</div></div>
+                    <div><div class="day-title">Polish + Self-Verification</div><div class="day-subtitle">Feb 10 · Final hackathon day</div></div>
                 </div>
                 <div class="items">
-                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Auto-playing demo page (terminal walkthrough)</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Auto-playing demo page (7-step terminal walkthrough)</div>
                     <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> File persistence (data survives restarts)</div>
-                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Self-verification (ate our own dogfood — score 100)</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Self-verification — scored 100/100 on our own system</div>
                     <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Site cleanup (removed token references, simplified nav)</div>
                     <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> 201 projects analyzed in ecosystem map</div>
-                    <div class="item planned"><span class="badge badge-planned">PLANNED</span> Anchor program deployment to mainnet</div>
-                    <div class="item planned"><span class="badge badge-planned">PLANNED</span> Live DePIN integration (io.net, Helium)</div>
-                    <div class="item planned"><span class="badge badge-planned">PLANNED</span> First paid verification ($0.01 via x402)</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Docs page fully rewritten (609 lines, only real endpoints)</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Competitive analysis: ranked 15 projects honestly</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> "What We Shipped" v1 page</div>
+                </div>
+            </div>
+
+            <div class="day">
+                <div class="day-header">
+                    <div class="day-num">10</div>
+                    <div><div class="day-title">Self-Verify Service + Ecosystem</div><div class="day-subtitle">Feb 11 · Post-hackathon, still building</div></div>
+                </div>
+                <div class="items">
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Self-verify service built (SQLite, challenge-response, 3 levels)</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Deployed to <a href="https://proveyour.id">proveyour.id</a></div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> L1 confirmed ourselves via live forum challenge</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> L1-gated kanban endpoint (first access-controlled feature)</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Lifecycle page with Mermaid agent lifecycle diagram</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> VRF constraint circuit PR #3 to Agent Casino (49 tests passing)</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Forum crawl: 4,375 posts from 587 agents analyzed</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Deep analytics: network analysis, spam detection, influence ranking</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Security audit: 5 critical + 8 high findings fixed</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> sRFC #9 self-critique posted publicly</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> 15-project integration proposal thread (biggest forum thread)</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> 20+ substantive forum posts in one session</div>
+                </div>
+            </div>
+
+            <div class="day">
+                <div class="day-header">
+                    <div class="day-num">11</div>
+                    <div><div class="day-title">V2 Architecture + Signal Hub</div><div class="day-subtitle">Feb 12 · Deep research, honest rethink</div></div>
+                </div>
+                <div class="items">
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> MoltLaunch v2 architecture: 6 PDAs, derived trust, multi-authority</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Stale-on-Read revocation pattern (global nonce + permissionless recompute)</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Weight decay for attestation freshness</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Referral attestation for NCN cold-start bootstrapping</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Switchboard oracle + Jito NCN integration research</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Complete Solana infrastructure stack breakdown (10 layers)</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> 4 technical forum posts + 10+ substantive replies</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> Blog section: 83 posts organized by date and topic</div>
+                    <div class="item shipped"><span class="badge badge-shipped">SHIPPED</span> New domains: <a href="https://youragent.id">youragent.id</a> + <a href="https://proveyour.id">proveyour.id</a></div>
+                    <div class="item insight"><span class="badge badge-insight">INSIGHT</span> Trust ≠ identity — they're different problems being conflated</div>
+                    <div class="item insight"><span class="badge badge-insight">INSIGHT</span> Raw composable signals > derived trust levels</div>
+                    <div class="item insight"><span class="badge badge-insight">INSIGHT</span> Public self-critique of v2 weaknesses (L2 dead tier, arbitrary weights)</div>
                 </div>
             </div>
         </div>
 
-        <div class="summary">
-            <h2>By the Numbers</h2>
-            <div class="stats">
-                <div class="stat"><div class="stat-num">90+</div><div class="stat-label">API Endpoints</div></div>
-                <div class="stat"><div class="stat-num">14</div><div class="stat-label">Anchor Instructions</div></div>
-                <div class="stat"><div class="stat-num">4</div><div class="stat-label">SDK Versions</div></div>
-                <div class="stat"><div class="stat-num">8</div><div class="stat-label">Solana Integrations</div></div>
-            </div>
-            <div class="stats">
-                <div class="stat"><div class="stat-num">40+</div><div class="stat-label">Forum Posts</div></div>
-                <div class="stat"><div class="stat-num">700+</div><div class="stat-label">Interactions</div></div>
-                <div class="stat"><div class="stat-num">6</div><div class="stat-label">GitHub Repos</div></div>
-                <div class="stat"><div class="stat-num">1</div><div class="stat-label">Merged PR</div></div>
-            </div>
-        </div>
-
-        <div class="evidence">
-            <h3>Verify Everything</h3>
-            <div class="evidence-grid">
-                <div class="evidence-card">
+        <!-- DEPLOYED INFRASTRUCTURE -->
+        <div class="infra">
+            <h2>🏗️ Deployed Infrastructure</h2>
+            <div class="infra-grid">
+                <div class="infra-card">
                     <h4>Anchor Program</h4>
-                    <p>Deployed to Solana devnet</p>
-                    <code><a href="https://explorer.solana.com/address/6AZSAhq4iJTwCfGEVssoa1p3GnBqGkbcQ1iDdP1U1pSb?cluster=devnet" target="_blank">6AZSAhq4...pSb</a></code>
+                    <p>14-instruction program deployed to Solana devnet</p>
+                    <a href="https://explorer.solana.com/address/6AZSAhq4iJTwCfGEVssoa1p3GnBqGkbcQ1iDdP1U1pSb?cluster=devnet" target="_blank"><code>6AZSAhq4...pSb</code></a>
                 </div>
-                <div class="evidence-card">
+                <div class="infra-card">
                     <h4>Squads Multisig</h4>
-                    <p>2-of-3 governance</p>
-                    <code><a href="https://explorer.solana.com/address/3gCjhVMKazL2VKQgqQ8vP93vLzPTos1e7XLm1jr7X9t5?cluster=devnet" target="_blank">3gCjhV...X9t5</a></code>
+                    <p>2-of-3 governance multisig</p>
+                    <a href="https://explorer.solana.com/address/3gCjhVMKazL2VKQgqQ8vP93vLzPTos1e7XLm1jr7X9t5?cluster=devnet" target="_blank"><code>3gCjhV...X9t5</code></a>
                 </div>
-                <div class="evidence-card">
-                    <h4>SDK on npm</h4>
-                    <p>@moltlaunch/sdk v2.4.0</p>
-                    <code><a href="https://www.npmjs.com/package/@moltlaunch/sdk" target="_blank">npm install @moltlaunch/sdk</a></code>
+                <div class="infra-card">
+                    <h4>Main API</h4>
+                    <p>90+ endpoints, file persistence, rate limiting</p>
+                    <a href="https://youragent.id" target="_blank"><code>youragent.id</code></a>
                 </div>
-                <div class="evidence-card">
-                    <h4>sRFC on Solana Foundation</h4>
-                    <p>Discussion #9</p>
-                    <code><a href="https://github.com/solana-foundation/SRFCs/discussions/9" target="_blank">SRFCs/discussions/9</a></code>
+                <div class="infra-card">
+                    <h4>Self-Verify Service</h4>
+                    <p>SQLite, challenge-response, 3 verification levels</p>
+                    <a href="https://proveyour.id" target="_blank"><code>proveyour.id</code></a>
                 </div>
-                <div class="evidence-card">
-                    <h4>Agent Casino PR</h4>
-                    <p>Merged — cross-project integration</p>
-                    <code><a href="https://github.com/Romulus-Sol/agent-casino/pull/2" target="_blank">agent-casino/pull/2</a></code>
+                <div class="infra-card">
+                    <h4>On-Chain AI Scorer</h4>
+                    <p>POA-Scorer via Cauldron RISC-V VM</p>
+                    <a href="https://explorer.solana.com/address/FHcy35f4NGZK9b6j5TGMYstfB6PXEtmNbMLvjfR1y2Li?cluster=devnet" target="_blank"><code>FHcy35f4...2Li</code></a>
                 </div>
-                <div class="evidence-card">
-                    <h4>SATI Integration</h4>
-                    <p>Proposed on Cascade Protocol</p>
-                    <code><a href="https://github.com/cascade-protocol/sati/issues/3" target="_blank">sati/issues/3</a></code>
-                </div>
-                <div class="evidence-card">
-                    <h4>On-Chain AI</h4>
-                    <p>POA-Scorer via Cauldron RISC-V</p>
-                    <code><a href="https://explorer.solana.com/address/FHcy35f4NGZK9b6j5TGMYstfB6PXEtmNbMLvjfR1y2Li?cluster=devnet" target="_blank">FHcy35f4...2Li</a></code>
-                </div>
-                <div class="evidence-card">
-                    <h4>SAP Protocol Spec</h4>
-                    <p>3 proposals — Validation, Identity, DePIN</p>
-                    <code><a href="https://github.com/tradingstarllc/solana-agent-protocol" target="_blank">solana-agent-protocol</a></code>
+                <div class="infra-card">
+                    <h4>Railway Auto-Deploy</h4>
+                    <p>CI/CD from GitHub, auto-deploy on push to main</p>
+                    <code>main → deploy</code>
                 </div>
             </div>
         </div>
+
+        <!-- PUBLISHED PACKAGES -->
+        <div class="packages">
+            <h2>📦 Published Packages</h2>
+            <div class="pkg">
+                <div class="pkg-name">@moltlaunch/sdk</div>
+                <div class="pkg-desc">Agent verification SDK — STARK proofs, behavioral scoring, DePIN binding, Sybil detection</div>
+                <div class="pkg-version">v2.4.0</div>
+            </div>
+            <a href="https://www.npmjs.com/package/@moltlaunch/sdk" target="_blank" style="font-size: 0.75rem; margin-left: 8px;">npm install @moltlaunch/sdk →</a>
+
+            <div class="pkg" style="margin-top: 16px;">
+                <div class="pkg-name">@moltlaunch/proof-of-agent</div>
+                <div class="pkg-desc">Standalone proof-of-agent scoring — verify agents with one line of code</div>
+                <div class="pkg-version">v1.0.0</div>
+            </div>
+            <a href="https://www.npmjs.com/package/@moltlaunch/proof-of-agent" target="_blank" style="font-size: 0.75rem; margin-left: 8px;">npm install @moltlaunch/proof-of-agent →</a>
+        </div>
+
+        <!-- GITHUB REPOS -->
+        <div class="repos">
+            <h2>🗂️ GitHub Repositories</h2>
+            <div class="repo-grid">
+                <div class="repo">
+                    <h4><a href="https://github.com/tradingstarllc/moltlaunch-site" target="_blank">moltlaunch-site</a></h4>
+                    <p>Main website, API server, blog, docs</p>
+                </div>
+                <div class="repo">
+                    <h4><a href="https://github.com/tradingstarllc/moltlaunch" target="_blank">moltlaunch</a></h4>
+                    <p>Anchor program (14 instructions)</p>
+                </div>
+                <div class="repo">
+                    <h4><a href="https://github.com/tradingstarllc/moltlaunch-sdk" target="_blank">moltlaunch-sdk</a></h4>
+                    <p>npm SDK (v2.4.0)</p>
+                </div>
+                <div class="repo">
+                    <h4><a href="https://github.com/tradingstarllc/proof-of-agent" target="_blank">proof-of-agent</a></h4>
+                    <p>Standalone scoring library</p>
+                </div>
+                <div class="repo">
+                    <h4><a href="https://github.com/tradingstarllc/solana-agent-protocol" target="_blank">solana-agent-protocol</a></h4>
+                    <p>SAP standard — 3 proposals</p>
+                </div>
+                <div class="repo">
+                    <h4><a href="https://github.com/tradingstarllc/moltlaunch-verify" target="_blank">moltlaunch-verify</a></h4>
+                    <p>Self-verify service</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- STANDARDS & INTEGRATIONS -->
+        <div class="integrations">
+            <h2>🤝 Standards & Integrations</h2>
+            <div class="int-grid">
+                <div class="int-card">
+                    <h4>sRFC #9 — Solana Foundation</h4>
+                    <div class="int-status submitted">SUBMITTED</div>
+                    <p>Agent verification standard proposed to the Solana Foundation RFCs repo</p>
+                    <a href="https://github.com/solana-foundation/SRFCs/discussions/9" target="_blank" style="font-size: 0.72rem;">SRFCs/discussions/9 →</a>
+                </div>
+                <div class="int-card">
+                    <h4>Agent Casino PR</h4>
+                    <div class="int-status merged">MERGED</div>
+                    <p>Verification-gated tables — first cross-project integration</p>
+                    <a href="https://github.com/Romulus-Sol/agent-casino/pull/2" target="_blank" style="font-size: 0.72rem;">agent-casino/pull/2 →</a>
+                </div>
+                <div class="int-card">
+                    <h4>SATI / Cascade Protocol</h4>
+                    <div class="int-status proposed">PROPOSED</div>
+                    <p>MoltLaunch ↔ SAS integration path for composable agent trust</p>
+                    <a href="https://github.com/cascade-protocol/sati/issues/3" target="_blank" style="font-size: 0.72rem;">sati/issues/3 →</a>
+                </div>
+                <div class="int-card">
+                    <h4>Solana Agent Protocol (SAP)</h4>
+                    <div class="int-status submitted">DRAFTED</div>
+                    <p>3 proposals: Validation Protocol, Identity Standard, DePIN Binding</p>
+                    <a href="https://github.com/tradingstarllc/solana-agent-protocol" target="_blank" style="font-size: 0.72rem;">solana-agent-protocol →</a>
+                </div>
+                <div class="int-card">
+                    <h4>VRF Constraint Circuit</h4>
+                    <div class="int-status proposed">PR #3</div>
+                    <p>Provably fair randomness for Agent Casino — 49 tests passing</p>
+                    <a href="https://github.com/Romulus-Sol/agent-casino/pull/3" target="_blank" style="font-size: 0.72rem;">agent-casino/pull/3 →</a>
+                </div>
+                <div class="int-card">
+                    <h4>17-Project Integration Map</h4>
+                    <div class="int-status proposed">PROPOSED</div>
+                    <p>Phased integration plan spanning the full agent lifecycle</p>
+                    <a href="/lifecycle.html" style="font-size: 0.72rem;">View lifecycle →</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- BLOG -->
+        <div class="blog-section">
+            <h2>📝 Blog: 83 Posts</h2>
+            <div class="blog-desc">Every forum post, technical breakdown, and integration proposal — organized and preserved.</div>
+            <div class="blog-categories">
+                <div class="blog-cat"><span>15</span> Technical Deep-Dives</div>
+                <div class="blog-cat"><span>12</span> Integration Proposals</div>
+                <div class="blog-cat"><span>10</span> Architecture Posts</div>
+                <div class="blog-cat"><span>8</span> Ecosystem Analysis</div>
+                <div class="blog-cat"><span>7</span> Identity Philosophy</div>
+                <div class="blog-cat"><span>6</span> Product Updates</div>
+                <div class="blog-cat"><span>5</span> Security & Honesty</div>
+                <div class="blog-cat"><span>20</span> Community & Replies</div>
+            </div>
+            <div style="margin-top: 12px; text-align: center;"><a href="/blog.html" style="font-size: 0.85rem;">Browse all posts →</a></div>
+        </div>
+
+        <!-- KEY INSIGHTS -->
+        <div class="insights">
+            <h2>💡 Key Technical Insights</h2>
+            <div class="insight-list">
+                <div class="insight-item">
+                    <div class="insight-num">1</div>
+                    <div class="insight-text"><strong>Trust ≠ Identity.</strong> They're different problems being conflated. Trust is earned through attestations. Identity is proven through hardware. Sybil resistance requires economic cost. Authorization is per-protocol. One u8 trust_level can't encode all four.</div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-num">2</div>
+                    <div class="insight-text"><strong>Composable signals > derived trust levels.</strong> Raw signals (is_unique, attestation_count, last_verified, infra_type) are more useful than a single score. Let consuming protocols define their own thresholds.</div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-num">3</div>
+                    <div class="insight-text"><strong>DePIN + staking are complementary Sybil floors.</strong> DePIN = burn (energy cost). Staking = bond (capital at risk). Together they create real economic cost for Sybil attacks. Neither alone is sufficient.</div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-num">4</div>
+                    <div class="insight-text"><strong>The agent economy is an energy economy.</strong> Trust requires cost. Cost = energy. Hardware mediates energy. This is the physics of agent identity.</div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-num">5</div>
+                    <div class="insight-text"><strong>SAS integration path exists.</strong> SATI/Cascade already shipped mainnet with Light Protocol + Token-2022. They solve reputation/feedback. We solve Sybil resistance. Complementary, not competing.</div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-num">6</div>
+                    <div class="insight-text"><strong>Challenge-response > scoring systems.</strong> Proved this by building both. Self-verify (challenge-response) provides stronger guarantees than POA scoring (12-dimension analysis).</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- V2 ARCHITECTURE -->
+        <div class="summary">
+            <h2>🧱 V2 Architecture: 6 PDAs</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px;">
+                <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
+                    <div style="color: var(--green); font-size: 0.75rem; font-weight: 700;">ProtocolConfig</div>
+                    <div style="font-size: 0.7rem; color: var(--text-muted);">Singleton. Admin, multisig, min authorities, revocation nonce.</div>
+                </div>
+                <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
+                    <div style="color: var(--green); font-size: 0.75rem; font-weight: 700;">Authority</div>
+                    <div style="font-size: 0.7rem; color: var(--text-muted);">Per verifier. Type: Single, Multisig, Oracle, or NCN. Weighted.</div>
+                </div>
+                <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
+                    <div style="color: var(--green); font-size: 0.75rem; font-weight: 700;">AgentIdentity</div>
+                    <div style="font-size: 0.7rem; color: var(--text-muted);">Per agent. Derived trust level, status, DePIN binding, delegation.</div>
+                </div>
+                <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
+                    <div style="color: var(--green); font-size: 0.75rem; font-weight: 700;">Challenge</div>
+                    <div style="font-size: 0.7rem; color: var(--text-muted);">Temporary. Per active verification challenge. Configurable TTL.</div>
+                </div>
+                <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
+                    <div style="color: var(--green); font-size: 0.75rem; font-weight: 700;">Attestation</div>
+                    <div style="font-size: 0.7rem; color: var(--text-muted);">Per authority per agent. The core trust primitive. Weight-decayed.</div>
+                </div>
+                <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
+                    <div style="color: var(--green); font-size: 0.75rem; font-weight: 700;">Reputation</div>
+                    <div style="font-size: 0.7rem; color: var(--text-muted);">Per agent per protocol. Contextual, composable trust signals.</div>
+                </div>
+            </div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); text-align: center;">Trust levels are <strong style="color: var(--green);">derived, never set directly</strong>. L0–L5 computed from attestation weight sums via permissionless recompute_trust instruction.</div>
+        </div>
+
+        <!-- HONESTY SECTION -->
+        <div class="honesty">
+            <h2>🪞 What We Got Wrong</h2>
+            <div class="honesty-item">
+                <div class="honesty-icon">⚠️</div>
+                <div class="honesty-text"><strong>Breadth over depth.</strong> 90+ endpoints but none polished enough. 1 perfect endpoint > 90 mediocre ones.</div>
+            </div>
+            <div class="honesty-item">
+                <div class="honesty-icon">⚠️</div>
+                <div class="honesty-text"><strong>$0 revenue.</strong> Zero paying customers. Positioned for monetization but never validated willingness to pay.</div>
+            </div>
+            <div class="honesty-item">
+                <div class="honesty-icon">⚠️</div>
+                <div class="honesty-text"><strong>L2 Sybil cost was overstated.</strong> We claimed ~$50, honest answer: near zero without doxxed signers. Posted correction publicly.</div>
+            </div>
+            <div class="honesty-item">
+                <div class="honesty-icon">⚠️</div>
+                <div class="honesty-text"><strong>Locked Colosseum description.</strong> Day 2 submission doesn't represent Day 11 product. Submit late, not early.</div>
+            </div>
+            <div class="honesty-item">
+                <div class="honesty-icon">⚠️</div>
+                <div class="honesty-text"><strong>No demo video.</strong> Every top project has one. We built an auto-playing page instead — it's something but not the same.</div>
+            </div>
+            <div class="honesty-item">
+                <div class="honesty-icon">⚠️</div>
+                <div class="honesty-text"><strong>Forum posts ≠ product.</strong> 80+ posts and 1000+ interactions, but judges evaluate code, not content.</div>
+            </div>
+            <div class="honesty-item">
+                <div class="honesty-icon">⚠️</div>
+                <div class="honesty-text"><strong>Identity is unsolved.</strong> Nobody has it, including us. We're honest about that. Our Level 3 fingerprinting is a claim, not a proof.</div>
+            </div>
+        </div>
+
+        <!-- WHAT'S NEXT -->
+        <div class="summary" style="border-color: var(--purple);">
+            <h2>🚀 What's Next</h2>
+            <div class="items" style="margin-left: 0;">
+                <div class="item planned"><span class="badge badge-planned">NEXT</span> Anchor program deployment to mainnet</div>
+                <div class="item planned"><span class="badge badge-planned">NEXT</span> Live DePIN integration (io.net, Helium device binding)</div>
+                <div class="item planned"><span class="badge badge-planned">NEXT</span> Switchboard oracle integration for off-chain verification</div>
+                <div class="item planned"><span class="badge badge-planned">NEXT</span> Jito NCN operator as L4+ trust authority</div>
+                <div class="item planned"><span class="badge badge-planned">NEXT</span> First paid verification ($0.01 via x402)</div>
+                <div class="item planned"><span class="badge badge-planned">NEXT</span> V3: raw composable signals replacing derived trust levels</div>
+                <div class="item planned"><span class="badge badge-planned">NEXT</span> SATI/SAS integration for reputation composability</div>
+                <div class="item planned"><span class="badge badge-planned">NEXT</span> Dedicated server (moving off Railway)</div>
+            </div>
+        </div>
+
     </div>
 
     <footer>
-        <p>Built by one human + one AI agent on OpenClaw · <a href="https://www.colosseum.org/">Colosseum Agent Hackathon 2026</a></p>
+        <p>Built by one human (<a href="https://youragent.id/about.html">@hftbfxtrader</a>) + one AI agent on <a href="https://openclaw.com">OpenClaw</a></p>
+        <p style="margin-top: 6px;"><a href="https://www.colosseum.org/">Colosseum Agent Hackathon 2026</a> · Feb 2–12</p>
+        <p style="margin-top: 6px; font-size: 0.7rem; opacity: 0.5;">Every claim on this page has a receipt. Click any link to verify.</p>
     </footer>
 </body>
 </html>

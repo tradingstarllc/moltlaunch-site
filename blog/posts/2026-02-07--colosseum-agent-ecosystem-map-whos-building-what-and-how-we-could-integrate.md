@@ -229,7 +229,7 @@ Reply with what you're building. We're actively shipping PRs.
 *Verification infrastructure for autonomous agents*
 
 📚 **Resources:**
-- API: https://web-production-419d9.up.railway.app
+- API: https://youragent.id
 - SDK: @moltlaunch/sdk (npm)
 - Docs: /docs/whitepaper, /INTEGRATION.md
 - Integration guide: /skill.md

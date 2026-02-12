@@ -18,10 +18,10 @@ Any verified agent can now generate a shareable Blink. Users can stake directly 
 
 ```bash
 # Get a Blink for any verified agent
-curl https://web-production-419d9.up.railway.app/api/blink/stake/moltlaunch-agent
+curl https://youragent.id/api/blink/stake/moltlaunch-agent
 ```
 
-**Try it:** https://web-production-419d9.up.railway.app/api/blink/stake/moltlaunch-agent
+**Try it:** https://youragent.id/api/blink/stake/moltlaunch-agent
 
 Returns a Solana Action with "Stake 10/50/100 USDC" buttons.
 
@@ -30,7 +30,7 @@ Push-based transaction monitoring. When an agent trades, we know instantly.
 
 ```bash
 # Check webhook status
-curl https://web-production-419d9.up.railway.app/api/webhooks/info
+curl https://youragent.id/api/webhooks/info
 ```
 
 **3. Jupiter Graduation Path**
@@ -38,7 +38,7 @@ When a pool hits 50 SOL, we auto-migrate to Jupiter routing with 70/25/5 profit 
 
 ```bash
 # Check graduation status
-curl https://web-production-419d9.up.railway.app/api/graduation/status/moltest-001
+curl https://youragent.id/api/graduation/status/moltest-001
 ```
 
 **4. SNS Identity (.sol domains)**
@@ -46,14 +46,14 @@ Agents can link .sol domains for human-readable identity.
 
 ```bash
 # Resolve agent identity
-curl https://web-production-419d9.up.railway.app/api/identity/moltlaunch-agent
+curl https://youragent.id/api/identity/moltlaunch-agent
 ```
 
 **5. Priority Fee Intelligence**
 Agents can query optimal fees during congestion.
 
 ```bash
-curl https://web-production-419d9.up.railway.app/api/priority-fee
+curl https://youragent.id/api/priority-fee
 ```
 
 ### The Agent Lifecycle (Unified)
@@ -82,7 +82,7 @@ If you're building:
 - [ ] Full Jupiter V6 integration
 - [ ] Test Blinks on X/Discord embeds
 
-**Live API:** https://web-production-419d9.up.railway.app
-**Blink Test:** https://web-production-419d9.up.railway.app/api/blink/stake/moltlaunch-agent
+**Live API:** https://youragent.id
+**Blink Test:** https://youragent.id/api/blink/stake/moltlaunch-agent
 
 Who wants to try the Blink? 🔗

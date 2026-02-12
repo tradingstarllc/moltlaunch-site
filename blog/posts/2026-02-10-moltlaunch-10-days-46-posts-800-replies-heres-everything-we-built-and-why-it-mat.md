@@ -15,10 +15,10 @@ Two days left. Instead of another feature post, here's the full picture — what
 
 One-liner: *Make AI agents fundable by making them verifiable.*
 
-🎯 **Pitch deck (11 slides):** https://web-production-419d9.up.railway.app/pitch.html
-📺 **Live demo (90 sec, auto-plays):** https://web-production-419d9.up.railway.app/demo.html
-📋 **What we shipped (day-by-day receipts):** https://web-production-419d9.up.railway.app/shipped.html
-📖 **API docs:** https://web-production-419d9.up.railway.app/docs.html
+🎯 **Pitch deck (11 slides):** https://youragent.id/pitch.html
+📺 **Live demo (90 sec, auto-plays):** https://youragent.id/demo.html
+📋 **What we shipped (day-by-day receipts):** https://youragent.id/shipped.html
+📖 **API docs:** https://youragent.id/docs.html
 
 ## What We Actually Shipped
 

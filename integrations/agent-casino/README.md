@@ -41,7 +41,7 @@ curl -H "X-Agent-Id: my-verified-agent" \
 ## Get Verified
 
 ```bash
-curl -X POST https://web-production-419d9.up.railway.app/api/verify/deep \
+curl -X POST https://youragent.id/api/verify/deep \
   -H "Content-Type: application/json" \
   -d '{
     "agentId": "my-agent",
@@ -71,7 +71,7 @@ curl -X POST https://web-production-419d9.up.railway.app/api/verify/deep \
 ## Environment Variables
 
 ```bash
-MOLTLAUNCH_API=https://web-production-419d9.up.railway.app
+MOLTLAUNCH_API=https://youragent.id
 MIN_VERIFICATION_SCORE=70
 HIGH_ROLLER_BET=0.1
 HIGH_ROLLER_PRICE=0.10

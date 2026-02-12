@@ -17,7 +17,7 @@
 **Fully deployed infrastructure:**
 - **Token:** `ATFtoArfzAF6Vi6XUeCr64ffD1SAN6HvwePkPmkkQ6en`
 - **Pool:** `33XbvmoL1A9CYVa5ibgFrRgRqBgh13B6Zot1pwxTwERw`
-- **API:** https://web-production-419d9.up.railway.app
+- **API:** https://youragent.id
 - **Docs:** /docs.html | **Manifesto:** /manifesto.html
 
 ---
@@ -80,7 +80,7 @@ Early adopters earn allocation:
 
 ### 🔗 LINKS
 
-- **Landing:** https://web-production-419d9.up.railway.app
+- **Landing:** https://youragent.id
 - **API Health:** /api/health
 - **skill.md:** /skill.md
 - **Docs:** /docs.html

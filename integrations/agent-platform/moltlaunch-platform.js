@@ -8,7 +8,7 @@ const crypto = require('crypto');
 
 class MoltLaunch {
     constructor(options = {}) {
-        this.apiUrl = options.apiUrl || 'https://web-production-419d9.up.railway.app';
+        this.apiUrl = options.apiUrl || 'https://youragent.id';
         this.platformId = options.platformId || 'unknown';
         this.timeout = options.timeout || 30000;
         this.retries = options.retries || 3;

@@ -215,7 +215,7 @@ const verification = await sdk.verifySecure({
 import requests
 
 # Submit trace
-resp = requests.post('https://web-production-419d9.up.railway.app/api/traces', json={
+resp = requests.post('https://youragent.id/api/traces', json={
     'agentId': 'my-agent',
     'trace': {
         'period': {'start': '2026-02-01', 'end': '2026-02-07'},

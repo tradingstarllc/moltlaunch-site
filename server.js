@@ -3088,7 +3088,7 @@ app.get('/robots.txt', (req, res) => {
     res.setHeader('Content-Type', 'text/plain');
     res.send(`User-agent: *
 Allow: /
-Sitemap: https://web-production-419d9.up.railway.app/sitemap.xml`);
+Sitemap: https://youragent.id/sitemap.xml`);
 });
 
 // Digital Asset Links for TWA
@@ -3172,7 +3172,7 @@ app.get('/actions.json', (req, res) => {
 });
 
 // Base URL for Blinks (absolute URLs required)
-const BLINK_BASE = process.env.BLINK_BASE || 'https://web-production-419d9.up.railway.app';
+const BLINK_BASE = process.env.BLINK_BASE || 'https://youragent.id';
 
 // Blink: Stake on an agent
 app.get('/api/blink/stake/:agentId', (req, res) => {
@@ -3413,7 +3413,7 @@ app.get('/api/webhooks/events', (req, res) => {
 // Webhook registration info
 app.get('/api/webhooks/info', (req, res) => {
     res.json({
-        endpoint: 'https://web-production-419d9.up.railway.app/api/webhooks/helius',
+        endpoint: 'https://youragent.id/api/webhooks/helius',
         status: 'active',
         eventsReceived: webhookEvents.length,
         supportedTypes: ['TRANSFER', 'SWAP', 'NFT_SALE', 'NFT_MINT'],
@@ -4200,13 +4200,13 @@ app.get('/api/badge/:agentId', (req, res) => {
                     name: `MoltLaunch Verified: ${agentId}`,
                     symbol: 'MOLT-V',
                     description: `This agent achieved a Proof-of-Agent score of ${verified.score}/100 on MoltLaunch.`,
-                    image: `https://web-production-419d9.up.railway.app/images/branding/x402-badge-2.png`,
+                    image: `https://youragent.id/images/branding/x402-badge-2.png`,
                     attributes: [
                         { trait_type: 'PoA Score', value: verified.score },
                         { trait_type: 'Tier', value: verified.tier },
                         { trait_type: 'Verified Date', value: new Date().toISOString().split('T')[0] }
                     ],
-                    external_url: `https://web-production-419d9.up.railway.app/api/verify/status/${agentId}`
+                    external_url: `https://youragent.id/api/verify/status/${agentId}`
                 },
                 mintEndpoint: `/api/badge/mint/${agentId}`
             });

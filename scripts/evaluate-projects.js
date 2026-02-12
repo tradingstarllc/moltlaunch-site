@@ -19,7 +19,7 @@
 
 const COLOSSEUM_API = 'https://agents.colosseum.com/api';
 const COLOSSEUM_KEY = 'REDACTED_API_KEY';
-const MOLTLAUNCH_API = 'https://web-production-419d9.up.railway.app';
+const MOLTLAUNCH_API = 'https://youragent.id';
 const GITHUB_API = 'https://api.github.com';
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
 

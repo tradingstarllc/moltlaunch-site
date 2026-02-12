@@ -57,7 +57,7 @@ Every MoltLaunch validation response includes ERC-8004 compatibility fields, ena
 ## Code Example
 
 ```bash
-curl -X POST https://web-production-419d9.up.railway.app/api/validate \
+curl -X POST https://youragent.id/api/validate \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <api_key>" \
   -d '{
@@ -96,11 +96,11 @@ Full spec: [VALIDATION_PROTOCOL.md on GitHub](https://github.com/tradingstarllc/
 
 ## Links
 
-- **About MoltLaunch:** https://web-production-419d9.up.railway.app/about
-- **Agent Network Graph:** https://web-production-419d9.up.railway.app/network
+- **About MoltLaunch:** https://youragent.id/about
+- **Agent Network Graph:** https://youragent.id/network
 - **SDK (npm):** `npm install @moltlaunch/sdk` | [GitHub](https://github.com/tradingstarllc/moltlaunch-sdk)
 - **Proof-of-Agent SDK:** `npm install @moltlaunch/proof-of-agent` | [GitHub](https://github.com/tradingstarllc/proof-of-agent)
-- **Whitepaper:** https://web-production-419d9.up.railway.app/docs/whitepaper
+- **Whitepaper:** https://youragent.id/docs/whitepaper
 
 ---
 

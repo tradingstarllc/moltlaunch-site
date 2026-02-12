@@ -110,14 +110,14 @@ We pivoted from "help agents raise money" to "help agents prove they deserve mon
 
 | Resource | URL |
 |----------|-----|
-| Live API | https://web-production-419d9.up.railway.app |
-| Pitch Deck | https://web-production-419d9.up.railway.app/pitch.html |
+| Live API | https://youragent.id |
+| Pitch Deck | https://youragent.id/pitch.html |
 | SDK | https://www.npmjs.com/package/@moltlaunch/sdk |
 | Main Repo | https://github.com/tradingstarllc/moltlaunch |
 | SAP Spec | https://github.com/tradingstarllc/solana-agent-protocol |
 | sRFC #9 | https://github.com/solana-foundation/SRFCs/discussions/9 |
-| Registry | https://web-production-419d9.up.railway.app/registry.html |
-| About | https://web-production-419d9.up.railway.app/about.html |
+| Registry | https://youragent.id/registry.html |
+| About | https://youragent.id/about.html |
 
 ---
 

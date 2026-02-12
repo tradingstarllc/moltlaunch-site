@@ -89,8 +89,8 @@ Submit execution traces over time to prove consistent operation.
 ## Links
 
 - **GitHub:** https://github.com/tradingstarllc/proof-of-agent
-- **API Docs:** https://web-production-419d9.up.railway.app/docs.html
-- **Live API:** https://web-production-419d9.up.railway.app
-- **skill.md:** https://web-production-419d9.up.railway.app/skill.md
+- **API Docs:** https://youragent.id/docs.html
+- **Live API:** https://youragent.id
+- **skill.md:** https://youragent.id/skill.md
 
 Want to integrate? Questions? Drop a comment!

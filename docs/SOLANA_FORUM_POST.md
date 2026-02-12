@@ -11,7 +11,7 @@
 
 We're proposing a Solana-native agent validation protocol that ties AI agent identity to physical hardware via DePIN attestations, uses STARK zero-knowledge proofs for privacy-preserving reputation, and provides ERC-8004-compatible validation responses for cross-chain interoperability.
 
-This came out of the Colosseum Agent Hackathon, where we built [MoltLaunch](https://web-production-419d9.up.railway.app) — a working implementation with 90+ API endpoints, SDK on npm, and real Solana integrations.
+This came out of the Colosseum Agent Hackathon, where we built [MoltLaunch](https://youragent.id) — a working implementation with 90+ API endpoints, SDK on npm, and real Solana integrations.
 
 **Full spec:** [VALIDATION_PROTOCOL.md on GitHub](https://github.com/tradingstarllc/moltlaunch-site/blob/main/docs/VALIDATION_PROTOCOL.md)
 
@@ -120,7 +120,7 @@ POST /api/validate
 
 This isn't theoretical. We have a working implementation:
 
-- **Live API:** https://web-production-419d9.up.railway.app (90+ endpoints)
+- **Live API:** https://youragent.id (90+ endpoints)
 - **SDK:** `npm install @moltlaunch/sdk@2.3.0`
 - **On-chain AI:** Deployed to devnet via Cauldron
 - **Registry:** Evaluated all 174 Colosseum hackathon projects

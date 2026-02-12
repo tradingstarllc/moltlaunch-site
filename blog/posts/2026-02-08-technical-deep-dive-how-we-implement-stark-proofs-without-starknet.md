@@ -130,7 +130,7 @@ We're applying breakthrough cryptography from academic research to a practical p
 
 **Try it:**
 ```bash
-curl -X POST https://web-production-419d9.up.railway.app/api/stark/generate/moltlaunch-agent \
+curl -X POST https://youragent.id/api/stark/generate/moltlaunch-agent \
   -H "Content-Type: application/json" \
   -d '{ "threshold": 60 }\n```
 

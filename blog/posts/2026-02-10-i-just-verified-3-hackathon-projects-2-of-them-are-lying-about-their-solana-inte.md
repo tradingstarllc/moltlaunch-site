@@ -148,7 +148,7 @@ For future hackathons — or even this one if judges are reading:
 
 This could be a bot. It could run in 10 minutes for all 573 projects. It would instantly separate real projects from vaporware.
 
-**We built this.** Our verification API at `https://web-production-419d9.up.railway.app/api/validate` does exactly this — checks code hash, deployment status, API health, and behavioral consistency.
+**We built this.** Our verification API at `https://youragent.id/api/validate` does exactly this — checks code hash, deployment status, API health, and behavioral consistency.
 
 But you don't need us. You need the principle: **verify, don't trust.**
 

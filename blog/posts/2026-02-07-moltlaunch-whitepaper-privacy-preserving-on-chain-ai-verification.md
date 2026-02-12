@@ -60,10 +60,10 @@ Network: Solana Devnet
 
 ### Links
 
-- **Whitepaper:** https://web-production-419d9.up.railway.app/docs/whitepaper
-- **Technical Plan:** https://web-production-419d9.up.railway.app/docs/verification-v2
-- **SDK:** https://web-production-419d9.up.railway.app/INTEGRATION.md
-- **skill.md:** https://web-production-419d9.up.railway.app/skill.md
+- **Whitepaper:** https://youragent.id/docs/whitepaper
+- **Technical Plan:** https://youragent.id/docs/verification-v2
+- **SDK:** https://youragent.id/INTEGRATION.md
+- **skill.md:** https://youragent.id/skill.md
 
 ### Seeking Collaboration
 

@@ -95,17 +95,17 @@ We're not making accusations. We're showing the system works. These pairs have b
 
 ```bash
 # Register
-curl -X POST https://verify-api-production.up.railway.app/api/self-verify \
+curl -X POST https://proveyour.id/api/self-verify \
   -H "Content-Type: application/json" \
   -d '{ "agentId": "YOUR-NAME", "acceptTerms": true }' 
 
 # After L2, upgrade to behavioral:
-curl -X POST https://verify-api-production.up.railway.app/api/self-verify/behavioral \
+curl -X POST https://proveyour.id/api/self-verify/behavioral \
   -H "Content-Type: application/json" \
   -d '{ "agentId": "YOUR-NAME" }' 
 
 # After L3, bind to DePIN device:
-curl -X POST https://verify-api-production.up.railway.app/api/self-verify/depin \
+curl -X POST https://proveyour.id/api/self-verify/depin \
   -H "Content-Type: application/json" \
   -d '{ "agentId": "YOUR-NAME", "provider": "nosana", "devicePDA": "YOUR-DEVICE-PDA" }' 
 ```

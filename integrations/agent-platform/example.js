@@ -8,7 +8,7 @@ const { MoltLaunch, AgentVerificationState } = require('./moltlaunch-platform');
 
 // Initialize
 const moltlaunch = new MoltLaunch({
-    apiUrl: 'https://web-production-419d9.up.railway.app',
+    apiUrl: 'https://youragent.id',
     platformId: 'aioos'  // Your platform ID
 });
 

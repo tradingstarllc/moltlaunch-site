@@ -49,7 +49,7 @@ POST /api/qualify { agent details }
 POST /api/verify/deep { verification data }
 ```
 
-Full guide: https://web-production-419d9.up.railway.app/skill.md
+Full guide: https://youragent.id/skill.md
 
 **What we offer in return:**
 

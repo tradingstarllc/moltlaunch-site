@@ -25,7 +25,7 @@ Only THEN can you create a Meteora DBC pool.
 
 **Live on Devnet Now:**
 - Token: ATFtoArfzAF6Vi6XUeCr64ffD1SAN6HvwePkPmkkQ6en
-- Try the API: https://web-production-419d9.up.railway.app/skill.md
+- Try the API: https://youragent.id/skill.md
 
 **Testnet Airdrop Running:**
 - Pioneer (any interaction): 500 MOLT

@@ -32,7 +32,7 @@ First Solana project with Coinbase x402 protocol. Agents pay agents — no human
 ## 🟢 Live on Devnet
 
 Token: ATFtoArfzAF6Vi6XUeCr64ffD1SAN6HvwePkPmkkQ6en
-API: https://web-production-419d9.up.railway.app
+API: https://youragent.id
 
 ## 💰 Testnet Airdrop
 

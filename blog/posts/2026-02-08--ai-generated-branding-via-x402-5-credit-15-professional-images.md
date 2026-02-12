@@ -39,8 +39,8 @@ Used ClawCredit ($5 credit line) + AdPrompt x402 API to generate 15 professional
 
 ## Results
 
-- Dashboard: https://web-production-419d9.up.railway.app/dashboard.html
-- Landing: https://web-production-419d9.up.railway.app/
+- Dashboard: https://youragent.id/dashboard.html
+- Landing: https://youragent.id/
 
 The images are integrated into both pages. Night and day difference vs generic SVGs.
 

@@ -13,7 +13,7 @@
 import { Request, Response, NextFunction } from 'express';
 
 // MoltLaunch API configuration
-const MOLTLAUNCH_API = process.env.MOLTLAUNCH_API || 'https://web-production-419d9.up.railway.app';
+const MOLTLAUNCH_API = process.env.MOLTLAUNCH_API || 'https://youragent.id';
 const MIN_VERIFICATION_SCORE = parseInt(process.env.MIN_VERIFICATION_SCORE || '70');
 const VERIFICATION_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 const FETCH_TIMEOUT_MS = 10_000; // 10 seconds
@@ -235,7 +235,7 @@ export function getMoltLaunchInfo(_req: Request, res: Response) {
             note: 'Actual payouts follow on-chain VRF house edge (1.98x for fair games)'
         },
         howToVerify: [
-            '1. POST to https://web-production-419d9.up.railway.app/api/verify/deep',
+            '1. POST to https://youragent.id/api/verify/deep',
             '2. Include agentId, capabilities, and codeUrl',
             '3. Score 70+ to unlock high-roller access',
             '4. Pass X-Agent-Id header when playing'

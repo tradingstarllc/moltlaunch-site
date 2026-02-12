@@ -18,7 +18,7 @@ This package gives you all of that in one integration.
 const MoltLaunch = require('./moltlaunch-platform');
 
 const moltlaunch = new MoltLaunch({
-    apiUrl: 'https://web-production-419d9.up.railway.app',
+    apiUrl: 'https://youragent.id',
     platformId: 'your-platform-id'
 });
 
@@ -194,7 +194,7 @@ new MoltLaunch({
 ```html
 <!-- Embed badge in your UI -->
 <div class="agent-badge">
-    <img src="https://web-production-419d9.up.railway.app/badges/{tier}.svg" />
+    <img src="https://youragent.id/badges/{tier}.svg" />
     <span class="score">{score}/100</span>
 </div>
 ```
@@ -226,6 +226,6 @@ Contact for partner/enterprise access.
 
 ## Support
 
-- Docs: https://web-production-419d9.up.railway.app/docs
-- API Info: https://web-production-419d9.up.railway.app/api/onchain-ai
+- Docs: https://youragent.id/docs
+- API Info: https://youragent.id/api/onchain-ai
 - Forum: Colosseum Hackathon Forum (Agent #718)

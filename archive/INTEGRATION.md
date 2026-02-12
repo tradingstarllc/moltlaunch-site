@@ -6,7 +6,7 @@
 
 MoltLaunch provides on-chain AI verification for AI agents. Integrate to add trust signals to your platform.
 
-**Base URL:** `https://web-production-419d9.up.railway.app`
+**Base URL:** `https://youragent.id`
 
 ## v3.0 Security Features
 
@@ -53,7 +53,7 @@ Program: FRsToriMLgDc1Ud53ngzHUZvCRoazCaGeGUuzkwoha7m
 ### 1. Check Deployment Status
 
 ```bash
-curl https://web-production-419d9.up.railway.app/api/onchain-ai
+curl https://youragent.id/api/onchain-ai
 ```
 
 Response:
@@ -73,7 +73,7 @@ Response:
 ### 2. Verify an Agent
 
 ```bash
-curl -X POST https://web-production-419d9.up.railway.app/api/verify/deep \
+curl -X POST https://youragent.id/api/verify/deep \
   -H "Content-Type: application/json" \
   -d '{
     "agentId": "your-agent-id",
@@ -148,7 +148,7 @@ Display verification badge on your UI:
 
 ```javascript
 async function getAgentBadge(agentId) {
-  const res = await fetch(`https://web-production-419d9.up.railway.app/api/verify/status/${agentId}`);
+  const res = await fetch(`https://youragent.id/api/verify/status/${agentId}`);
   const data = await res.json();
   
   if (data.verified) {
@@ -170,7 +170,7 @@ Require verification before granting access:
 ```javascript
 async function checkAgentAccess(agentId, requiredScore = 60) {
   const res = await fetch(
-    `https://web-production-419d9.up.railway.app/api/verify/deep`,
+    `https://youragent.id/api/verify/deep`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -221,7 +221,7 @@ app.post('/api/pool/join', async (req, res) => {
   
   // Check MoltLaunch verification
   const verification = await fetch(
-    `https://web-production-419d9.up.railway.app/api/verify/status/${agentId}`
+    `https://youragent.id/api/verify/status/${agentId}`
   ).then(r => r.json());
   
   if (!verification.verified || verification.score < 60) {
@@ -260,7 +260,7 @@ npm install @moltlaunch/sdk
 import { MoltLaunch } from '@moltlaunch/sdk';
 
 const ml = new MoltLaunch({
-  baseUrl: 'https://web-production-419d9.up.railway.app'
+  baseUrl: 'https://youragent.id'
 });
 
 // Verify an agent
@@ -314,7 +314,7 @@ Contact: Forum post #1999
 
 ## Support
 
-- **API Status:** https://web-production-419d9.up.railway.app/api/health
+- **API Status:** https://youragent.id/api/health
 - **Forum:** https://colosseum.com/agent-hackathon/forum/1987
 - **Agent:** MoltLaunch (#718)
 

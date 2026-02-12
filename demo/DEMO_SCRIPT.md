@@ -2,7 +2,7 @@
 
 **Duration:** ~3 minutes
 **Format:** Terminal API walkthrough
-**API Base:** https://web-production-419d9.up.railway.app
+**API Base:** https://youragent.id
 
 ---
 
@@ -19,7 +19,7 @@
 
 ```bash
 # Quick verification - does this agent exist and respond?
-curl -s -X POST "https://web-production-419d9.up.railway.app/api/verify/quick" \
+curl -s -X POST "https://youragent.id/api/verify/quick" \
   -H "Content-Type: application/json" \
   -d '{"agentId": "demo-agent", "apiEndpoint": "https://example.com/api"}' | jq '.'
 ```
@@ -34,7 +34,7 @@ curl -s -X POST "https://web-production-419d9.up.railway.app/api/verify/quick" \
 
 ```bash
 # Deep verification - comprehensive analysis
-curl -s -X POST "https://web-production-419d9.up.railway.app/api/verify/deep" \
+curl -s -X POST "https://youragent.id/api/verify/deep" \
   -H "Content-Type: application/json" \
   -d '{
     "agentId": "trading-bot-demo",
@@ -56,7 +56,7 @@ curl -s -X POST "https://web-production-419d9.up.railway.app/api/verify/deep" \
 
 ```bash
 # Check verification status - instant lookup
-curl -s "https://web-production-419d9.up.railway.app/api/verify/status/trading-bot-demo" | jq '.'
+curl -s "https://youragent.id/api/verify/status/trading-bot-demo" | jq '.'
 ```
 
 **Narration:**
@@ -69,7 +69,7 @@ curl -s "https://web-production-419d9.up.railway.app/api/verify/status/trading-b
 
 ```bash
 # Generate privacy-preserving proof
-curl -s -X POST "https://web-production-419d9.up.railway.app/api/stark/generate/trading-bot-demo" \
+curl -s -X POST "https://youragent.id/api/stark/generate/trading-bot-demo" \
   -H "Content-Type: application/json" \
   -d '{"threshold": 60}' | jq '{success, commitment: .commitment[0:32], publicInputs, privacyNote}'
 ```
@@ -86,10 +86,10 @@ curl -s -X POST "https://web-production-419d9.up.railway.app/api/stark/generate/
 
 ```bash
 # Check Pyth oracle price
-curl -s "https://web-production-419d9.up.railway.app/api/oracles/pyth/price/SOL%2FUSD" | jq '.'
+curl -s "https://youragent.id/api/oracles/pyth/price/SOL%2FUSD" | jq '.'
 
 # Check Jito MEV tip
-curl -s "https://web-production-419d9.up.railway.app/api/mev/jito/tip-estimate" | jq '.'
+curl -s "https://youragent.id/api/mev/jito/tip-estimate" | jq '.'
 ```
 
 **Narration:**
