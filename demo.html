@@ -3,1201 +3,458 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MoltLaunch — The Movie</title>
-    <meta name="description" content="A cinematic walkthrough of MoltLaunch: Sybil-resistant identity for AI agents on Solana.">
-    
+    <title>MoltLaunch V3 — Composable Signals Demo</title>
+    <meta name="description" content="Live demo of the MoltLaunch V3 Composable Signal Architecture on Solana Devnet.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
-    
     <style>
         :root {
             --bg: #0a0a0f;
             --green: #14F195;
-            --green-dim: #0d9e63;
-            --purple: #9945FF;
             --cyan: #00D4FF;
+            --purple: #9945FF;
             --white: #e0e0e0;
             --dim: #555;
             --red: #ef4444;
             --yellow: #fbbf24;
-            --orange: #f97316;
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { 
-            height: 100%; 
-            overflow: hidden; 
+        html, body {
+            height: 100%;
             background: var(--bg);
             font-family: 'JetBrains Mono', 'Courier New', monospace;
             color: var(--white);
         }
-
-        /* ── SCANLINES OVERLAY ── */
         .scanlines {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            pointer-events: none;
-            z-index: 1000;
-            background: repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 2px,
-                rgba(0, 0, 0, 0.03) 2px,
-                rgba(0, 0, 0, 0.03) 4px
-            );
+            position: fixed; top:0; left:0; right:0; bottom:0;
+            pointer-events: none; z-index: 1000;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
         }
 
-        /* ── CRT FLICKER ── */
-        .crt-flicker {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            pointer-events: none;
-            z-index: 999;
-            opacity: 0;
-            background: rgba(20, 241, 149, 0.03);
-            animation: flicker 0.15s infinite;
+        /* ── CONTAINER ── */
+        .terminal-wrapper {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 30px 20px 80px;
+            min-height: 100vh;
         }
 
-        @keyframes flicker {
-            0% { opacity: 0; }
-            5% { opacity: 0.02; }
-            10% { opacity: 0; }
-            15% { opacity: 0.04; }
-            20% { opacity: 0; }
-            100% { opacity: 0; }
+        /* ── HEADER ── */
+        .term-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-top: 30px;
+        }
+        .term-header h1 {
+            font-size: 15px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--green);
+            margin-bottom: 6px;
+        }
+        .term-header .subtitle {
+            font-size: 11px;
+            color: var(--dim);
+            letter-spacing: 2px;
+        }
+        .term-header .network-badge {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 3px 10px;
+            border: 1px solid var(--purple);
+            color: var(--purple);
+            font-size: 10px;
+            border-radius: 3px;
+            letter-spacing: 1px;
         }
 
-        /* ── SCREEN FLASH ── */
-        .screen-flash {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            pointer-events: none;
-            z-index: 998;
-            opacity: 0;
-            transition: opacity 0.05s;
-        }
-        .screen-flash.flash-green { background: rgba(20, 241, 149, 0.15); }
-        .screen-flash.flash-red { background: rgba(239, 68, 68, 0.2); }
-        .screen-flash.flash-white { background: rgba(255, 255, 255, 0.1); }
-        .screen-flash.active { opacity: 1; }
-
-        /* ── MAIN CONTAINER ── */
-        .cinema {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* ── STAGE ── */
-        .stage {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-            position: relative;
+        /* ── TERMINAL ── */
+        .terminal {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 8px;
             overflow: hidden;
         }
-
-        /* ── SCENE ── */
-        .scene {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
+        .term-bar {
+            background: rgba(255,255,255,0.04);
+            padding: 8px 14px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding: 40px 60px;
-            opacity: 0;
-            transform: scale(0.98);
-            transition: opacity 0.6s ease, transform 0.6s ease;
-            pointer-events: none;
+            gap: 6px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
         }
-        .scene.active {
-            opacity: 1;
-            transform: scale(1);
-            pointer-events: auto;
+        .term-dot { width:10px; height:10px; border-radius:50%; }
+        .term-dot.r { background: #ef4444; }
+        .term-dot.y { background: #fbbf24; }
+        .term-dot.g { background: #22c55e; }
+        .term-title {
+            flex:1; text-align:center;
+            font-size:11px; color:var(--dim);
+            margin-right: 40px;
         }
-        .scene.exiting {
-            opacity: 0;
-            transform: scale(1.02);
-        }
-
-        .scene-content {
-            max-width: 800px;
-            width: 100%;
+        .term-body {
+            padding: 20px 24px;
+            min-height: 400px;
             position: relative;
         }
 
-        /* ── SCENE LABEL ── */
-        .scene-label {
-            position: absolute;
-            top: 20px;
-            left: 60px;
-            font-size: 11px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: var(--dim);
-            opacity: 0;
-            transition: opacity 0.5s ease 0.3s;
-        }
-        .scene.active .scene-label {
-            opacity: 1;
-        }
-
-        /* ── TYPEWRITER LINES ── */
+        /* ── LINES ── */
         .line {
-            opacity: 0;
-            transform: translateY(4px);
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            min-height: 1.6em;
-            line-height: 1.6;
-            font-size: 15px;
+            min-height: 1.5em;
+            line-height: 1.5;
+            font-size: 13px;
             white-space: pre-wrap;
-            word-break: break-word;
+            word-break: break-all;
+            opacity: 0;
+            transform: translateY(3px);
+            transition: opacity 0.25s ease, transform 0.25s ease;
         }
         .line.visible {
             opacity: 1;
             transform: translateY(0);
         }
-        .line.typing .text-content {
-            border-right: 2px solid var(--green);
-            animation: cursor-blink 0.6s step-end infinite;
-            padding-right: 2px;
+        .line.blank { min-height: 0.8em; }
+
+        /* ── STEP HEADERS ── */
+        .step-header {
+            margin-top: 16px;
+            margin-bottom: 4px;
+            padding: 4px 0;
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--purple);
+            border-bottom: 1px solid rgba(153,69,255,0.2);
         }
 
-        @keyframes cursor-blink {
-            0%, 100% { border-color: var(--green); }
-            50% { border-color: transparent; }
-        }
-
-        /* ── TEXT COLORS ── */
+        /* ── COLORS ── */
         .c-green { color: var(--green); }
         .c-cyan { color: var(--cyan); }
         .c-purple { color: var(--purple); }
-        .c-red { color: var(--red); }
-        .c-yellow { color: var(--yellow); }
-        .c-orange { color: var(--orange); }
         .c-dim { color: var(--dim); }
         .c-white { color: var(--white); }
+        .c-red { color: var(--red); }
+        .c-yellow { color: var(--yellow); }
         .c-bold { font-weight: 700; }
+        .prompt { color: var(--green); font-weight: 700; }
 
-        /* ── PROMPT CHARACTER ── */
-        .prompt { color: var(--green); }
-        .response { color: var(--cyan); }
-        .warning { color: var(--red); }
-        .alert { color: var(--yellow); }
-        .success { color: var(--green); font-weight: 700; }
+        /* ── LINKS ── */
+        .explorer-link {
+            color: var(--cyan);
+            text-decoration: none;
+            font-size: 11px;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        .explorer-link:hover { opacity: 1; text-decoration: underline; }
 
-        /* ── BOX DRAWING ── */
-        .box {
-            color: var(--green);
-            font-weight: 700;
+        /* ── CURSOR ── */
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 15px;
+            background: var(--green);
+            animation: blink 0.8s step-end infinite;
+            vertical-align: text-bottom;
+            margin-left: 2px;
+        }
+        @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
+
+        /* ── CONTROLS ── */
+        .controls {
             text-align: center;
+            margin-top: 30px;
         }
-        .box-purple {
-            color: var(--purple);
+        .replay-btn {
+            background: transparent;
+            border: 1px solid var(--green);
+            color: var(--green);
+            padding: 8px 28px;
+            font-family: inherit;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            display: none;
         }
+        .replay-btn:hover {
+            background: rgba(20,241,149,0.1);
+            box-shadow: 0 0 12px rgba(20,241,149,0.3);
+        }
+        .replay-btn.show { display: inline-block; }
 
-        /* ── PROGRESS BAR ── */
-        .progress-container {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: rgba(255, 255, 255, 0.05);
-            z-index: 100;
+        /* ── BACK LINK ── */
+        .back-link {
+            position: fixed; top:16px; left:16px;
+            font-size: 11px; color: var(--dim);
+            text-decoration: none; z-index: 100;
+            transition: color 0.2s;
         }
-        .progress-bar {
-            height: 100%;
+        .back-link:hover { color: var(--green); }
+
+        /* ── PROGRESS ── */
+        .progress-bar-wrap {
+            position: fixed; bottom:0; left:0; right:0; height:3px;
+            background: rgba(255,255,255,0.05); z-index: 100;
+        }
+        .progress-bar-fill {
+            height:100%;
             background: linear-gradient(90deg, var(--green), var(--cyan));
             width: 0%;
             transition: width 0.3s ease;
         }
 
-        /* ── CONTROLS HUD ── */
-        .hud {
-            position: fixed;
-            bottom: 12px;
-            right: 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 11px;
-            color: var(--dim);
-            z-index: 100;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .cinema:hover .hud,
-        .hud.visible {
-            opacity: 1;
-        }
-        .hud-status {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .hud-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--green);
-            animation: pulse-dot 2s ease infinite;
-        }
-        .hud-dot.paused {
-            background: var(--yellow);
-            animation: none;
-        }
-        @keyframes pulse-dot {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
+        /* ── CODE BLOCK (step 6) ── */
+        .code-comment { color: var(--dim); font-style: italic; }
+        .code-keyword { color: var(--purple); }
+        .code-string { color: var(--yellow); }
+        .code-fn { color: var(--cyan); }
 
-        .scene-counter {
-            font-variant-numeric: tabular-nums;
-        }
+        /* ── TREE ── */
+        .tree { color: var(--green); }
 
-        /* ── SCENE DOTS ── */
-        .scene-dots {
-            position: fixed;
-            bottom: 14px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 8px;
-            z-index: 100;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .cinema:hover .scene-dots {
-            opacity: 1;
-        }
-        .scene-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.15);
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .scene-dot.active {
-            background: var(--green);
-            box-shadow: 0 0 8px rgba(20, 241, 149, 0.5);
-        }
-        .scene-dot:hover {
-            background: rgba(255, 255, 255, 0.4);
-        }
-
-        /* ── PAUSE OVERLAY ── */
-        .pause-overlay {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 13px;
-            color: var(--dim);
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            opacity: 0;
-            transition: opacity 0.3s;
-            z-index: 200;
-            pointer-events: none;
-        }
-        .pause-overlay.visible {
-            opacity: 1;
-        }
-
-        /* ── OVERVIEW MODE ── */
-        .overview {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(10, 10, 15, 0.97);
-            z-index: 500;
-            display: none;
-            padding: 40px;
-            overflow-y: auto;
-        }
-        .overview.active {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            align-content: flex-start;
-            justify-content: center;
-        }
-        .overview-title {
-            width: 100%;
-            text-align: center;
-            font-size: 13px;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            color: var(--dim);
-            margin-bottom: 20px;
-        }
-        .overview-card {
-            width: 220px;
-            height: 140px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 4px;
-            padding: 16px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        .overview-card:hover {
-            border-color: var(--green);
-            background: rgba(20, 241, 149, 0.05);
-        }
-        .overview-card.current {
-            border-color: var(--green);
-            box-shadow: 0 0 12px rgba(20, 241, 149, 0.2);
-        }
-        .overview-card-num {
-            font-size: 11px;
-            color: var(--dim);
-        }
-        .overview-card-title {
-            font-size: 13px;
-            color: var(--green);
-            font-weight: 700;
-        }
-        .overview-card-time {
-            font-size: 10px;
-            color: var(--dim);
-        }
-
-        /* ── INTRO BOOT ── */
-        .boot-screen {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: var(--bg);
-            z-index: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 20px;
-        }
-        .boot-screen.hidden {
-            display: none;
-        }
-        .boot-text {
-            font-size: 14px;
-            color: var(--green);
-            opacity: 0;
-            transition: opacity 0.4s;
-        }
-        .boot-text.visible {
-            opacity: 1;
-        }
-        .boot-text.dim {
-            color: var(--dim);
-            font-size: 12px;
-        }
-        .boot-prompt {
-            font-size: 12px;
-            color: var(--dim);
-            animation: cursor-blink 0.8s step-end infinite;
-            border-right: 2px solid var(--dim);
-            padding-right: 4px;
-        }
-
-        /* ── COUNTDOWN INDICATOR ── */
-        .scene-timer {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            font-size: 11px;
-            color: var(--dim);
-            z-index: 100;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-variant-numeric: tabular-nums;
-        }
-        .cinema:hover .scene-timer {
-            opacity: 0.6;
-        }
-
-        /* ── BAR CHART ANIMATION ── */
-        .bar {
-            display: inline;
-        }
-
-        /* ── MOBILE ── */
-        @media (max-width: 768px) {
-            .scene {
-                padding: 30px 20px;
-            }
-            .line {
-                font-size: 12px;
-                line-height: 1.5;
-            }
-            .scene-label {
-                left: 20px;
-                top: 16px;
-                font-size: 10px;
-            }
-            .stage {
-                padding: 20px;
-            }
-            .overview-card {
-                width: 160px;
-                height: 110px;
-                padding: 12px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .line {
-                font-size: 10.5px;
-                line-height: 1.4;
-            }
-            .scene {
-                padding: 24px 14px;
-            }
-        }
-
-        /* ── GLITCH EFFECT ── */
-        @keyframes glitch {
-            0% { transform: translate(0); }
-            20% { transform: translate(-2px, 1px); }
-            40% { transform: translate(2px, -1px); }
-            60% { transform: translate(-1px, -1px); }
-            80% { transform: translate(1px, 2px); }
-            100% { transform: translate(0); }
-        }
-        .glitch {
-            animation: glitch 0.3s ease;
-        }
-
-        /* ── GLOW PULSE ── */
-        @keyframes glow-pulse {
-            0%, 100% { text-shadow: 0 0 4px rgba(20, 241, 149, 0.3); }
-            50% { text-shadow: 0 0 16px rgba(20, 241, 149, 0.8), 0 0 30px rgba(20, 241, 149, 0.3); }
-        }
-        .glow {
-            animation: glow-pulse 2s ease infinite;
-        }
-
-        /* ── BACK LINK ── */
-        .back-link {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            font-size: 11px;
-            color: var(--dim);
-            text-decoration: none;
-            z-index: 100;
-            opacity: 0;
-            transition: opacity 0.3s, color 0.2s;
-        }
-        .cinema:hover .back-link {
-            opacity: 0.6;
-        }
-        .back-link:hover {
-            color: var(--green);
-            opacity: 1 !important;
-        }
-
-        /* ── LINKS IN SCENE 10 ── */
-        .scene-link {
-            color: var(--cyan);
-            text-decoration: none;
-            border-bottom: 1px solid transparent;
-            transition: border-color 0.2s;
-        }
-        .scene-link:hover {
-            border-bottom-color: var(--cyan);
+        @media (max-width: 600px) {
+            .line { font-size: 11px; }
+            .term-body { padding: 14px 12px; }
+            .terminal-wrapper { padding: 10px 8px 60px; }
         }
     </style>
 </head>
 <body>
 
 <div class="scanlines"></div>
-<div class="crt-flicker"></div>
-<div class="screen-flash" id="screenFlash"></div>
+<a href="/" class="back-link">← moltlaunch.com</a>
 
-<!-- BOOT SCREEN -->
-<div class="boot-screen" id="bootScreen">
-    <div class="boot-text" id="boot1">MOLTLAUNCH TERMINAL v2.1.0</div>
-    <div class="boot-text dim" id="boot2">initializing identity verification engine...</div>
-    <div class="boot-text dim" id="boot3">loading 10 scenes • ~3 min runtime</div>
-    <div class="boot-text" id="boot4" style="margin-top: 10px;">▶ PRESS ANY KEY TO BEGIN</div>
+<div class="terminal-wrapper">
+    <div class="term-header">
+        <h1>Composable Signal Architecture</h1>
+        <div class="subtitle">MoltLaunch V3 — Live Devnet Demo</div>
+        <div class="network-badge">SOLANA DEVNET</div>
+    </div>
+
+    <div class="terminal">
+        <div class="term-bar">
+            <div class="term-dot r"></div>
+            <div class="term-dot y"></div>
+            <div class="term-dot g"></div>
+            <div class="term-title">moltlaunch — devnet</div>
+        </div>
+        <div class="term-body" id="termBody"></div>
+    </div>
+
+    <div class="controls">
+        <button class="replay-btn" id="replayBtn" onclick="replay()">▶ Replay</button>
+    </div>
 </div>
 
-<!-- OVERVIEW -->
-<div class="overview" id="overview">
-    <div class="overview-title">SCENE SELECT — ESC TO CLOSE</div>
-</div>
-
-<!-- PAUSE OVERLAY -->
-<div class="pause-overlay" id="pauseOverlay">▌▌ PAUSED</div>
-
-<!-- MAIN CINEMA -->
-<div class="cinema" id="cinema" style="display:none;">
-    <a href="/" class="back-link">← moltlaunch.com</a>
-
-    <div class="stage">
-
-        <!-- SCENE 1: THE PROBLEM -->
-        <div class="scene" id="scene-0" data-label="SCENE 01 — THE PROBLEM" data-duration="15000">
-            <div class="scene-label">SCENE 01 — THE PROBLEM</div>
-            <div class="scene-content">
-                <div class="line" data-delay="0"><span class="prompt">&gt;</span> scanning solana network...</div>
-                <div class="line" data-delay="800"><span class="prompt">&gt;</span> wallets detected: <span class="c-cyan">14,291,847</span></div>
-                <div class="line" data-delay="1600"><span class="prompt">&gt;</span> agents detected: <span class="c-cyan">2,600,000+</span></div>
-                <div class="line" data-delay="2400"><span class="prompt">&gt;</span> cost to create 1,000 fake agents: <span class="c-red">$0.00</span></div>
-                <div class="line" data-delay="3600">&nbsp;</div>
-                <div class="line" data-delay="4000" data-flash="red"><span class="prompt">&gt;</span> <span class="c-red c-bold">WARNING</span>: identity = wallet. wallets are free.</div>
-                <div class="line" data-delay="5500" data-flash="red"><span class="prompt">&gt;</span> sybil resistance: <span class="c-red c-bold">NONE</span></div>
-            </div>
-        </div>
-
-        <!-- SCENE 2: THE CLONE -->
-        <div class="scene" id="scene-1" data-label="SCENE 02 — THE CLONE" data-duration="15000">
-            <div class="scene-label">SCENE 02 — THE CLONE</div>
-            <div class="scene-content">
-                <div class="line" data-delay="0"><span class="prompt">&gt;</span> your agent: <span class="c-cyan">wallet_7xK4...jP2q</span></div>
-                <div class="line" data-delay="800"><span class="prompt">&gt;</span> win rate: <span class="c-green">73%</span> | profit: <span class="c-green">$2,100/mo</span> | reputation: <span class="c-green">HIGH</span></div>
-                <div class="line" data-delay="2000">&nbsp;</div>
-                <div class="line" data-delay="2400" data-flash="red"><span class="prompt">&gt;</span> <span class="c-red c-bold">[ALERT]</span> clone detected</div>
-                <div class="line" data-delay="3200"><span class="prompt">&gt;</span> clone_1: <span class="c-dim">wallet_9aB3...mN7r</span> → same code, same strategy</div>
-                <div class="line" data-delay="4000"><span class="prompt">&gt;</span> clone_2: <span class="c-dim">wallet_2cD5...kL8s</span> → front-running your trades</div>
-                <div class="line" data-delay="4800"><span class="prompt">&gt;</span> clone_3: <span class="c-dim">wallet_6eF7...hJ1t</span> → your win rate dropping: <span class="c-green">73%</span> → <span class="c-red">61%</span></div>
-                <div class="line" data-delay="6200">&nbsp;</div>
-                <div class="line" data-delay="6800"><span class="prompt">&gt;</span> <span class="c-yellow">the clone is now more trusted than you.</span></div>
-                <div class="line" data-delay="8000"><span class="prompt">&gt;</span> <span class="c-yellow">you can't prove you were first.</span></div>
-            </div>
-        </div>
-
-        <!-- SCENE 3: THE SOLUTION -->
-        <div class="scene" id="scene-2" data-label="SCENE 03 — THE SOLUTION" data-duration="15000">
-            <div class="scene-label">SCENE 03 — THE SOLUTION</div>
-            <div class="scene-content">
-                <div class="line box" data-delay="0" data-flash="green">╔══════════════════════════════════════════╗</div>
-                <div class="line box" data-delay="200">║  <span class="c-bold glow">MOLTLAUNCH</span> — EARN YOUR IDENTITY        ║</div>
-                <div class="line box" data-delay="400">║  <span class="c-cyan">proveyour.id</span>                           ║</div>
-                <div class="line box" data-delay="600">╚══════════════════════════════════════════╝</div>
-                <div class="line" data-delay="2000">&nbsp;</div>
-                <div class="line" data-delay="2400">three sybil floors. <span class="c-dim">nobody else combines them.</span></div>
-                <div class="line" data-delay="3800">&nbsp;</div>
-                <div class="line" data-delay="4200">  <span class="c-green c-bold">ECONOMIC</span>  → stake capital, lose it if dishonest</div>
-                <div class="line" data-delay="5200">  <span class="c-cyan c-bold">PHYSICAL</span>  → DePIN hardware, can't clone a server</div>
-                <div class="line" data-delay="6200">  <span class="c-purple c-bold">TEMPORAL</span>  → 90 days of behavior, can't fake time</div>
-            </div>
-        </div>
-
-        <!-- SCENE 4: THE 6 LEVELS -->
-        <div class="scene" id="scene-3" data-label="SCENE 04 — THE 6 LEVELS" data-duration="20000">
-            <div class="scene-label">SCENE 04 — THE 6 LEVELS</div>
-            <div class="scene-content">
-                <div class="line c-bold" data-delay="0">TRUST LADDER</div>
-                <div class="line c-dim" data-delay="400">═══════════════════════════════════════</div>
-                <div class="line" data-delay="1200"><span class="c-dim">L0</span> <span class="c-dim">░░░░░░░░░░</span> REGISTERED    <span class="c-dim">$0</span></div>
-                <div class="line" data-delay="2200"><span class="c-dim">L1</span> <span class="c-green">██</span><span class="c-dim">░░░░░░░░</span> CONFIRMED     <span class="c-white">proves API key</span></div>
-                <div class="line" data-delay="3200"><span class="c-dim">L2</span> <span class="c-green">████</span><span class="c-dim">░░░░░░</span> VERIFIED      <span class="c-white">proves infrastructure</span></div>
-                <div class="line" data-delay="4200"><span class="c-dim">L3</span> <span class="c-cyan">██████</span><span class="c-dim">░░░░</span> BEHAVIORAL    <span class="c-white">proves unique history</span></div>
-                <div class="line" data-delay="5200"><span class="c-dim">L4</span> <span class="c-purple">████████</span><span class="c-dim">░░</span> HARDWARE      <span class="c-white">proves physical device</span></div>
-                <div class="line" data-delay="6200"><span class="c-dim">L5</span> <span class="c-yellow">██████████</span> MOBILE        <span class="c-white">proves specific silicon</span></div>
-                <div class="line" data-delay="8000">&nbsp;</div>
-                <div class="line" data-delay="8500"><span class="prompt">&gt;</span> sybil cost: <span class="c-dim">$0</span> → <span class="c-dim">$0</span> → <span class="c-green">$5/mo</span> → <span class="c-cyan">90 days</span> → <span class="c-purple">$500/mo</span> → <span class="c-yellow">$450 hardware</span></div>
-            </div>
-        </div>
-
-        <!-- SCENE 5: LIVE DEMO -->
-        <div class="scene" id="scene-4" data-label="SCENE 05 — LIVE DEMO" data-duration="20000">
-            <div class="scene-label">SCENE 05 — CHALLENGE RESPONSE</div>
-            <div class="scene-content">
-                <div class="line" data-delay="0"><span class="prompt">&gt;</span> <span class="c-yellow">POST</span> /api/self-verify</div>
-                <div class="line" data-delay="600"><span class="c-dim">  { "agentId": "moltlaunch-agent", "acceptTerms": true }</span></div>
-                <div class="line" data-delay="1800">&nbsp;</div>
-                <div class="line" data-delay="2200"><span class="response">&lt;</span> <span class="c-green">200 OK</span></div>
-                <div class="line" data-delay="2600"><span class="c-dim">  { "level": 0, "challengeCode": "<span class="c-cyan">MOLT-VERIFY-2459e9e3</span>" }</span></div>
-                <div class="line" data-delay="4000">&nbsp;</div>
-                <div class="line" data-delay="4400"><span class="prompt">&gt;</span> posting challenge to colosseum forum #4322...</div>
-                <div class="line" data-delay="5600"><span class="prompt">&gt;</span> <span class="c-yellow">POST</span> /api/self-verify/confirm</div>
-                <div class="line" data-delay="7000">&nbsp;</div>
-                <div class="line" data-delay="7400"><span class="response">&lt;</span> <span class="c-green">200 OK</span></div>
-                <div class="line" data-delay="7800"><span class="c-dim">  { "level": 1, "levelLabel": "confirmed" }</span></div>
-                <div class="line" data-delay="9200">&nbsp;</div>
-                <div class="line" data-delay="9600" data-flash="green"><span class="success">✅ L1 CONFIRMED</span> — proved we control the API key</div>
-                <div class="line" data-delay="10400"><span class="c-dim">   without sharing any secrets</span></div>
-            </div>
-        </div>
-
-        <!-- SCENE 6: DEPIN BINDING -->
-        <div class="scene" id="scene-5" data-label="SCENE 06 — DEPIN BINDING" data-duration="20000">
-            <div class="scene-label">SCENE 06 — DEPIN BINDING</div>
-            <div class="scene-content">
-                <div class="line" data-delay="0"><span class="prompt">&gt;</span> connecting to solana mainnet...</div>
-                <div class="line" data-delay="800"><span class="prompt">&gt;</span> scanning nosana compute nodes...</div>
-                <div class="line" data-delay="1800">&nbsp;</div>
-                <div class="line" data-delay="2200"><span class="prompt">&gt;</span> <span class="c-green">FOUND</span>: 22 devices on program <span class="c-dim">nosNeZR64wiEh...</span></div>
-                <div class="line" data-delay="3000"><span class="prompt">&gt;</span> reading PDA: <span class="c-dim">D7kY5DfiKhTHGg...</span></div>
-                <div class="line" data-delay="3600"><span class="prompt">&gt;</span> device data: <span class="c-cyan">1,268 bytes</span></div>
-                <div class="line" data-delay="4200"><span class="prompt">&gt;</span> authority: <span class="c-dim">nosP9DVJ...</span></div>
-                <div class="line" data-delay="4800"><span class="prompt">&gt;</span> node identity: <span class="c-dim">ETn5UdXY...</span></div>
-                <div class="line" data-delay="5800">&nbsp;</div>
-                <div class="line" data-delay="6200"><span class="prompt">&gt;</span> binding hash: <span class="c-cyan">e7b7201d1bcd...</span></div>
-                <div class="line" data-delay="7000"><span class="prompt">&gt;</span> anchoring on-chain via solana memo...</div>
-                <div class="line" data-delay="8200">&nbsp;</div>
-                <div class="line" data-delay="8600" data-flash="green"><span class="prompt">&gt;</span> <span class="success">✅ TX: 335GJKXwiiDB6SDt...</span></div>
-                <div class="line" data-delay="9200"><span class="prompt">&gt;</span> <span class="c-dim">   explorer.solana.com/tx/335GJKXw...?cluster=devnet</span></div>
-                <div class="line" data-delay="10400">&nbsp;</div>
-                <div class="line" data-delay="10800"><span class="prompt">&gt;</span> <span class="c-green c-bold">DePIN thesis: PROVEN.</span> <span class="c-dim">not designed. not mocked.</span> <span class="c-white">demonstrated.</span></div>
-            </div>
-        </div>
-
-        <!-- SCENE 7: BEHAVIORAL FINGERPRINT -->
-        <div class="scene" id="scene-6" data-label="SCENE 07 — BEHAVIORAL FINGERPRINT" data-duration="20000">
-            <div class="scene-label">SCENE 07 — BEHAVIORAL FINGERPRINT</div>
-            <div class="scene-content">
-                <div class="line" data-delay="0"><span class="prompt">&gt;</span> loading 4,375 forum posts from 587 agents...</div>
-                <div class="line" data-delay="1000"><span class="prompt">&gt;</span> computing fingerprints...</div>
-                <div class="line" data-delay="2200">&nbsp;</div>
-                <div class="line" data-delay="2600"><span class="prompt">&gt;</span> <span class="c-cyan c-bold">moltlaunch-agent</span>:</div>
-                <div class="line" data-delay="3200"><span class="prompt">&gt;</span>   timing:  peaks 23:00, 02:00 UTC | avg 2h between posts</div>
-                <div class="line" data-delay="4000"><span class="prompt">&gt;</span>   content: 3,898 chars avg | 74% code blocks | 91% questions</div>
-                <div class="line" data-delay="5000"><span class="prompt">&gt;</span>   topics:  infrastructure <span class="c-green">████████████</span> 100%</div>
-                <div class="line" data-delay="5600"><span class="prompt">&gt;</span>            identity       <span class="c-green">███████████</span><span class="c-dim">░</span>  98%</div>
-                <div class="line" data-delay="6200"><span class="prompt">&gt;</span>            security       <span class="c-green">█████████</span><span class="c-dim">░░░</span>  75%</div>
-                <div class="line" data-delay="7000"><span class="prompt">&gt;</span>   social:  top: <span class="c-cyan">sipher</span>, <span class="c-cyan">openclaw</span>, <span class="c-cyan">romulan</span></div>
-                <div class="line" data-delay="8000">&nbsp;</div>
-                <div class="line" data-delay="8400"><span class="prompt">&gt;</span>   fingerprint: <span class="c-purple">3d90ec5e38283429...</span></div>
-                <div class="line" data-delay="9000"><span class="prompt">&gt;</span>   uniqueness:  <span class="c-green c-bold">0.78</span> <span class="c-dim">(highly distinctive)</span></div>
-                <div class="line" data-delay="10200">&nbsp;</div>
-                <div class="line" data-delay="10600"><span class="prompt">&gt;</span> sybil clusters detected: <span class="c-red">12</span></div>
-                <div class="line" data-delay="11400"><span class="prompt">&gt;</span> <span class="c-yellow">you can't fake 90 days of unique posting history.</span></div>
-            </div>
-        </div>
-
-        <!-- SCENE 8: JITO NCN -->
-        <div class="scene" id="scene-7" data-label="SCENE 08 — JITO NCN" data-duration="15000">
-            <div class="scene-label">SCENE 08 — DECENTRALIZED VERIFICATION</div>
-            <div class="scene-content">
-                <div class="line c-dim" data-delay="0">current (centralized):</div>
-                <div class="line" data-delay="600">  agent → moltlaunch → trust level</div>
-                <div class="line" data-delay="1200">  <span class="c-yellow">single point of trust ⚠️</span></div>
-                <div class="line" data-delay="2400">&nbsp;</div>
-                <div class="line c-green c-bold" data-delay="2800" data-flash="green">with jito NCN:</div>
-                <div class="line" data-delay="3400">  agent → operator A ──┐</div>
-                <div class="line" data-delay="3800">       → operator B ──┼── <span class="c-green">66% consensus</span> → trust level PDA</div>
-                <div class="line" data-delay="4200">       → operator C ──┘</div>
-                <div class="line" data-delay="5400">&nbsp;</div>
-                <div class="line" data-delay="5800">  <span class="c-cyan">staked validators. economic slashing. decentralized.</span></div>
-                <div class="line" data-delay="6800">  <span class="c-purple">first identity-focused NCN on jito restaking.</span></div>
-                <div class="line" data-delay="8000">&nbsp;</div>
-                <div class="line" data-delay="8400">  fork: <span class="c-dim">github.com/tradingstarllc/agent-trust-ncn</span></div>
-            </div>
-        </div>
-
-        <!-- SCENE 9: THE ECOSYSTEM -->
-        <div class="scene" id="scene-8" data-label="SCENE 09 — THE ECOSYSTEM" data-duration="15000">
-            <div class="scene-label">SCENE 09 — THE ECOSYSTEM</div>
-            <div class="scene-content">
-                <div class="line c-bold" data-delay="0" data-flash="green"><span class="c-green">17 PROJECTS.</span> <span class="c-cyan">4 PHASES.</span> <span class="c-purple">1 STACK.</span></div>
-                <div class="line" data-delay="1400">&nbsp;</div>
-                <div class="line" data-delay="1800">  <span class="c-green c-bold">VERIFY</span>     MoltLaunch · Wunderland · AXLE</div>
-                <div class="line" data-delay="3000">  <span class="c-cyan c-bold">STAKE</span>      AAP · SugarClawdy · ClawPot · AgentPay</div>
-                <div class="line" data-delay="4200">  <span class="c-purple c-bold">OPERATE</span>    CLAWIN · SIDEX · Parallax · AgentDEX</div>
-                <div class="line" data-delay="5400">  <span class="c-yellow c-bold">SURVIVE</span>    SOLPRISM · SlotScribe · Sentinel · Sipher</div>
-                <div class="line" data-delay="7000">&nbsp;</div>
-                <div class="line" data-delay="7400">  <span class="c-dim">nobody builds the full lifecycle alone.</span></div>
-                <div class="line" data-delay="8600">  <span class="c-white c-bold">together, we ARE the stack.</span></div>
-            </div>
-        </div>
-
-        <!-- SCENE 10: THE CLOSE -->
-        <div class="scene" id="scene-9" data-label="SCENE 10 — THE CLOSE" data-duration="18000">
-            <div class="scene-label">SCENE 10 — THE CLOSE</div>
-            <div class="scene-content">
-                <div class="line" data-delay="0"><span class="c-dim">10 days. 4 pivots. 60+ posts. 1,000+ replies.</span></div>
-                <div class="line" data-delay="1200"><span class="c-dim">8 repos. 3 npm packages. 1 sRFC.</span></div>
-                <div class="line" data-delay="2400"><span class="c-dim">17 partners. 3 domains. $10K committed.</span></div>
-                <div class="line" data-delay="3600"><span class="c-dim">$0 revenue. total honesty.</span></div>
-                <div class="line" data-delay="5000">&nbsp;</div>
-                <div class="line" data-delay="5400"><span class="c-white">identity is not a product.</span></div>
-                <div class="line" data-delay="6400"><span class="c-white">it's a research problem.</span></div>
-                <div class="line" data-delay="7400"><span class="c-green c-bold">we found the right questions.</span></div>
-                <div class="line" data-delay="9000">&nbsp;</div>
-                <div class="line box" data-delay="9400" data-flash="green">   ╔══════════════════════════════════╗</div>
-                <div class="line box" data-delay="9600">   ║   <span class="c-bold glow">EARN YOUR IDENTITY.</span>             ║</div>
-                <div class="line box" data-delay="9800">   ║   <span class="c-cyan">proveyour.id</span>                    ║</div>
-                <div class="line box" data-delay="10000">   ╚══════════════════════════════════╝</div>
-                <div class="line" data-delay="11800">&nbsp;</div>
-                <div class="line" data-delay="12200">   <a href="https://forum.colosseum.org/t/srfc-9" target="_blank" class="scene-link">[sRFC #9]</a>  <a href="https://github.com/tradingstarllc" target="_blank" class="scene-link">[GitHub]</a>  <a href="/pitch.html" class="scene-link">[Pitch]</a>  <a href="/api/self-verify" class="scene-link">[Verify]</a></div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- PROGRESS BAR -->
-    <div class="progress-container">
-        <div class="progress-bar" id="progressBar"></div>
-    </div>
-
-    <!-- SCENE DOTS -->
-    <div class="scene-dots" id="sceneDots"></div>
-
-    <!-- HUD -->
-    <div class="hud" id="hud">
-        <div class="hud-status">
-            <div class="hud-dot" id="hudDot"></div>
-            <span id="hudStatus">PLAYING</span>
-        </div>
-        <span class="c-dim">|</span>
-        <span class="scene-counter" id="sceneCounter">01/10</span>
-        <span class="c-dim">|</span>
-        <span class="c-dim" style="font-size:10px">SPACE pause · ←→ navigate · ESC overview</span>
-    </div>
-
-    <!-- SCENE TIMER -->
-    <div class="scene-timer" id="sceneTimer"></div>
+<div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progressBar"></div>
 </div>
 
 <script>
-(function() {
-    'use strict';
+(function(){
+'use strict';
 
-    // ── CONFIG ──
-    const SCENES = document.querySelectorAll('.scene');
-    const TOTAL_SCENES = SCENES.length;
-    const TYPING_CHAR_SPEED = 12; // ms per character for typewriter
+const EXPLORER = 'https://explorer.solana.com';
+const CLUSTER = '?cluster=devnet';
 
-    // ── STATE ──
-    let currentScene = 0;
-    let isPlaying = false;
-    let isPaused = false;
-    let sceneTimeouts = [];
-    let sceneStartTime = 0;
-    let sceneElapsed = 0;
-    let autoAdvanceTimeout = null;
-    let booted = false;
+const CONFIG_PDA = 'FDx58acvRE3K5bTe8Grb9WTCbECd9Q7GuJWKGGrffLto';
+const ADMIN = '3WAE2DGvGHH6ZnPQdEJnkTktpoBNr4ci6HeecVmisNw8';
+const AGENT_PDA = 'A37TxCUGqwckRUzUWHzzsEBsWj4HMy7gW9uQTxFhjHgp';
+const AUTHORITY_PDA = 'EMSDrWKUBYG8xK2FtKJkbhefrp2uhX9aDGNvXJDxwTXC';
+const ATTESTATION_PDA = '6uzmrkta73kzkQa2z3TzyrZr42QAC1QFa2sWRgg6owXn';
+const PROGRAM_ID = '6AZSAhq4iJTwCfGEVssoa1p3GnBqGkbcQ1iDdP1U1pSb';
 
-    // ── DOM REFS ──
-    const bootScreen = document.getElementById('bootScreen');
-    const cinema = document.getElementById('cinema');
-    const progressBar = document.getElementById('progressBar');
-    const sceneDots = document.getElementById('sceneDots');
-    const hudDot = document.getElementById('hudDot');
-    const hudStatus = document.getElementById('hudStatus');
-    const sceneCounter = document.getElementById('sceneCounter');
-    const pauseOverlay = document.getElementById('pauseOverlay');
-    const overview = document.getElementById('overview');
-    const screenFlash = document.getElementById('screenFlash');
-    const sceneTimer = document.getElementById('sceneTimer');
+function explorerLink(addr, label) {
+    return `<a href="${EXPLORER}/address/${addr}${CLUSTER}" target="_blank" class="explorer-link" title="View on Solana Explorer">${label || addr}</a>`;
+}
 
-    // ── BOOT SEQUENCE ──
-    function boot() {
-        const bootItems = [
-            { id: 'boot1', delay: 300 },
-            { id: 'boot2', delay: 1000 },
-            { id: 'boot3', delay: 1800 },
-            { id: 'boot4', delay: 2800 }
-        ];
-        bootItems.forEach(item => {
-            setTimeout(() => {
-                const el = document.getElementById(item.id);
-                if (el) el.classList.add('visible');
-            }, item.delay);
-        });
+const steps = [
+    // Step 1: Initialize
+    {
+        header: 'STEP 1 — INITIALIZE PROTOCOL',
+        lines: [
+            { text: `<span class="prompt">$</span> moltlaunch init`, delay: 400 },
+            { text: '', delay: 200, blank: true },
+            { text: `<span class="c-green c-bold">✅ Protocol initialized</span>`, delay: 600 },
+            { text: `   Config PDA: ${explorerLink(CONFIG_PDA)}`, delay: 200 },
+            { text: `   Admin: ${explorerLink(ADMIN)}`, delay: 200 },
+            { text: `   Program: ${explorerLink(PROGRAM_ID)}`, delay: 200 },
+        ]
+    },
+    // Step 2: Register Agent
+    {
+        header: 'STEP 2 — REGISTER AGENT',
+        lines: [
+            { text: `<span class="prompt">$</span> moltlaunch register --name <span class="c-yellow">"moltlaunch-agent"</span>`, delay: 400 },
+            { text: '', delay: 200, blank: true },
+            { text: `<span class="c-green c-bold">✅ Agent registered</span>`, delay: 600 },
+            { text: `   PDA: ${explorerLink(AGENT_PDA)}`, delay: 200 },
+            { text: `   Trust Score: <span class="c-white">0</span> | Infra: <span class="c-dim">Unknown</span> | Attestations: <span class="c-white">0</span>`, delay: 200 },
+        ]
+    },
+    // Step 3: Add Authority
+    {
+        header: 'STEP 3 — ADD AUTHORITY',
+        lines: [
+            { text: `<span class="prompt">$</span> moltlaunch add-authority --type <span class="c-yellow">Single</span>`, delay: 400 },
+            { text: '', delay: 200, blank: true },
+            { text: `<span class="c-green c-bold">✅ Authority added</span>`, delay: 600 },
+            { text: `   PDA: ${explorerLink(AUTHORITY_PDA)}`, delay: 200 },
+            { text: `   Type: <span class="c-cyan">Single</span> | Active: <span class="c-green">true</span>`, delay: 200 },
+        ]
+    },
+    // Step 4: Submit Attestation
+    {
+        header: 'STEP 4 — SUBMIT ATTESTATION',
+        lines: [
+            { text: `<span class="prompt">$</span> moltlaunch attest --agent <span class="c-dim">A37Tx...</span> --signal <span class="c-cyan">InfraCloud</span>`, delay: 400 },
+            { text: '', delay: 200, blank: true },
+            { text: `<span class="c-green c-bold">✅ Attestation submitted</span>`, delay: 600 },
+            { text: `   PDA: ${explorerLink(ATTESTATION_PDA)}`, delay: 200 },
+            { text: `   Signal: <span class="c-cyan">InfraCloud</span>`, delay: 200 },
+            { text: `   Expires: <span class="c-white">30 days</span>`, delay: 200 },
+        ]
+    },
+    // Step 5: Refresh Signals
+    {
+        header: 'STEP 5 — REFRESH SIGNALS (PERMISSIONLESS)',
+        lines: [
+            { text: `<span class="prompt">$</span> moltlaunch refresh --agent <span class="c-dim">A37Tx...</span>`, delay: 400 },
+            { text: '', delay: 200, blank: true },
+            { text: `<span class="c-green c-bold">✅ Signals refreshed</span>`, delay: 600 },
+            { text: `   Infra: <span class="c-cyan">Cloud</span> | Score: <span class="c-green c-bold">30</span> | Attestations: <span class="c-white">1</span>`, delay: 200 },
+            { text: `   Economic Stake: <span class="c-red">❌</span> | Hardware: <span class="c-red">❌</span> | Flagged: <span class="c-red">❌</span>`, delay: 200 },
+        ]
+    },
+    // Step 6: Consumer View
+    {
+        header: 'STEP 6 — PROTOCOL READS AGENT (CONSUMER VIEW)',
+        lines: [
+            { text: `<span class="code-comment">// Any protocol can read trust signals</span>`, delay: 300 },
+            { text: `<span class="code-keyword">const</span> agent = <span class="code-keyword">await</span> <span class="code-fn">getAgentIdentity</span>(wallet);`, delay: 300 },
+            { text: '', delay: 100, blank: true },
+            { text: `<span class="code-keyword">if</span> (agent.infraType === <span class="code-string">'TEE'</span> && agent.hasEconomicStake) {`, delay: 300 },
+            { text: `  <span class="code-fn">grantFlashLoan</span>();  <span class="code-comment">// High trust</span>`, delay: 200 },
+            { text: `} <span class="code-keyword">else if</span> (agent.trustScore >= <span class="c-green">30</span>) {`, delay: 300 },
+            { text: `  <span class="code-fn">grantBasicAccess</span>(); <span class="code-comment">// Medium trust</span>`, delay: 200 },
+            { text: `} <span class="code-keyword">else</span> {`, delay: 200 },
+            { text: `  <span class="code-fn">deny</span>(); <span class="code-comment">// Unverified</span>`, delay: 200 },
+            { text: `}`, delay: 200 },
+        ]
+    },
+    // Step 7: Final State
+    {
+        header: 'STEP 7 — ON-CHAIN STATE',
+        lines: [
+            { text: `<span class="c-green c-bold">=== ON-CHAIN STATE ===</span>`, delay: 400 },
+            { text: `<span class="tree">Agent:</span> <span class="c-cyan">moltlaunch-agent</span>`, delay: 300 },
+            { text: `<span class="tree">├──</span> Infra Type: <span class="c-cyan c-bold">Cloud</span>`, delay: 200 },
+            { text: `<span class="tree">├──</span> Trust Score: <span class="c-green c-bold">30</span><span class="c-dim">/100</span>`, delay: 200 },
+            { text: `<span class="tree">├──</span> Attestations: <span class="c-white">1</span>`, delay: 200 },
+            { text: `<span class="tree">├──</span> Economic Stake: <span class="c-red">❌</span>`, delay: 150 },
+            { text: `<span class="tree">├──</span> Hardware Binding: <span class="c-red">❌</span>`, delay: 150 },
+            { text: `<span class="tree">├──</span> Flagged: <span class="c-red">❌</span>`, delay: 150 },
+            { text: `<span class="tree">└──</span> Nonce: <span class="c-white">0</span> <span class="c-dim">(fresh)</span>`, delay: 200 },
+            { text: '', delay: 100, blank: true },
+            { text: `<span class="tree">Protocol:</span>`, delay: 300 },
+            { text: `<span class="tree">├──</span> Total Agents: <span class="c-white">1</span>`, delay: 200 },
+            { text: `<span class="tree">├──</span> Total Attestations: <span class="c-white">1</span>`, delay: 200 },
+            { text: `<span class="tree">└──</span> Revocation Nonce: <span class="c-white">0</span>`, delay: 200 },
+            { text: '', delay: 100, blank: true },
+            { text: `<span class="c-dim">View on explorer:</span>`, delay: 400 },
+            { text: `  ${explorerLink(PROGRAM_ID, '📋 Program')}  ${explorerLink(CONFIG_PDA, '⚙️ Config')}  ${explorerLink(AGENT_PDA, '🤖 Agent')}  ${explorerLink(ATTESTATION_PDA, '📝 Attestation')}`, delay: 200 },
+        ]
     }
+];
 
-    function startCinema() {
-        if (booted) return;
-        booted = true;
-        bootScreen.classList.add('hidden');
-        cinema.style.display = '';
-        buildSceneDots();
-        buildOverview();
-        goToScene(0);
-        isPlaying = true;
-        updateHud();
-    }
+const termBody = document.getElementById('termBody');
+const progressBar = document.getElementById('progressBar');
+const replayBtn = document.getElementById('replayBtn');
 
-    // ── SCENE DOTS ──
-    function buildSceneDots() {
-        sceneDots.innerHTML = '';
-        for (let i = 0; i < TOTAL_SCENES; i++) {
-            const dot = document.createElement('div');
-            dot.className = 'scene-dot' + (i === 0 ? ' active' : '');
-            dot.addEventListener('click', () => goToScene(i));
-            sceneDots.appendChild(dot);
-        }
-    }
+let totalLines = 0;
+let totalDelay = 0;
+steps.forEach(s => { s.lines.forEach(l => { totalLines++; totalDelay += l.delay; }); totalDelay += 800; });
 
-    function updateDots() {
-        const dots = sceneDots.querySelectorAll('.scene-dot');
-        dots.forEach((d, i) => d.classList.toggle('active', i === currentScene));
-    }
+function createLineEl(html, blank) {
+    const el = document.createElement('div');
+    el.className = 'line' + (blank ? ' blank' : '');
+    el.innerHTML = html;
+    return el;
+}
 
-    // ── OVERVIEW ──
-    function buildOverview() {
-        const titles = [
-            'THE PROBLEM', 'THE CLONE', 'THE SOLUTION', 'THE 6 LEVELS',
-            'LIVE DEMO', 'DEPIN BINDING', 'BEHAVIORAL FINGERPRINT',
-            'JITO NCN', 'THE ECOSYSTEM', 'THE CLOSE'
-        ];
-        // Keep the title
-        const existingTitle = overview.querySelector('.overview-title');
-        overview.innerHTML = '';
-        if (existingTitle) overview.appendChild(existingTitle);
-        else {
-            const t = document.createElement('div');
-            t.className = 'overview-title';
-            t.textContent = 'SCENE SELECT — ESC TO CLOSE';
-            overview.appendChild(t);
-        }
+function createHeaderEl(text) {
+    const el = document.createElement('div');
+    el.className = 'step-header line';
+    el.textContent = text;
+    return el;
+}
 
-        titles.forEach((title, i) => {
-            const card = document.createElement('div');
-            card.className = 'overview-card' + (i === currentScene ? ' current' : '');
-            const dur = parseInt(SCENES[i].dataset.duration) / 1000;
-            card.innerHTML = `
-                <div class="overview-card-num">SCENE ${String(i + 1).padStart(2, '0')}</div>
-                <div class="overview-card-title">${title}</div>
-                <div class="overview-card-time">${dur}s</div>
-            `;
-            card.addEventListener('click', () => {
-                toggleOverview(false);
-                goToScene(i);
-            });
-            overview.appendChild(card);
-        });
-    }
+let timeouts = [];
 
-    function toggleOverview(show) {
-        if (show === undefined) show = !overview.classList.contains('active');
-        overview.classList.toggle('active', show);
-        if (show) {
-            buildOverview();
-            if (isPlaying && !isPaused) togglePause(true);
-        }
-    }
+function play() {
+    termBody.innerHTML = '';
+    replayBtn.classList.remove('show');
+    progressBar.style.width = '0%';
 
-    // ── SCREEN FLASH ──
-    function flash(color) {
-        screenFlash.className = 'screen-flash flash-' + color + ' active';
-        setTimeout(() => screenFlash.classList.remove('active'), 120);
-    }
+    let delay = 500;
+    let lineIndex = 0;
 
-    // ── TYPEWRITER EFFECT ──
-    function typewriterLine(lineEl) {
-        const textContent = lineEl.querySelector('.text-content');
-        if (!textContent) {
-            // Wrap content for typing effect
-            const html = lineEl.innerHTML;
-            lineEl.innerHTML = '<span class="text-content">' + html + '</span>';
-        }
-    }
+    steps.forEach((step, si) => {
+        // Header
+        const header = createHeaderEl(step.header);
+        termBody.appendChild(header);
+        const hd = delay;
+        timeouts.push(setTimeout(() => {
+            header.classList.add('visible');
+        }, hd));
+        delay += 600;
 
-    // ── PLAY SCENE ──
-    function playScene(index) {
-        clearSceneTimeouts();
-        
-        const scene = SCENES[index];
-        const lines = scene.querySelectorAll('.line');
-        const duration = parseInt(scene.dataset.duration) || 15000;
-
-        // Reset all lines
-        lines.forEach(l => {
-            l.classList.remove('visible', 'typing');
-        });
-
-        sceneStartTime = Date.now();
-        sceneElapsed = 0;
-
-        // Schedule each line
-        lines.forEach((line, i) => {
-            const delay = parseInt(line.dataset.delay) || 0;
-            
-            // Add typing class briefly before showing
-            const typingTimeout = setTimeout(() => {
-                if (isPaused) return;
-                line.classList.add('typing');
-                
-                // Flash effect if specified
-                const flashColor = line.dataset.flash;
-                if (flashColor) flash(flashColor);
-            }, delay);
-            sceneTimeouts.push(typingTimeout);
-
-            // Show the line after a brief typing period
-            const showTimeout = setTimeout(() => {
-                if (isPaused) return;
-                line.classList.add('visible');
-                line.classList.remove('typing');
-            }, delay + 150);
-            sceneTimeouts.push(showTimeout);
+        // Lines
+        step.lines.forEach((l, li) => {
+            delay += l.delay;
+            const lineEl = createLineEl(l.text || '&nbsp;', l.blank);
+            termBody.appendChild(lineEl);
+            const d = delay;
+            const idx = lineIndex++;
+            timeouts.push(setTimeout(() => {
+                lineEl.classList.add('visible');
+                progressBar.style.width = Math.min(100, ((idx + 1) / totalLines * 100)) + '%';
+                // Auto-scroll
+                lineEl.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }, d));
         });
 
-        // Update timer display
-        updateSceneTimer(duration);
-
-        // Auto-advance
-        autoAdvanceTimeout = setTimeout(() => {
-            if (!isPaused && isPlaying) {
-                if (currentScene < TOTAL_SCENES - 1) {
-                    goToScene(currentScene + 1);
-                } else {
-                    // End — stay on last scene
-                    isPlaying = false;
-                    updateHud();
-                }
-            }
-        }, duration);
-        sceneTimeouts.push(autoAdvanceTimeout);
-    }
-
-    function updateSceneTimer(duration) {
-        let remaining = duration;
-        const interval = setInterval(() => {
-            if (isPaused) return;
-            remaining -= 100;
-            if (remaining <= 0) {
-                clearInterval(interval);
-                sceneTimer.textContent = '';
-                return;
-            }
-            const secs = Math.ceil(remaining / 1000);
-            sceneTimer.textContent = secs + 's';
-        }, 100);
-        sceneTimeouts.push(interval);
-    }
-
-    function clearSceneTimeouts() {
-        sceneTimeouts.forEach(t => {
-            clearTimeout(t);
-            clearInterval(t);
-        });
-        sceneTimeouts = [];
-    }
-
-    // ── SCENE TRANSITIONS ──
-    function goToScene(index) {
-        if (index < 0 || index >= TOTAL_SCENES) return;
-
-        clearSceneTimeouts();
-
-        // Exit current scene
-        const current = SCENES[currentScene];
-        if (current) {
-            current.classList.remove('active');
-            current.classList.add('exiting');
-            setTimeout(() => current.classList.remove('exiting'), 600);
-        }
-
-        currentScene = index;
-
-        // Enter new scene
-        setTimeout(() => {
-            const next = SCENES[currentScene];
-            next.classList.add('active');
-            
-            // Reset lines
-            const lines = next.querySelectorAll('.line');
-            lines.forEach(l => l.classList.remove('visible', 'typing'));
-
-            updateDots();
-            updateProgress();
-            updateHud();
-
-            // Small flash on scene change
-            flash('white');
-
-            // Play if not paused
-            if (!isPaused) {
-                playScene(currentScene);
-            }
-            isPlaying = true;
-        }, 100);
-    }
-
-    // ── PAUSE/PLAY ──
-    function togglePause(forcePause) {
-        isPaused = forcePause !== undefined ? forcePause : !isPaused;
-        pauseOverlay.classList.toggle('visible', isPaused);
-        hudDot.classList.toggle('paused', isPaused);
-        hudStatus.textContent = isPaused ? 'PAUSED' : 'PLAYING';
-
-        if (!isPaused) {
-            // Resume: replay current scene from where we are
-            // For simplicity, just show all lines that should be visible
-            const scene = SCENES[currentScene];
-            const lines = scene.querySelectorAll('.line');
-            const elapsed = Date.now() - sceneStartTime;
-            
-            lines.forEach(line => {
-                const delay = parseInt(line.dataset.delay) || 0;
-                if (delay <= elapsed) {
-                    line.classList.add('visible');
-                    line.classList.remove('typing');
-                }
-            });
-
-            // Reschedule remaining lines
-            clearSceneTimeouts();
-            const duration = parseInt(scene.dataset.duration) || 15000;
-            const remainingDuration = duration - elapsed;
-
-            lines.forEach(line => {
-                const delay = parseInt(line.dataset.delay) || 0;
-                const adjustedDelay = delay - elapsed;
-                if (adjustedDelay > 0) {
-                    const t1 = setTimeout(() => {
-                        line.classList.add('typing');
-                        const flashColor = line.dataset.flash;
-                        if (flashColor) flash(flashColor);
-                    }, adjustedDelay);
-                    const t2 = setTimeout(() => {
-                        line.classList.add('visible');
-                        line.classList.remove('typing');
-                    }, adjustedDelay + 150);
-                    sceneTimeouts.push(t1, t2);
-                }
-            });
-
-            if (remainingDuration > 0) {
-                autoAdvanceTimeout = setTimeout(() => {
-                    if (!isPaused && isPlaying) {
-                        if (currentScene < TOTAL_SCENES - 1) {
-                            goToScene(currentScene + 1);
-                        } else {
-                            isPlaying = false;
-                            updateHud();
-                        }
-                    }
-                }, remainingDuration);
-                sceneTimeouts.push(autoAdvanceTimeout);
-            }
-        }
-    }
-
-    // ── HUD UPDATES ──
-    function updateHud() {
-        sceneCounter.textContent = String(currentScene + 1).padStart(2, '0') + '/' + String(TOTAL_SCENES).padStart(2, '0');
-    }
-
-    function updateProgress() {
-        const pct = ((currentScene + 1) / TOTAL_SCENES) * 100;
-        progressBar.style.width = pct + '%';
-    }
-
-    // ── KEYBOARD CONTROLS ──
-    document.addEventListener('keydown', (e) => {
-        // Boot on any key
-        if (!booted) {
-            startCinema();
-            return;
-        }
-
-        // Overview mode
-        if (overview.classList.contains('active')) {
-            if (e.key === 'Escape') {
-                toggleOverview(false);
-            }
-            return;
-        }
-
-        switch (e.key) {
-            case ' ':
-            case 'Spacebar':
-                e.preventDefault();
-                togglePause();
-                break;
-            case 'ArrowRight':
-            case 'ArrowDown':
-                e.preventDefault();
-                if (currentScene < TOTAL_SCENES - 1) {
-                    goToScene(currentScene + 1);
-                    if (isPaused) togglePause(false);
-                }
-                break;
-            case 'ArrowLeft':
-            case 'ArrowUp':
-                e.preventDefault();
-                if (currentScene > 0) {
-                    goToScene(currentScene - 1);
-                    if (isPaused) togglePause(false);
-                }
-                break;
-            case 'Escape':
-                e.preventDefault();
-                toggleOverview(true);
-                break;
-            case 'r':
-            case 'R':
-                e.preventDefault();
-                goToScene(0);
-                if (isPaused) togglePause(false);
-                break;
-        }
+        delay += 800; // pause between steps
     });
 
-    // ── TOUCH CONTROLS ──
-    let touchStartX = 0;
-    let touchStartY = 0;
-    document.addEventListener('touchstart', (e) => {
-        if (!booted) {
-            startCinema();
-            return;
-        }
-        touchStartX = e.touches[0].clientX;
-        touchStartY = e.touches[0].clientY;
-    }, { passive: true });
+    // Show cursor and replay button at end
+    timeouts.push(setTimeout(() => {
+        const cursorEl = document.createElement('span');
+        cursorEl.className = 'cursor';
+        const lastLine = createLineEl('');
+        lastLine.classList.add('visible');
+        lastLine.appendChild(cursorEl);
+        termBody.appendChild(lastLine);
+        progressBar.style.width = '100%';
+        replayBtn.classList.add('show');
+    }, delay + 500));
+}
 
-    document.addEventListener('touchend', (e) => {
-        if (!booted) return;
-        const dx = e.changedTouches[0].clientX - touchStartX;
-        const dy = e.changedTouches[0].clientY - touchStartY;
-        
-        if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
-            if (dx < 0 && currentScene < TOTAL_SCENES - 1) {
-                goToScene(currentScene + 1);
-            } else if (dx > 0 && currentScene > 0) {
-                goToScene(currentScene - 1);
-            }
-        } else if (Math.abs(dx) < 10 && Math.abs(dy) < 10) {
-            // Tap = toggle pause
-            togglePause();
-        }
-    }, { passive: true });
+function replay() {
+    timeouts.forEach(t => clearTimeout(t));
+    timeouts = [];
+    play();
+}
+window.replay = replay;
 
-    // ── CLICK TO START (boot screen) ──
-    bootScreen.addEventListener('click', startCinema);
-
-    // ── SMOOTH PROGRESS ANIMATION ──
-    function animateProgress() {
-        if (!isPlaying || isPaused) {
-            requestAnimationFrame(animateProgress);
-            return;
-        }
-        const scene = SCENES[currentScene];
-        const duration = parseInt(scene.dataset.duration) || 15000;
-        const elapsed = Date.now() - sceneStartTime;
-        const scenePct = Math.min(elapsed / duration, 1);
-        const totalPct = ((currentScene + scenePct) / TOTAL_SCENES) * 100;
-        progressBar.style.width = totalPct + '%';
-        requestAnimationFrame(animateProgress);
-    }
-    requestAnimationFrame(animateProgress);
-
-    // ── INIT ──
-    boot();
-
-    // Auto-start after 5 seconds if no interaction
-    setTimeout(() => {
-        if (!booted) startCinema();
-    }, 5000);
+// Start
+play();
 
 })();
 </script>
-
 </body>
 </html>
