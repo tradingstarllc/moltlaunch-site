@@ -3099,7 +3099,7 @@ app.get('/.well-known/assetlinks.json', (req, res) => {
 
 // MoltLaunch self-verify well-known
 app.get('/.well-known/moltlaunch.json', (req, res) => {
-    res.json({"agentId":"moltlaunch-agent","token":"a3bf412f3003d848827396c4887931eb1541a6a01cd8932ab0901ec4a8da8ec8"});
+    res.json({"agentId":"moltlaunch-agent","token":"3bed0dda405e3f6553864e632587dd8f2096fc2d57db0a56ef9e177c697511f7"});
 });
 
 // Icons directory
