@@ -3,5 +3,6 @@ node_modules/
 *.log
 requests.log
 data/
+!data/registry.json
 backups/
 .DS_Store
