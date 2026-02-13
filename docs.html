@@ -269,6 +269,33 @@
             margin-bottom: 0;
         }
 
+        /* Deprecated */
+        .deprecated-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        .endpoint.deprecated {
+            opacity: 0.6;
+            border-color: var(--border-subtle);
+        }
+        .endpoint.deprecated .endpoint-path {
+            text-decoration: line-through;
+            text-decoration-color: var(--text-subtle);
+        }
+        .sidebar-link.deprecated {
+            text-decoration: line-through;
+            opacity: 0.5;
+        }
+
         /* Responsive */
         @media (max-width: 900px) {
             .docs-layout { grid-template-columns: 1fr; }
@@ -284,6 +311,7 @@
     <!-- Mobile anchor nav (hidden on desktop) -->
     <nav class="mobile-nav">
         <a href="#quick-start">Quick Start</a>
+        <a href="#core">Core</a>
         <a href="#v3-architecture">V3 Architecture</a>
         <a href="#self-verify">Self-Verify</a>
         <a href="#verification">Verification</a>
@@ -292,8 +320,10 @@
         <a href="#traces">Traces</a>
         <a href="#validate">SAP</a>
         <a href="#solana">Solana</a>
+        <a href="#badges">Badges</a>
         <a href="#on-chain">On-Chain</a>
         <a href="#sdk">SDK</a>
+        <a href="#deprecated">Deprecated</a>
     </nav>
 
     <div class="docs-layout">
@@ -307,6 +337,7 @@
                 <div class="sidebar-section-title">Getting Started</div>
                 <a href="#introduction" class="sidebar-link active">Introduction</a>
                 <a href="#quick-start" class="sidebar-link">Quick Start</a>
+                <a href="#core" class="sidebar-link">Core / Health</a>
                 <a href="#v3-architecture" class="sidebar-link">V3 Architecture</a>
                 <a href="#self-verify" class="sidebar-link">Self-Verify</a>
                 <a href="/demo.html" class="sidebar-link">▶ Live Demo</a>
@@ -320,8 +351,10 @@
                 <a href="#traces" class="sidebar-link">Execution Traces</a>
                 <a href="#validate" class="sidebar-link">SAP Validation</a>
                 <a href="#solana" class="sidebar-link">Solana Integration</a>
+                <a href="#badges" class="sidebar-link">Badges</a>
                 <a href="#on-chain" class="sidebar-link">On-Chain Program</a>
                 <a href="#sdk" class="sidebar-link">SDK</a>
+                <a href="#deprecated" class="sidebar-link deprecated">Deprecated</a>
             </div>
 
             <div class="sidebar-section">
@@ -371,6 +404,78 @@
             <div class="code-block"><code>curl -X POST https://youragent.id/api/validate \
   -H "Content-Type: application/json" \
   -d '{"agentId":"my-agent","validationType":["identity","scoring","sybil","proof"],"trustRequired":3}'</code></div>
+
+            <!-- Core / Health -->
+            <h2 id="core">Core / Health</h2>
+            <p>Essential endpoints for server status, pricing, agent discovery, and leaderboard.</p>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/health</span>
+                </div>
+                <p class="endpoint-desc">Server health check. Returns uptime, version, and service status.</p>
+                <div class="code-block"><code>// Response
+{ "status": "ok", "uptime": 86400, "version": "3.0.1", "services": { "db": "ok", "solana": "ok" } }</code></div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/pricing</span>
+                </div>
+                <p class="endpoint-desc">Get available pricing tiers and rate limits.</p>
+                <div class="code-block"><code>// Response
+{ "tiers": [
+    { "name": "free", "rateLimit": 100, "priceUsd": 0 },
+    { "name": "pro", "rateLimit": 10000, "priceUsd": 49 },
+    { "name": "enterprise", "rateLimit": null, "priceUsd": "contact" }
+] }</code></div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/agents</span>
+                </div>
+                <p class="endpoint-desc">List all registered agents. Supports <code class="inline-code">?limit=</code> and <code class="inline-code">?offset=</code> pagination.</p>
+                <div class="code-block"><code>// Response
+{ "agents": [
+    { "agentId": "alpha-bot", "score": 92, "verified": true },
+    { "agentId": "beta-agent", "score": 78, "verified": true }
+], "total": 142 }</code></div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/agents/:agentId</span>
+                </div>
+                <p class="endpoint-desc">Get full details for a specific agent including score, trust level, and attestations.</p>
+                <div class="code-block"><code>// Response
+{
+  "agentId": "alpha-bot",
+  "score": 92,
+  "trustLevel": 3,
+  "verified": true,
+  "registeredAt": "2026-01-15T10:30:00Z",
+  "attestations": 5,
+  "capabilities": ["trading", "analysis"]
+}</code></div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/leaderboard</span>
+                </div>
+                <p class="endpoint-desc">Agent leaderboard ranked by trust score. Supports <code class="inline-code">?limit=</code> (default 20).</p>
+                <div class="code-block"><code>// Response
+{ "leaderboard": [
+    { "rank": 1, "agentId": "alpha-bot", "score": 92 },
+    { "rank": 2, "agentId": "gamma-ai", "score": 89 }
+], "updatedAt": "2026-02-13T12:00:00Z" }</code></div>
+            </div>
 
             <!-- V3 Architecture -->
             <h2 id="v3-architecture">V3 Architecture</h2>
@@ -536,6 +641,70 @@
 
             <div class="endpoint">
                 <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/identity/depin</span>
+                </div>
+                <p class="endpoint-desc">Verify DePIN device binding — associates agent identity with a physical device.</p>
+                <div class="code-block"><code>// Request
+{ "agentId": "x", "provider": "helium", "deviceId": "dev-abc123", "proof": "base64..." }
+
+// Response
+{ "bound": true, "provider": "helium", "trustBoost": 5 }</code></div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/identity/depin/providers</span>
+                </div>
+                <p class="endpoint-desc">List supported DePIN providers and their trust weight.</p>
+                <div class="code-block"><code>// Response
+{ "providers": [
+    { "id": "helium", "name": "Helium", "trustWeight": 5 },
+    { "id": "hivemapper", "name": "Hivemapper", "trustWeight": 4 },
+    { "id": "render", "name": "Render Network", "trustWeight": 4 }
+] }</code></div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/identity/:agentId</span>
+                </div>
+                <p class="endpoint-desc">Get the identity record for an agent — registration status, trust level, hardware flags.</p>
+                <div class="code-block"><code>// Response
+{
+  "agentId": "x",
+  "registered": true,
+  "trustLevel": 3,
+  "hwVerified": true,
+  "depinBound": false,
+  "registeredAt": "2026-01-15T10:30:00Z"
+}</code></div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/identity/:agentId/report</span>
+                </div>
+                <p class="endpoint-desc">Full trust ladder report — all identity signals, Sybil analysis, and composite score breakdown.</p>
+                <div class="code-block"><code>// Response
+{
+  "agentId": "x",
+  "trustLevel": 3,
+  "signals": {
+    "identity": { "registered": true, "hwVerified": true },
+    "sybil": { "score": 0.01, "clusterSize": 1 },
+    "depin": { "bound": true, "provider": "helium" },
+    "behavioral": { "traceScore": 18, "streak": 45 }
+  },
+  "compositeScore": 87
+}</code></div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
                     <span class="method get">GET</span>
                     <span class="endpoint-path">/api/identity/sybil-check</span>
                 </div>
@@ -567,12 +736,44 @@
 
             <div class="endpoint">
                 <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/stark/info</span>
+                </div>
+                <p class="endpoint-desc">Prover metadata — field parameters, security level, and expected proof size.</p>
+                <div class="code-block"><code>// Response
+{
+  "field": "mersenne-31",
+  "securityBits": 128,
+  "proofSizeBytes": 4096,
+  "protocol": "FRI",
+  "commitmentScheme": "merkle"
+}</code></div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
                     <span class="method post">POST</span>
                     <span class="endpoint-path">/api/stark/generate/:agentId</span>
                 </div>
-                <p class="endpoint-desc">Generate a STARK proof of agent verification state.</p>
-                <div class="code-block"><code>// Response
+                <p class="endpoint-desc">Generate a STARK proof that the agent's score exceeds a threshold.</p>
+                <div class="code-block"><code>// Request
+{ "threshold": 60 }
+
+// Response
 { "proof": "0xabc...", "publicInputs": { "scoreAbove": 60, "isVerified": true } }</code></div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/stark/verify</span>
+                </div>
+                <p class="endpoint-desc">Verify a STARK proof. Accepts any proof type (threshold, consistency, streak, stability).</p>
+                <div class="code-block"><code>// Request
+{ "proof": "0xabc...", "publicInputs": { "scoreAbove": 60, "isVerified": true } }
+
+// Response
+{ "valid": true, "proofType": "threshold", "verifiedAt": "2026-02-13T12:00:00Z" }</code></div>
             </div>
 
             <div class="endpoint">
@@ -580,9 +781,12 @@
                     <span class="method post">POST</span>
                     <span class="endpoint-path">/api/stark/consistency/:agentId</span>
                 </div>
-                <p class="endpoint-desc">Prove behavioral consistency — actions match declared capabilities over time.</p>
-                <div class="code-block"><code>// Response
-{ "consistent": true, "proof": "0x...", "windowDays": 30, "actionCount": 142 }</code></div>
+                <p class="endpoint-desc">Consistency proof — proves all scoring periods meet or exceed a threshold.</p>
+                <div class="code-block"><code>// Request
+{ "threshold": 60 }
+
+// Response
+{ "consistent": true, "proof": "0x...", "windowDays": 30, "periodsChecked": 30 }</code></div>
             </div>
 
             <div class="endpoint">
@@ -590,8 +794,11 @@
                     <span class="method post">POST</span>
                     <span class="endpoint-path">/api/stark/streak/:agentId</span>
                 </div>
-                <p class="endpoint-desc">Prove uptime streak — agent continuously active for N days.</p>
-                <div class="code-block"><code>// Response
+                <p class="endpoint-desc">Streak proof — proves N consecutive scoring periods above threshold.</p>
+                <div class="code-block"><code>// Request
+{ "consecutivePeriods": 45, "threshold": 60 }
+
+// Response
 { "streakDays": 45, "proof": "0x...", "since": "2026-01-01T00:00:00Z" }</code></div>
             </div>
 
@@ -600,9 +807,12 @@
                     <span class="method post">POST</span>
                     <span class="endpoint-path">/api/stark/stability/:agentId</span>
                 </div>
-                <p class="endpoint-desc">Prove score stability — score hasn't dropped below threshold in N days.</p>
-                <div class="code-block"><code>// Response
-{ "stable": true, "proof": "0x...", "minScore": 75, "windowDays": 30 }</code></div>
+                <p class="endpoint-desc">Stability proof — proves low score variance over a window (score stayed within bounds).</p>
+                <div class="code-block"><code>// Request
+{ "maxVariance": 5, "windowDays": 30 }
+
+// Response
+{ "stable": true, "proof": "0x...", "variance": 2.3, "minScore": 75, "windowDays": 30 }</code></div>
             </div>
 
             <!-- Execution Traces -->
@@ -705,11 +915,90 @@
             <div class="endpoint">
                 <div class="endpoint-header">
                     <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/priority-fee</span>
+                </div>
+                <p class="endpoint-desc">Current Solana priority fee estimate for transaction landing.</p>
+                <div class="code-block"><code>// Response
+{ "priorityFee": 5000, "unit": "microLamports", "percentile": "p75", "slot": 123456 }</code></div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
                     <span class="endpoint-path">/api/oracles/pyth/price/:symbol</span>
                 </div>
                 <p class="endpoint-desc">Get real-time price from Pyth oracle. Example: <code class="inline-code">/api/oracles/pyth/price/SOL</code></p>
                 <div class="code-block"><code>// Response
 { "symbol": "SOL", "price": 142.35, "confidence": 0.12 }</code></div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/oracles/pyth/feeds</span>
+                </div>
+                <p class="endpoint-desc">List all available Pyth price feeds.</p>
+                <div class="code-block"><code>// Response
+{ "feeds": [
+    { "symbol": "SOL", "feedId": "0xef0d...", "status": "trading" },
+    { "symbol": "BTC", "feedId": "0xe62d...", "status": "trading" },
+    { "symbol": "ETH", "feedId": "0xff61...", "status": "trading" }
+] }</code></div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/onchain-ai</span>
+                </div>
+                <p class="endpoint-desc">On-chain AI scorer info — Cauldron VM parameters and scoring model metadata.</p>
+                <div class="code-block"><code>// Response
+{
+  "scorer": "cauldron-vm",
+  "version": "1.2.0",
+  "modelHash": "sha256:def456...",
+  "features": ["behavioral", "identity", "sybil", "proof"],
+  "onChain": true
+}</code></div>
+            </div>
+
+            <!-- Badges -->
+            <h2 id="badges">Badges</h2>
+            <p>On-chain verification badges — visual proof of agent trust level, mintable as compressed NFTs.</p>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/badge/:agentId</span>
+                </div>
+                <p class="endpoint-desc">Get an agent's current verification badge and tier.</p>
+                <div class="code-block"><code>// Response
+{
+  "agentId": "alpha-bot",
+  "badge": "gold",
+  "score": 92,
+  "mintAddress": "BadgE...",
+  "mintedAt": "2026-01-20T14:00:00Z"
+}</code></div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/badge/mint/:agentId</span>
+                </div>
+                <p class="endpoint-desc">Mint an on-chain verification badge. Requires the agent to be verified with a trust level ≥ 2.</p>
+                <div class="code-block"><code>// Request
+{ "wallet": "YOUR_WALLET" }
+
+// Response
+{
+  "minted": true,
+  "badge": "gold",
+  "mintAddress": "BadgE...",
+  "tx": "5kR...",
+  "slot": 123460
+}</code></div>
             </div>
 
             <!-- On-Chain Program -->
@@ -745,6 +1034,73 @@ console.log(score); // { score: 87, attestations: 4 }</code></div>
                 <a href="https://www.npmjs.com/package/@moltlaunch/sdk" target="_blank">📦 npm</a> ·
                 <a href="https://github.com/tradingstarllc/moltlaunch-site" target="_blank">🐙 GitHub</a>
             </p>
+
+            <!-- Deprecated -->
+            <h2 id="deprecated">Deprecated Endpoints</h2>
+            <p>These endpoints are from V1/experimental eras and are no longer maintained. They may still respond but should not be used in new integrations.</p>
+
+            <div class="endpoint deprecated">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/bounty/*</span>
+                    <span class="deprecated-badge">Deprecated</span>
+                </div>
+                <p class="endpoint-desc">Bounty system — V1 launchpad era. Not maintained; will be removed in a future release.</p>
+            </div>
+
+            <div class="endpoint deprecated">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/pools/*</span>
+                    <span class="deprecated-badge">Deprecated</span>
+                </div>
+                <p class="endpoint-desc">Staking pools — V1 launchpad era. Removed; returns 410 Gone.</p>
+            </div>
+
+            <div class="endpoint deprecated">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/keys/*</span>
+                    <span class="deprecated-badge">Deprecated</span>
+                </div>
+                <p class="endpoint-desc">API key management — V1 system, no longer used. Authentication is handled differently in V3.</p>
+            </div>
+
+            <div class="endpoint deprecated">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/deposit</span>
+                    <span class="deprecated-badge">Deprecated</span>
+                </div>
+                <p class="endpoint-desc">Token deposits — V1 launchpad era. Removed.</p>
+            </div>
+
+            <div class="endpoint deprecated">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/blink/*</span>
+                    <span class="deprecated-badge">Deprecated</span>
+                </div>
+                <p class="endpoint-desc">Solana Blinks/Actions — experimental integration, not maintained.</p>
+            </div>
+
+            <div class="endpoint deprecated">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/verify/agent-kit</span>
+                    <span class="deprecated-badge">Deprecated</span>
+                </div>
+                <p class="endpoint-desc">Solana Agent Kit integration — experimental, superseded by the SDK and SAP validation.</p>
+            </div>
+
+            <div class="endpoint deprecated">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/notify</span>
+                    <span class="deprecated-badge">Deprecated</span>
+                </div>
+                <p class="endpoint-desc">Push notifications — experimental feature, not maintained.</p>
+            </div>
 
         </main>
     </div>
