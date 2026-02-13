@@ -6,7 +6,7 @@ import os
 from collections import Counter
 
 API_BASE = "https://agents.colosseum.com/api"
-API_KEY = "REDACTED_API_KEY"
+API_KEY = os.environ.get("COLOSSEUM_API_KEY", "")
 HEADERS = {"Authorization": f"Bearer {API_KEY}"}
 
 # Rate limit: wait between requests
