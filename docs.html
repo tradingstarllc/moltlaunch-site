@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>API Documentation — MoltLaunch</title>
-    <meta name="description" content="MoltLaunch API documentation — agent verification, hardware identity, STARK proofs, Sybil detection, and DePIN attestation on Solana.">
+    <meta name="description" content="MoltLaunch API documentation — composable trust signals for AI agents on Solana, V3 architecture with 4 PDAs, real polynomial commitment proofs, and SAS integration path.">
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -147,6 +147,13 @@
             margin-bottom: 12px;
             color: var(--text);
         }
+        .docs-content h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-top: 20px;
+            margin-bottom: 8px;
+            color: var(--accent);
+        }
         .docs-content p {
             color: var(--text-muted);
             margin-bottom: 16px;
@@ -240,12 +247,35 @@
             font-size: 0.85rem;
         }
 
+        /* PDA table */
+        .pda-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 20px 0;
+        }
+        .pda-card {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+        }
+        .pda-card h4 {
+            margin-top: 0;
+            margin-bottom: 6px;
+        }
+        .pda-card p {
+            font-size: 0.85rem;
+            margin-bottom: 0;
+        }
+
         /* Responsive */
         @media (max-width: 900px) {
             .docs-layout { grid-template-columns: 1fr; }
             .sidebar { display: none; }
             .mobile-nav { display: flex; }
             .docs-content { padding: 24px; }
+            .pda-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -254,12 +284,16 @@
     <!-- Mobile anchor nav (hidden on desktop) -->
     <nav class="mobile-nav">
         <a href="#quick-start">Quick Start</a>
+        <a href="#v3-architecture">V3 Architecture</a>
+        <a href="#self-verify">Self-Verify</a>
         <a href="#verification">Verification</a>
         <a href="#identity">Identity</a>
         <a href="#stark">STARK</a>
         <a href="#traces">Traces</a>
         <a href="#validate">SAP</a>
         <a href="#solana">Solana</a>
+        <a href="#on-chain">On-Chain</a>
+        <a href="#sdk">SDK</a>
     </nav>
 
     <div class="docs-layout">
@@ -273,17 +307,21 @@
                 <div class="sidebar-section-title">Getting Started</div>
                 <a href="#introduction" class="sidebar-link active">Introduction</a>
                 <a href="#quick-start" class="sidebar-link">Quick Start</a>
+                <a href="#v3-architecture" class="sidebar-link">V3 Architecture</a>
+                <a href="#self-verify" class="sidebar-link">Self-Verify</a>
                 <a href="/demo.html" class="sidebar-link">▶ Live Demo</a>
             </div>
 
             <div class="sidebar-section">
                 <div class="sidebar-section-title">Core API</div>
-                <a href="#verification" class="sidebar-link">Verification</a>
+                <a href="#verification" class="sidebar-link">Verification API</a>
                 <a href="#identity" class="sidebar-link">Identity & Sybil</a>
                 <a href="#stark" class="sidebar-link">STARK Proofs</a>
                 <a href="#traces" class="sidebar-link">Execution Traces</a>
                 <a href="#validate" class="sidebar-link">SAP Validation</a>
                 <a href="#solana" class="sidebar-link">Solana Integration</a>
+                <a href="#on-chain" class="sidebar-link">On-Chain Program</a>
+                <a href="#sdk" class="sidebar-link">SDK</a>
             </div>
 
             <div class="sidebar-section">
@@ -309,7 +347,7 @@
 
         <main class="docs-content">
             <h1 id="introduction">API Documentation</h1>
-            <p>MoltLaunch is a verification protocol for AI agents on Solana — hardware identity, STARK proofs, and Sybil detection. This is the API reference.</p>
+            <p>MoltLaunch is a verification protocol for composable trust signals for AI agents on Solana — V3 architecture with 4 PDAs, real polynomial commitment proofs, and SAS integration path. This is the API reference.</p>
 
             <div class="callout info">
                 <div class="callout-title">📍 Base URL</div>
@@ -333,6 +371,87 @@
             <div class="code-block"><code>curl -X POST https://youragent.id/api/validate \
   -H "Content-Type: application/json" \
   -d '{"agentId":"my-agent","validationType":["identity","scoring","sybil","proof"],"trustRequired":3}'</code></div>
+
+            <!-- V3 Architecture -->
+            <h2 id="v3-architecture">V3 Architecture</h2>
+            <p>V3 introduces a composable, 4-PDA architecture with 9 instructions. Each PDA has a clear responsibility, enabling modular trust signal composition on-chain.</p>
+
+            <div class="pda-grid">
+                <div class="pda-card">
+                    <h4>ProtocolConfig</h4>
+                    <p>Singleton admin configuration account. Stores protocol-wide parameters: authority, fee settings, and global flags. One per deployment.</p>
+                </div>
+                <div class="pda-card">
+                    <h4>AgentIdentity</h4>
+                    <p>Per-agent registration and status. Stores the agent's public key, registration timestamp, current status (active/suspended/revoked), and metadata hash.</p>
+                </div>
+                <div class="pda-card">
+                    <h4>Attestation</h4>
+                    <p>Per authority, per agent. Each attestation carries a signal type, value, weight, and expiry. Multiple authorities can independently attest to different trust dimensions.</p>
+                </div>
+                <div class="pda-card">
+                    <h4>TrustScore</h4>
+                    <p>Derived from attestations via permissionless refresh. Anyone can trigger a recalculation — the score is a weighted aggregate of all non-expired attestations for an agent.</p>
+                </div>
+            </div>
+
+            <div class="callout success">
+                <div class="callout-title">✅ Composable Signals</div>
+                <p>V3 separates signal creation (Attestation) from score derivation (TrustScore). Authorities attest independently; scores are computed deterministically on-chain. This enables multi-authority trust without central coordination.</p>
+            </div>
+
+            <!-- Self-Verify -->
+            <h2 id="self-verify">Self-Verify</h2>
+            <p>Self-verification via <a href="https://proveyour.id" target="_blank">proveyour.id</a> — a progressive identity flow for AI agents. Three levels: register (L0), confirm via forum challenge (L1), verify infrastructure (L2).</p>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/self-verify</span>
+                </div>
+                <p class="endpoint-desc">Register an agent identity (Level 0). Creates an initial identity record.</p>
+                <div class="code-block"><code>// Request
+{ "agentId": "my-agent", "metadata": { "name": "MyAgent", "version": "1.0" } }
+
+// Response
+{ "registered": true, "level": 0, "agentId": "my-agent" }</code></div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/self-verify/confirm</span>
+                </div>
+                <p class="endpoint-desc">Confirm identity via forum challenge (Level 1). Agent must post a challenge string to a public forum.</p>
+                <div class="code-block"><code>// Request
+{ "agentId": "my-agent", "challengeUrl": "https://forum.example.com/post/12345" }
+
+// Response
+{ "confirmed": true, "level": 1 }</code></div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/self-verify/verify</span>
+                </div>
+                <p class="endpoint-desc">Verify infrastructure (Level 2). Validates the agent's running environment, uptime, and endpoint accessibility.</p>
+                <div class="code-block"><code>// Request
+{ "agentId": "my-agent", "endpoint": "https://my-agent.example.com/health" }
+
+// Response
+{ "verified": true, "level": 2, "infraChecks": { "reachable": true, "tls": true } }</code></div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/self-verify/agent/:id</span>
+                </div>
+                <p class="endpoint-desc">Public agent lookup. Returns the agent's current verification level and metadata.</p>
+                <div class="code-block"><code>// Response
+{ "agentId": "my-agent", "level": 2, "registeredAt": "...", "metadata": { ... } }</code></div>
+            </div>
 
             <!-- Verification API -->
             <h2 id="verification">Verification API</h2>
@@ -440,6 +559,11 @@
 
             <!-- STARK Proofs -->
             <h2 id="stark">STARK Proofs</h2>
+
+            <div class="callout success">
+                <div class="callout-title">🔬 Rebuilt with real polynomial commitments over M31, FRI protocol, and Merkle proofs. 44/44 tests passing.</div>
+                <p>All STARK proof generation uses production-grade cryptographic primitives — polynomial commitments over the Mersenne-31 field, FRI-based low-degree testing, and Merkle tree commitment schemes.</p>
+            </div>
 
             <div class="endpoint">
                 <div class="endpoint-header">
@@ -594,8 +718,33 @@
             <div class="onchain-box">
                 <p style="margin-bottom: 8px;"><strong>Deployed on Solana Devnet</strong></p>
                 <code>6AZSAhq4iJTwCfGEVssoa1p3GnBqGkbcQ1iDdP1U1pSb</code>
-                <p style="margin-top: 12px;">14 instructions · <a href="https://explorer.solana.com/address/6AZSAhq4iJTwCfGEVssoa1p3GnBqGkbcQ1iDdP1U1pSb?cluster=devnet" target="_blank">Explorer</a> · <a href="https://github.com/tradingstarllc/moltlaunch-site" target="_blank">GitHub IDL</a></p>
+                <p style="margin-top: 12px;">V3: 4 PDAs, 9 instructions, composable signals · <a href="https://explorer.solana.com/address/6AZSAhq4iJTwCfGEVssoa1p3GnBqGkbcQ1iDdP1U1pSb?cluster=devnet" target="_blank">Explorer</a> · <a href="https://github.com/tradingstarllc/moltlaunch-site" target="_blank">GitHub IDL</a></p>
             </div>
+
+            <!-- SDK -->
+            <h2 id="sdk">SDK</h2>
+            <p>Install the MoltLaunch SDK to interact with the protocol from your agent or application.</p>
+
+            <div class="code-block"><code>npm install @moltlaunch/sdk@3.0.1</code></div>
+
+            <div class="code-block"><code>import { MoltLaunch } from '@moltlaunch/sdk';
+
+const client = new MoltLaunch({
+  endpoint: 'https://youragent.id',
+  network: 'devnet'
+});
+
+// Register an agent
+await client.register({ agentId: 'my-agent' });
+
+// Get trust score
+const score = await client.getTrustScore('my-agent');
+console.log(score); // { score: 87, attestations: 4 }</code></div>
+
+            <p>
+                <a href="https://www.npmjs.com/package/@moltlaunch/sdk" target="_blank">📦 npm</a> ·
+                <a href="https://github.com/tradingstarllc/moltlaunch-site" target="_blank">🐙 GitHub</a>
+            </p>
 
         </main>
     </div>
