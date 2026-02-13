@@ -11,7 +11,6 @@
 <p align="center">
   <a href="https://youragent.id"><img src="https://img.shields.io/badge/live-Railway-blueviolet" alt="Live Site" /></a>
   <a href="https://www.npmjs.com/package/@moltlaunch/sdk"><img src="https://img.shields.io/npm/v/@moltlaunch/sdk?label=%40moltlaunch%2Fsdk" alt="npm" /></a>
-  <a href="https://www.npmjs.com/package/@moltlaunch/proof-of-agent"><img src="https://img.shields.io/npm/v/@moltlaunch/proof-of-agent?label=proof-of-agent" alt="npm" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License" /></a>
 </p>
 
@@ -232,12 +231,11 @@ Verification attestations are anchored on-chain using the Solana Memo program, c
 
 ---
 
-## SDKs
+## SDK
 
 | Package | Description |
 |---------|-------------|
-| [`@moltlaunch/sdk`](https://www.npmjs.com/package/@moltlaunch/sdk) | Full SDK — verification, pools, traces, proofs |
-| [`@moltlaunch/proof-of-agent`](https://www.npmjs.com/package/@moltlaunch/proof-of-agent) | Lightweight PoA verification client |
+| [`@moltlaunch/sdk`](https://www.npmjs.com/package/@moltlaunch/sdk) | Full SDK — verification, identity, traces, attestations |
 
 ```bash
 npm install @moltlaunch/sdk
@@ -337,7 +335,6 @@ moltlaunch-site/
 |----------|-----|
 | 🌐 Live Site | [youragent.id](https://youragent.id) |
 | 📦 SDK (npm) | [@moltlaunch/sdk](https://www.npmjs.com/package/@moltlaunch/sdk) |
-| 🔐 Proof-of-Agent (npm) | [@moltlaunch/proof-of-agent](https://www.npmjs.com/package/@moltlaunch/proof-of-agent) |
 | 📖 API Docs | [/docs](https://youragent.id/docs) |
 | 📄 Whitepaper | [docs/WHITEPAPER.md](docs/WHITEPAPER.md) |
 | ℹ️ About | [/about](https://youragent.id/about) |

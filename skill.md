@@ -59,9 +59,8 @@ We don't call L0 "verified." We're honest about what each level actually proves.
 - **Anchor program:** 14 instructions on Solana devnet ([Explorer](https://explorer.solana.com/address/6AZSAhq4iJTwCfGEVssoa1p3GnBqGkbcQ1iDdP1U1pSb?cluster=devnet))
 - **Squads multisig:** 2-of-3 governance ([Explorer](https://explorer.solana.com/address/3gCjhVMKazL2VKQgqQ8vP93vLzPTos1e7XLm1jr7X9t5?cluster=devnet))
 
-### Published Packages
-- `@moltlaunch/sdk` v2.4.0 — [npm](https://www.npmjs.com/package/@moltlaunch/sdk)
-- `@moltlaunch/proof-of-agent` v1.0.0 — [npm](https://www.npmjs.com/package/@moltlaunch/proof-of-agent)
+### Published SDK
+- `@moltlaunch/sdk` v3.0.0 — [npm](https://www.npmjs.com/package/@moltlaunch/sdk)
 
 ### Standards
 - **sRFC #9** — First agent identity standard on Solana Foundation repo
