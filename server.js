@@ -3123,6 +3123,8 @@ app.use((req, res, next) => {
     if (req.path === '/skill.md' || req.path === '/INTEGRATION.md') return next();
     // Allow docs .md files
     if (req.path.startsWith('/docs/') && req.path.endsWith('.md')) return next();
+    // Allow registry data
+    if (req.path === '/data/registry.json') return next();
 
     if (blocked.includes(req.path)) return res.status(404).send('Not found');
     if (blockedPrefixes.some(p => req.path.startsWith(p))) return res.status(404).send('Not found');
