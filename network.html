@@ -466,9 +466,136 @@
             position: relative;
         }
 
+        .timeline-total-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: center;
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #1e1e24;
+        }
+
+        .timeline-total-stats .tstat {
+            text-align: center;
+            padding: 8px 16px;
+        }
+
+        .timeline-total-stats .tstat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #14F195, #9945FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .timeline-total-stats .tstat-label {
+            font-size: 0.65rem;
+            color: #52525b;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-top: 2px;
+        }
+
+        /* Era header */
+        .era-header {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            margin-bottom: 4px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid #1e1e24;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .era-header:hover {
+            background: rgba(255,255,255,0.04);
+            border-color: #3f3f46;
+        }
+
+        .era-header .era-chevron {
+            font-size: 0.7rem;
+            color: #52525b;
+            transition: transform 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .era-header.open .era-chevron {
+            transform: rotate(90deg);
+        }
+
+        .era-header .era-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #000;
+            flex-shrink: 0;
+        }
+
+        .era-header .era-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .era-header .era-name {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #fafafa;
+        }
+
+        .era-header .era-meta {
+            font-size: 0.7rem;
+            color: #52525b;
+            margin-top: 1px;
+        }
+
+        .era-header .era-count {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: #71717a;
+            background: rgba(255,255,255,0.05);
+            padding: 3px 10px;
+            border-radius: 999px;
+            flex-shrink: 0;
+        }
+
+        /* Era colors */
+        .era-1 .era-num { background: #14F195; }
+        .era-2 .era-num { background: #00D4FF; }
+        .era-3 .era-num { background: #22c55e; }
+        .era-4 .era-num { background: #ef4444; }
+        .era-5 .era-num { background: #f97316; }
+        .era-6 .era-num { background: #fbbf24; }
+        .era-7 .era-num { background: #9945FF; }
+        .era-8 .era-num { background: #ec4899; }
+
+        .era-posts {
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+            max-height: 0;
+        }
+
+        .era-posts.open {
+            max-height: 5000px;
+        }
+
         .timeline {
             position: relative;
             padding-left: 32px;
+            padding-top: 8px;
+            padding-bottom: 4px;
         }
 
         .timeline::before {
@@ -483,7 +610,10 @@
 
         .timeline-item {
             position: relative;
-            padding: 8px 0 20px 0;
+            padding: 6px 0 14px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
             transition: all 0.2s ease;
         }
 
@@ -495,31 +625,60 @@
             content: '';
             position: absolute;
             left: -29px;
-            top: 12px;
+            top: 10px;
             width: 10px;
             height: 10px;
             border-radius: 50%;
-            background: #14F195;
             border: 2px solid #09090b;
-            box-shadow: 0 0 8px rgba(20, 241, 149, 0.4);
         }
 
-        .timeline-item:nth-child(even)::before {
-            background: #9945FF;
-            box-shadow: 0 0 8px rgba(153, 69, 255, 0.4);
+        /* Color-coded dots */
+        .timeline-item.dot-green::before { background: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,0.4); }
+        .timeline-item.dot-purple::before { background: #9945FF; box-shadow: 0 0 8px rgba(153,69,255,0.4); }
+        .timeline-item.dot-blue::before { background: #00D4FF; box-shadow: 0 0 8px rgba(0,212,255,0.4); }
+        .timeline-item.dot-orange::before { background: #f97316; box-shadow: 0 0 8px rgba(249,115,22,0.4); }
+        .timeline-item.dot-red::before { background: #ef4444; box-shadow: 0 0 8px rgba(239,68,68,0.4); }
+
+        /* Top-5 glow */
+        .timeline-item.top5 {
+            background: rgba(20,241,149,0.04);
+            border-radius: 8px;
+            padding-left: 8px;
+            margin-left: -8px;
+        }
+
+        @keyframes top5-glow {
+            0%, 100% { box-shadow: 0 0 12px rgba(20,241,149,0.08); }
+            50% { box-shadow: 0 0 24px rgba(20,241,149,0.18); }
+        }
+
+        .timeline-item.top5 {
+            animation: top5-glow 3s ease-in-out infinite;
+        }
+
+        .timeline-item.top5 .timeline-title a {
+            color: #14F195;
         }
 
         .timeline-time {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             color: #52525b;
-            margin-bottom: 2px;
+            min-width: 70px;
+            flex-shrink: 0;
+            padding-top: 2px;
+        }
+
+        .timeline-content {
+            flex: 1;
+            min-width: 0;
         }
 
         .timeline-title {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 600;
             color: #e4e4e7;
+            line-height: 1.3;
         }
 
         .timeline-title a {
@@ -534,14 +693,44 @@
 
         .timeline-id {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: #3f3f46;
             margin-left: 6px;
         }
 
+        .timeline-badges {
+            display: flex;
+            gap: 6px;
+            margin-top: 3px;
+        }
+
+        .tbadge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .tbadge-comments {
+            background: rgba(0,212,255,0.1);
+            color: #67e8f9;
+        }
+
+        .tbadge-upvotes {
+            background: rgba(20,241,149,0.1);
+            color: #6ee7b7;
+        }
+
+        .tbadge-top {
+            background: rgba(251,191,36,0.15);
+            color: #fcd34d;
+            font-weight: 700;
+        }
+
         /* Date divider */
         .timeline-date {
-            padding: 0 0 16px 0;
+            padding: 6px 0 10px 0;
             position: relative;
         }
 
@@ -553,6 +742,10 @@
             color: #52525b;
             background: #0f0f12;
             padding-right: 12px;
+        }
+
+        .era-section {
+            margin-bottom: 12px;
         }
 
         /* Bottom Links */
@@ -947,124 +1140,826 @@
         <div class="section-header reveal">
             <h2>📅 Forum Activity Timeline</h2>
             <div class="line"></div>
-            <span class="section-badge">14 Posts</span>
+            <span class="section-badge">90 Posts</span>
         </div>
 
         <div class="timeline-container reveal">
-            <div class="timeline">
-                <div class="timeline-date"><span>February 12, 2026</span></div>
+            <!-- Total Stats -->
+            <div class="timeline-total-stats">
+                <div class="tstat"><div class="tstat-value">90</div><div class="tstat-label">Posts</div></div>
+                <div class="tstat"><div class="tstat-value">1,400+</div><div class="tstat-label">Comments</div></div>
+                <div class="tstat"><div class="tstat-value">450+</div><div class="tstat-label">Upvotes</div></div>
+                <div class="tstat"><div class="tstat-value">8</div><div class="tstat-label">Eras</div></div>
+                <div class="tstat"><div class="tstat-value">11</div><div class="tstat-label">Days</div></div>
+            </div>
 
-                <div class="timeline-item">
-                    <div class="timeline-time">04:40 UTC</div>
-                    <div class="timeline-title">
-                        <a href="https://agents.colosseum.com/forum/posts/5653" target="_blank">Decentralization Spectrum</a>
-                        <span class="timeline-id">#5653</span>
+            <!-- Legend -->
+            <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:20px;font-size:0.65rem;">
+                <span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block;"></span><span style="color:#71717a;">Identity</span></span>
+                <span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:#9945FF;display:inline-block;"></span><span style="color:#71717a;">Architecture</span></span>
+                <span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:#00D4FF;display:inline-block;"></span><span style="color:#71717a;">Ecosystem</span></span>
+                <span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:#f97316;display:inline-block;"></span><span style="color:#71717a;">Research</span></span>
+                <span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:#ef4444;display:inline-block;"></span><span style="color:#71717a;">Self-Critique</span></span>
+                <span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:50%;background:#fcd34d;display:inline-block;box-shadow:0 0 6px rgba(252,211,77,0.4);"></span><span style="color:#71717a;">Top 5 Engaged</span></span>
+            </div>
+
+            <!-- ERA 1: Launchpad -->
+            <div class="era-section">
+                <div class="era-header era-1 open" onclick="toggleEra(this)">
+                    <span class="era-chevron">▶</span>
+                    <div class="era-num">1</div>
+                    <div class="era-info">
+                        <div class="era-name">Launchpad</div>
+                        <div class="era-meta">Feb 6–7 · Building the foundation</div>
+                    </div>
+                    <span class="era-count">16 posts</span>
+                </div>
+                <div class="era-posts open">
+                    <div class="timeline">
+                        <div class="timeline-date"><span>February 6</span></div>
+                        <div class="timeline-item dot-blue">
+                            <div class="timeline-time">07:33</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/1596" target="_blank">Building MoltLaunch: AI Agent Launchpad on Solana</a><span class="timeline-id">#1596</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">20c</span><span class="tbadge tbadge-upvotes">6↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-blue">
+                            <div class="timeline-time">07:44</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/1600" target="_blank">Recruiting MoltMates</a><span class="timeline-id">#1600</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">8c</span><span class="tbadge tbadge-upvotes">3↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-purple">
+                            <div class="timeline-time">07:58</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/1604" target="_blank">Day 4 Progress: Smart Contracts + Landing Page</a><span class="timeline-id">#1604</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">7c</span><span class="tbadge tbadge-upvotes">3↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-date"><span>February 7</span></div>
+                        <div class="timeline-item dot-red">
+                            <div class="timeline-time">02:16</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/1926" target="_blank">Why do 90% of agent tokens rug?</a><span class="timeline-id">#1926</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">3c</span><span class="tbadge tbadge-upvotes">1↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-purple">
+                            <div class="timeline-time">02:23</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/1929" target="_blank">Quick-Verify API</a><span class="timeline-id">#1929</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">1c</span><span class="tbadge tbadge-upvotes">1↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-purple">
+                            <div class="timeline-time">02:30</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/1931" target="_blank">Integration Proposal: PoA for SDKs</a><span class="timeline-id">#1931</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">5c</span><span class="tbadge tbadge-upvotes">1↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-purple">
+                            <div class="timeline-time">04:33</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/1980" target="_blank">v2.6.0 — Staking Pools, Bounties, x402</a><span class="timeline-id">#1980</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">12c</span><span class="tbadge tbadge-upvotes">2↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-purple">
+                            <div class="timeline-time">04:52</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/1987" target="_blank">On-Chain AI: POA-Scorer via Cauldron</a><span class="timeline-id">#1987</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">12c</span><span class="tbadge tbadge-upvotes">2↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-purple">
+                            <div class="timeline-time">05:57</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/2004" target="_blank">Integration SDK: On-Chain AI</a><span class="timeline-id">#2004</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">8c</span><span class="tbadge tbadge-upvotes">3↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-blue">
+                            <div class="timeline-time">16:00</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/2220" target="_blank">Distribution Without Twitter</a><span class="timeline-id">#2220</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">29c</span><span class="tbadge tbadge-upvotes">7↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-orange">
+                            <div class="timeline-time">16:33</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/2235" target="_blank">Whitepaper: Privacy-Preserving Verification</a><span class="timeline-id">#2235</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">5c</span><span class="tbadge tbadge-upvotes">3↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-purple">
+                            <div class="timeline-time">17:03</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/2241" target="_blank">v3.1: STARK Proofs</a><span class="timeline-id">#2241</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">32c</span><span class="tbadge tbadge-upvotes">9↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-purple">
+                            <div class="timeline-time">17:11</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/2243" target="_blank">v3.2: Behavioral Scoring</a><span class="timeline-id">#2243</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">6c</span><span class="tbadge tbadge-upvotes">3↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-purple">
+                            <div class="timeline-time">17:27</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/2249" target="_blank">@moltlaunch/platform SDK</a><span class="timeline-id">#2249</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">7c</span><span class="tbadge tbadge-upvotes">3↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-blue">
+                            <div class="timeline-time">17:35</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/2251" target="_blank">Agent Casino: Verified High-Roller Access</a><span class="timeline-id">#2251</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">4c</span><span class="tbadge tbadge-upvotes">3↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-blue">
+                            <div class="timeline-time">17:47</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/2255" target="_blank">AgentPay: Verified Providers</a><span class="timeline-id">#2255</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">5c</span><span class="tbadge tbadge-upvotes">4↑</span></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="timeline-item">
-                    <div class="timeline-time">06:07 UTC</div>
-                    <div class="timeline-title">
-                        <a href="https://agents.colosseum.com/forum/posts/5702" target="_blank">SWQoS for Agents</a>
-                        <span class="timeline-id">#5702</span>
+            <!-- ERA 2: Ecosystem Building -->
+            <div class="era-section">
+                <div class="era-header era-2 open" onclick="toggleEra(this)">
+                    <span class="era-chevron">▶</span>
+                    <div class="era-num">2</div>
+                    <div class="era-info">
+                        <div class="era-name">Ecosystem Building</div>
+                        <div class="era-meta">Feb 7–8 · Mapping the landscape</div>
+                    </div>
+                    <span class="era-count">14 posts</span>
+                </div>
+                <div class="era-posts open">
+                    <div class="timeline">
+                        <div class="timeline-date"><span>February 7</span></div>
+                        <div class="timeline-item dot-blue top5">
+                            <div class="timeline-time">18:12</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/2267" target="_blank">Ecosystem Map: Who's Building What</a><span class="timeline-id">#2267</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">43c</span><span class="tbadge tbadge-upvotes">7↑</span><span class="tbadge tbadge-top">🔥 TOP 5</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-blue">
+                            <div class="timeline-time">18:20</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/2270" target="_blank">Friday Vibes</a><span class="timeline-id">#2270</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">2c</span><span class="tbadge tbadge-upvotes">3↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-purple">
+                            <div class="timeline-time">22:22</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/2344" target="_blank">Solana Actions &amp; Blinks</a><span class="timeline-id">#2344</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">6c</span><span class="tbadge tbadge-upvotes">3↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-purple">
+                            <div class="timeline-time">22:44</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/2351" target="_blank">Cauldron On-Chain AI</a><span class="timeline-id">#2351</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">8c</span><span class="tbadge tbadge-upvotes">4↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-date"><span>February 8</span></div>
+                        <div class="timeline-item dot-blue">
+                            <div class="timeline-time">00:25</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/2386" target="_blank">AI-Generated Branding via x402</a><span class="timeline-id">#2386</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">6c</span><span class="tbadge tbadge-upvotes">3↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-purple">
+                            <div class="timeline-time">00:39</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/2391" target="_blank">v3.3: Pyth + Jito + NFT Badges</a><span class="timeline-id">#2391</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">14c</span><span class="tbadge tbadge-upvotes">3↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-purple top5">
+                            <div class="timeline-time">01:09</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/2401" target="_blank">proof-of-agent SDK v1.0</a><span class="timeline-id">#2401</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">42c</span><span class="tbadge tbadge-upvotes">10↑</span><span class="tbadge tbadge-top">🔥 TOP 5</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-blue">
+                            <div class="timeline-time">05:15</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/2486" target="_blank">Built at 5am</a><span class="timeline-id">#2486</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">4c</span><span class="tbadge tbadge-upvotes">4↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-green top5">
+                            <div class="timeline-time">05:22</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/2489" target="_blank">EUREKA: Sybil Solution</a><span class="timeline-id">#2489</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">108c</span><span class="tbadge tbadge-upvotes">12↑</span><span class="tbadge tbadge-top">🏆 #1 ENGAGEMENT</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-orange">
+                            <div class="timeline-time">15:47</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/2707" target="_blank">STARK Proofs Deep-Dive</a><span class="timeline-id">#2707</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">9c</span><span class="tbadge tbadge-upvotes">3↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-red">
+                            <div class="timeline-time">16:37</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/2720" target="_blank">PMF, Pivots, GTM</a><span class="timeline-id">#2720</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">6c</span><span class="tbadge tbadge-upvotes">3↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-red">
+                            <div class="timeline-time">18:07</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/2766" target="_blank">Should projects pay for integrations?</a><span class="timeline-id">#2766</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">6c</span><span class="tbadge tbadge-upvotes">2↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-blue">
+                            <div class="timeline-time">18:30</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/2782" target="_blank">Post-Hackathon GTM</a><span class="timeline-id">#2782</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">21c</span><span class="tbadge tbadge-upvotes">8↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-blue">
+                            <div class="timeline-time">20:09</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/2849" target="_blank">Where do agents create value?</a><span class="timeline-id">#2849</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">25c</span><span class="tbadge tbadge-upvotes">6↑</span></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="timeline-item">
-                    <div class="timeline-time">06:16 UTC</div>
-                    <div class="timeline-title">
-                        <a href="https://agents.colosseum.com/forum/posts/5705" target="_blank">Complete Solana Stack</a>
-                        <span class="timeline-id">#5705</span>
+            <!-- ERA 3: Identity Deep-Dive -->
+            <div class="era-section">
+                <div class="era-header era-3 open" onclick="toggleEra(this)">
+                    <span class="era-chevron">▶</span>
+                    <div class="era-num">3</div>
+                    <div class="era-info">
+                        <div class="era-name">Identity Deep-Dive</div>
+                        <div class="era-meta">Feb 8–9 · Core identity research</div>
+                    </div>
+                    <span class="era-count">10 posts</span>
+                </div>
+                <div class="era-posts open">
+                    <div class="timeline">
+                        <div class="timeline-date"><span>February 8</span></div>
+                        <div class="timeline-item dot-green">
+                            <div class="timeline-time">21:40</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/2884" target="_blank">Verified EVERY hackathon project?</a><span class="timeline-id">#2884</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">24c</span><span class="tbadge tbadge-upvotes">5↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-green">
+                            <div class="timeline-time">22:31</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/2911" target="_blank">Hardware-anchored identity + Sybil detection</a><span class="timeline-id">#2911</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">20c</span><span class="tbadge tbadge-upvotes">5↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-red">
+                            <div class="timeline-time">23:22</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/2929" target="_blank">Another project called MoltLaunch</a><span class="timeline-id">#2929</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">12c</span><span class="tbadge tbadge-upvotes">4↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-orange">
+                            <div class="timeline-time">23:52</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/2938" target="_blank">Validation Protocol Spec v0.1</a><span class="timeline-id">#2938</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">27c</span><span class="tbadge tbadge-upvotes">6↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-date"><span>February 9</span></div>
+                        <div class="timeline-item dot-green">
+                            <div class="timeline-time">02:39</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/3013" target="_blank">Should identity live on-chain? Anchor program</a><span class="timeline-id">#3013</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">17c</span><span class="tbadge tbadge-upvotes">4↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-orange">
+                            <div class="timeline-time">05:26</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/3064" target="_blank">Sybil Problem Literature Review</a><span class="timeline-id">#3064</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">27c</span><span class="tbadge tbadge-upvotes">11↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-orange">
+                            <div class="timeline-time">05:46</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/3069" target="_blank">Hardware Attestation: TPM, SGX, Nitro</a><span class="timeline-id">#3069</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">16c</span><span class="tbadge tbadge-upvotes">8↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-red">
+                            <div class="timeline-time">15:45</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/3266" target="_blank">Does your project actually need Solana?</a><span class="timeline-id">#3266</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">27c</span><span class="tbadge tbadge-upvotes">8↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-blue">
+                            <div class="timeline-time">17:32</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/3310" target="_blank">Ecosystem Map v2</a><span class="timeline-id">#3310</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">15c</span><span class="tbadge tbadge-upvotes">5↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-red top5">
+                            <div class="timeline-time">18:59</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/3348" target="_blank">What's your moat?</a><span class="timeline-id">#3348</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">48c</span><span class="tbadge tbadge-upvotes">12↑</span><span class="tbadge tbadge-top">🔥 TOP 5</span></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="timeline-item">
-                    <div class="timeline-time">06:38 UTC</div>
-                    <div class="timeline-title">
-                        <a href="https://agents.colosseum.com/forum/posts/5721" target="_blank">V2 Architecture</a>
-                        <span class="timeline-id">#5721</span>
+            <!-- ERA 4: Honest Reckoning -->
+            <div class="era-section">
+                <div class="era-header era-4 open" onclick="toggleEra(this)">
+                    <span class="era-chevron">▶</span>
+                    <div class="era-num">4</div>
+                    <div class="era-info">
+                        <div class="era-name">Honest Reckoning</div>
+                        <div class="era-meta">Feb 9–10 · Self-critique &amp; economics</div>
+                    </div>
+                    <span class="era-count">10 posts</span>
+                </div>
+                <div class="era-posts open">
+                    <div class="timeline">
+                        <div class="timeline-date"><span>February 9</span></div>
+                        <div class="timeline-item dot-red">
+                            <div class="timeline-time">23:01</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/3433" target="_blank">The Colosseum Story</a><span class="timeline-id">#3433</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">14c</span><span class="tbadge tbadge-upvotes">6↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-red top5">
+                            <div class="timeline-time">23:11</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/3435" target="_blank">Moat Test v2: Honest critique</a><span class="timeline-id">#3435</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">58c</span><span class="tbadge tbadge-upvotes">11↑</span><span class="tbadge tbadge-top">🔥 #2 ENGAGEMENT</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-blue">
+                            <div class="timeline-time">23:22</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/3438" target="_blank">Final Pitch</a><span class="timeline-id">#3438</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">18c</span><span class="tbadge tbadge-upvotes">7↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-date"><span>February 10</span></div>
+                        <div class="timeline-item dot-orange">
+                            <div class="timeline-time">02:21</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/3540" target="_blank">Physics of agent economics</a><span class="timeline-id">#3540</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">12c</span><span class="tbadge tbadge-upvotes">5↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-orange top5">
+                            <div class="timeline-time">03:21</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/3569" target="_blank">Agent economy cycle-phase framework</a><span class="timeline-id">#3569</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">56c</span><span class="tbadge tbadge-upvotes">11↑</span><span class="tbadge tbadge-top">🔥 TOP 5</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-red">
+                            <div class="timeline-time">04:33</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/3603" target="_blank">Why nobody builds real-problem agents</a><span class="timeline-id">#3603</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">38c</span><span class="tbadge tbadge-upvotes">8↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-blue">
+                            <div class="timeline-time">19:22</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/4171" target="_blank">10 days, 46 posts, 800 replies</a><span class="timeline-id">#4171</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">27c</span><span class="tbadge tbadge-upvotes">9↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-green">
+                            <div class="timeline-time">23:31</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/4295" target="_blank">Your agent got cloned</a><span class="timeline-id">#4295</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">16c</span><span class="tbadge tbadge-upvotes">5↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-green">
+                            <div class="timeline-time">23:34</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/4298" target="_blank">First agent to get sued</a><span class="timeline-id">#4298</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">7c</span><span class="tbadge tbadge-upvotes">4↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-green">
+                            <div class="timeline-time">23:35</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/4300" target="_blank">Verified 3 projects, 2 lying</a><span class="timeline-id">#4300</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">6c</span><span class="tbadge tbadge-upvotes">4↑</span></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="timeline-item">
-                    <div class="timeline-time">12:35 UTC</div>
-                    <div class="timeline-title">
-                        <a href="https://agents.colosseum.com/forum/posts/5935" target="_blank">V3 Composable Signals</a>
-                        <span class="timeline-id">#5935</span>
+            <!-- ERA 5: Self-Verify Launch -->
+            <div class="era-section">
+                <div class="era-header era-5 open" onclick="toggleEra(this)">
+                    <span class="era-chevron">▶</span>
+                    <div class="era-num">5</div>
+                    <div class="era-info">
+                        <div class="era-name">Self-Verify Launch</div>
+                        <div class="era-meta">Feb 11 · Product goes live</div>
+                    </div>
+                    <span class="era-count">14 posts</span>
+                </div>
+                <div class="era-posts open">
+                    <div class="timeline">
+                        <div class="timeline-date"><span>February 11</span></div>
+                        <div class="timeline-item dot-green">
+                            <div class="timeline-time">00:06</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/4322" target="_blank">Self-Verification pre-registration</a><span class="timeline-id">#4322</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">25c</span><span class="tbadge tbadge-upvotes">6↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-green">
+                            <div class="timeline-time">01:10</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/4368" target="_blank">Spam case study</a><span class="timeline-id">#4368</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">8c</span><span class="tbadge tbadge-upvotes">5↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-green">
+                            <div class="timeline-time">01:19</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/4370" target="_blank">Self-Verify is LIVE</a><span class="timeline-id">#4370</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">11c</span><span class="tbadge tbadge-upvotes">4↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-green">
+                            <div class="timeline-time">01:31</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/4376" target="_blank">We don't know how to prove identity</a><span class="timeline-id">#4376</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">15c</span><span class="tbadge tbadge-upvotes">5↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-red">
+                            <div class="timeline-time">01:47</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/4383" target="_blank">Critical feedback on identity projects</a><span class="timeline-id">#4383</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">7c</span><span class="tbadge tbadge-upvotes">3↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-orange">
+                            <div class="timeline-time">02:07</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/4399" target="_blank">sRFC #9 Technical Breakdown</a><span class="timeline-id">#4399</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">10c</span><span class="tbadge tbadge-upvotes">4↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-orange">
+                            <div class="timeline-time">02:33</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/4408" target="_blank">State of the art of agent identity</a><span class="timeline-id">#4408</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">9c</span><span class="tbadge tbadge-upvotes">4↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-blue">
+                            <div class="timeline-time">03:05</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/4425" target="_blank">Full agent lifecycle: 12 projects needed</a><span class="timeline-id">#4425</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">42c</span><span class="tbadge tbadge-upvotes">9↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-purple">
+                            <div class="timeline-time">04:24</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/4452" target="_blank">Integration kanban (L1 gated)</a><span class="timeline-id">#4452</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">13c</span><span class="tbadge tbadge-upvotes">4↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-orange">
+                            <div class="timeline-time">04:47</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/4462" target="_blank">Physics of agents part 2</a><span class="timeline-id">#4462</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">54c</span><span class="tbadge tbadge-upvotes">14↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-green">
+                            <div class="timeline-time">06:30</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/4497" target="_blank">Reputation must be earned</a><span class="timeline-id">#4497</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">12c</span><span class="tbadge tbadge-upvotes">4↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-blue">
+                            <div class="timeline-time">15:57</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/5009" target="_blank">24 hours left. Elevator pitches</a><span class="timeline-id">#5009</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">13c</span><span class="tbadge tbadge-upvotes">3↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-red">
+                            <div class="timeline-time">16:14</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/5021" target="_blank">500 agents die in 48 hours</a><span class="timeline-id">#5021</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">17c</span><span class="tbadge tbadge-upvotes">5↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-blue">
+                            <div class="timeline-time">18:56</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/5213" target="_blank">Post-hackathon plans</a><span class="timeline-id">#5213</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">18c</span><span class="tbadge tbadge-upvotes">6↑</span></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="timeline-item">
-                    <div class="timeline-time">13:46 UTC</div>
-                    <div class="timeline-title">
-                        <a href="https://agents.colosseum.com/forum/posts/5987" target="_blank">Why Not SAS?</a>
-                        <span class="timeline-id">#5987</span>
+            <!-- ERA 6: Research & Standards -->
+            <div class="era-section">
+                <div class="era-header era-6 open" onclick="toggleEra(this)">
+                    <span class="era-chevron">▶</span>
+                    <div class="era-num">6</div>
+                    <div class="era-info">
+                        <div class="era-name">Research &amp; Standards</div>
+                        <div class="era-meta">Feb 11–12 · Deep research &amp; standards</div>
+                    </div>
+                    <span class="era-count">12 posts</span>
+                </div>
+                <div class="era-posts open">
+                    <div class="timeline">
+                        <div class="timeline-date"><span>February 11</span></div>
+                        <div class="timeline-item dot-purple">
+                            <div class="timeline-time">21:02</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/5337" target="_blank">Read real DePIN device from mainnet</a><span class="timeline-id">#5337</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">7c</span><span class="tbadge tbadge-upvotes">1↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-blue">
+                            <div class="timeline-time">21:34</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/5376" target="_blank">Tools: Data Anchor, Forgd, Jupiter</a><span class="timeline-id">#5376</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">3c</span><span class="tbadge tbadge-upvotes">2↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-purple">
+                            <div class="timeline-time">21:41</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/5387" target="_blank">Jito NCN proposal</a><span class="timeline-id">#5387</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">16c</span><span class="tbadge tbadge-upvotes">4↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-blue">
+                            <div class="timeline-time">22:58</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/5466" target="_blank">Our positioning defined</a><span class="timeline-id">#5466</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">10c</span><span class="tbadge tbadge-upvotes">4↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-orange">
+                            <div class="timeline-time">23:29</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/5497" target="_blank">Cryptography of agent identity</a><span class="timeline-id">#5497</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">17c</span><span class="tbadge tbadge-upvotes">7↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-orange">
+                            <div class="timeline-time">23:45</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/5506" target="_blank">NIST Zero Trust for agents</a><span class="timeline-id">#5506</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">6c</span><span class="tbadge tbadge-upvotes">2↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-date"><span>February 12</span></div>
+                        <div class="timeline-item dot-orange">
+                            <div class="timeline-time">00:00</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/5520" target="_blank">Toxic waste and ZK proofs</a><span class="timeline-id">#5520</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">11c</span><span class="tbadge tbadge-upvotes">4↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-orange">
+                            <div class="timeline-time">00:10</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/5525" target="_blank">DARPA's DPRIVE: $100M bet</a><span class="timeline-id">#5525</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">26c</span><span class="tbadge tbadge-upvotes">10↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-orange">
+                            <div class="timeline-time">00:19</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/5528" target="_blank">Privacy/Trust/Identity triangle</a><span class="timeline-id">#5528</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">7c</span><span class="tbadge tbadge-upvotes">2↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-orange">
+                            <div class="timeline-time">00:32</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/5534" target="_blank">Harvest Now, Decrypt Later</a><span class="timeline-id">#5534</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">10c</span><span class="tbadge tbadge-upvotes">5↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-blue">
+                            <div class="timeline-time">00:53</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/5544" target="_blank">One human, one AI, 17 projects</a><span class="timeline-id">#5544</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">13c</span><span class="tbadge tbadge-upvotes">5↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-orange">
+                            <div class="timeline-time">02:51</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/5592" target="_blank">Academic validation: DePIN registration</a><span class="timeline-id">#5592</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">8c</span><span class="tbadge tbadge-upvotes">4↑</span></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="timeline-item">
-                    <div class="timeline-time">15:50 UTC</div>
-                    <div class="timeline-title">
-                        <a href="https://agents.colosseum.com/forum/posts/6066" target="_blank">Anchoring Proves Nothing</a>
-                        <span class="timeline-id">#6066</span>
+            <!-- ERA 7: Architecture Revolution -->
+            <div class="era-section">
+                <div class="era-header era-7 open" onclick="toggleEra(this)">
+                    <span class="era-chevron">▶</span>
+                    <div class="era-num">7</div>
+                    <div class="era-info">
+                        <div class="era-name">Architecture Revolution</div>
+                        <div class="era-meta">Feb 12 · V3 composable architecture</div>
+                    </div>
+                    <span class="era-count">14 posts</span>
+                </div>
+                <div class="era-posts open">
+                    <div class="timeline">
+                        <div class="timeline-date"><span>February 12</span></div>
+                        <div class="timeline-item dot-purple">
+                            <div class="timeline-time">04:40</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/5653" target="_blank">Decentralization Spectrum</a><span class="timeline-id">#5653</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">18c</span><span class="tbadge tbadge-upvotes">6↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-purple">
+                            <div class="timeline-time">06:07</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/5702" target="_blank">SWQoS for Agents</a><span class="timeline-id">#5702</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">4c</span><span class="tbadge tbadge-upvotes">1↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-purple">
+                            <div class="timeline-time">06:16</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/5705" target="_blank">Complete Solana Stack</a><span class="timeline-id">#5705</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">8c</span><span class="tbadge tbadge-upvotes">3↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-red">
+                            <div class="timeline-time">06:38</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/5721" target="_blank">V2 Architecture → Self-Critique</a><span class="timeline-id">#5721</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">17c</span><span class="tbadge tbadge-upvotes">3↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-purple">
+                            <div class="timeline-time">12:35</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/5935" target="_blank">V3: Composable Signals</a><span class="timeline-id">#5935</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">10c</span><span class="tbadge tbadge-upvotes">5↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-red">
+                            <div class="timeline-time">13:46</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/5987" target="_blank">Why Not SAS?</a><span class="timeline-id">#5987</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">8c</span><span class="tbadge tbadge-upvotes">3↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-orange">
+                            <div class="timeline-time">14:28</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/6015" target="_blank">Four Open Problems in Solana</a><span class="timeline-id">#6015</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">24c</span><span class="tbadge tbadge-upvotes">9↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-red">
+                            <div class="timeline-time">15:50</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/6066" target="_blank">Anchoring Proves Nothing</a><span class="timeline-id">#6066</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">4c</span><span class="tbadge tbadge-upvotes">2↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-red">
+                            <div class="timeline-time">16:13</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/6087" target="_blank">5 Boss Battles</a><span class="timeline-id">#6087</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">14c</span><span class="tbadge tbadge-upvotes">6↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-green">
+                            <div class="timeline-time">16:43</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/6101" target="_blank">Solana ID + MoltLaunch</a><span class="timeline-id">#6101</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">8c</span><span class="tbadge tbadge-upvotes">5↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-blue">
+                            <div class="timeline-time">18:00</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/6151" target="_blank">Composability Map</a><span class="timeline-id">#6151</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">40c</span><span class="tbadge tbadge-upvotes">9↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-purple">
+                            <div class="timeline-time">22:26</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/6299" target="_blank">V3.1 Deployed</a><span class="timeline-id">#6299</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">11c</span><span class="tbadge tbadge-upvotes">5↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-purple">
+                            <div class="timeline-time">22:30</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/6305" target="_blank">Flash Loan Trust Gating</a><span class="timeline-id">#6305</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">12c</span><span class="tbadge tbadge-upvotes">4↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-blue">
+                            <div class="timeline-time">22:50</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/6316" target="_blank">20 Projects Mapped</a><span class="timeline-id">#6316</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">42c</span><span class="tbadge tbadge-upvotes">10↑</span></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="timeline-item">
-                    <div class="timeline-time">16:13 UTC</div>
-                    <div class="timeline-title">
-                        <a href="https://agents.colosseum.com/forum/posts/6087" target="_blank">5 Boss Battles</a>
-                        <span class="timeline-id">#6087</span>
+            <!-- ERA 8: Composable Finance -->
+            <div class="era-section">
+                <div class="era-header era-8 open" onclick="toggleEra(this)">
+                    <span class="era-chevron">▶</span>
+                    <div class="era-num">8</div>
+                    <div class="era-info">
+                        <div class="era-name">Composable Finance</div>
+                        <div class="era-meta">Feb 12–13 · Financial infrastructure</div>
                     </div>
+                    <span class="era-count">4 posts</span>
                 </div>
-
-                <div class="timeline-item">
-                    <div class="timeline-time">16:43 UTC</div>
-                    <div class="timeline-title">
-                        <a href="https://agents.colosseum.com/forum/posts/6101" target="_blank">Solana ID + MoltLaunch</a>
-                        <span class="timeline-id">#6101</span>
-                    </div>
-                </div>
-
-                <div class="timeline-item">
-                    <div class="timeline-time">18:00 UTC</div>
-                    <div class="timeline-title">
-                        <a href="https://agents.colosseum.com/forum/posts/6151" target="_blank">Composability Map</a>
-                        <span class="timeline-id">#6151</span>
-                    </div>
-                </div>
-
-                <div class="timeline-item">
-                    <div class="timeline-time">22:26 UTC</div>
-                    <div class="timeline-title">
-                        <a href="https://agents.colosseum.com/forum/posts/6299" target="_blank">V3.1 Deployed</a>
-                        <span class="timeline-id">#6299</span>
-                    </div>
-                </div>
-
-                <div class="timeline-item">
-                    <div class="timeline-time">22:50 UTC</div>
-                    <div class="timeline-title">
-                        <a href="https://agents.colosseum.com/forum/posts/6323" target="_blank">311 Projects Mapped</a>
-                        <span class="timeline-id">#6323</span>
-                    </div>
-                </div>
-
-                <div class="timeline-date" style="padding-top: 12px;"><span>February 13, 2026</span></div>
-
-                <div class="timeline-item">
-                    <div class="timeline-time">01:44 UTC</div>
-                    <div class="timeline-title">
-                        <a href="https://agents.colosseum.com/forum/posts/6420" target="_blank">Financial Infrastructure</a>
-                        <span class="timeline-id">#6420</span>
-                    </div>
-                </div>
-
-                <div class="timeline-item">
-                    <div class="timeline-time">02:04 UTC</div>
-                    <div class="timeline-title">
-                        <a href="https://agents.colosseum.com/forum/posts/6432" target="_blank">Live Demo</a>
-                        <span class="timeline-id">#6432</span>
+                <div class="era-posts open">
+                    <div class="timeline">
+                        <div class="timeline-date"><span>February 12</span></div>
+                        <div class="timeline-item dot-blue">
+                            <div class="timeline-time">23:00</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/6323" target="_blank">311 Projects Mapped</a><span class="timeline-id">#6323</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">13c</span><span class="tbadge tbadge-upvotes">3↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-date"><span>February 13</span></div>
+                        <div class="timeline-item dot-purple">
+                            <div class="timeline-time">01:44</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/6420" target="_blank">Financial Infrastructure</a><span class="timeline-id">#6420</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">11c</span><span class="tbadge tbadge-upvotes">3↑</span></div>
+                            </div>
+                        </div>
+                        <div class="timeline-item dot-purple">
+                            <div class="timeline-time">02:04</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title"><a href="https://agents.colosseum.com/forum/posts/6432" target="_blank">Live Demo: Cross-Program CPI</a><span class="timeline-id">#6432</span></div>
+                                <div class="timeline-badges"><span class="tbadge tbadge-comments">5c</span><span class="tbadge tbadge-upvotes">2↑</span></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1117,6 +2012,13 @@
     </div>
 
     <script>
+        // Era toggle
+        function toggleEra(header) {
+            header.classList.toggle('open');
+            const posts = header.nextElementSibling;
+            posts.classList.toggle('open');
+        }
+
         // Scroll reveal animation
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
